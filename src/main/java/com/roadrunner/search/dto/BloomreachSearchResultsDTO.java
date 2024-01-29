@@ -16,8 +16,7 @@ public class BloomreachSearchResultsDTO {
 
 	long totalSearchCount;
 
-//	@Expose
-//	BrandCategoriesResponse brand;
+	BrandCategoriesResponse brand;
 
 	String redirectUrl;
 

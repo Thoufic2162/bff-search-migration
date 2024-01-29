@@ -169,5 +169,29 @@ public class SearchConstants {
 	public static final String HEADER_CONTENT = "headerContent";
 	public static final String PAGE_TITLE = "pageTitle";
 	public static final String SEO_FOOTER = "seoFooter";
-
+	public static final String HOKA = "hoka";
+	public static final String REFERENCE = "referer";
+	public static final String MEMBERSHIPLEVEL = "membershipLevel";
+	public static final String VIP2 = "VIP2";
+	public static final String VIP3 = "VIP3";
+	public static final String NON_VIP_EXCEPT_HOKA = "non_vip_except_hoka";
+	public static final String FIRST_TIME_VISITOR_WITH_HOKA = "first_time_visitor_with_hoka";
+	public static final String FIRST_TIME_VISITOR_EXCEPT_HOKA = "first_time_visitor_except_hoka";
+	public static final String RETURNING_NONVIP_WITH_HOKA = "returning_nonvip_with_hoka";
+	public static final String RETURNING_NONVIP_EXCEPT_HOKA = "returning_nonvip_except_hoka";
+	public static final String HAS_HOKA_PAGE = "hasHokaPage";
+	public static final String LARGE_BRAND = "L";
+	public static final String UNDERSCORE = "_";
+	public static final Object APPAREL = "apparel";
+	public static final String HOKA_ONE = "hoka-one-one";
+	public static final String RRS_IMAGE = "https://roadrunnersports.scene7.com";
+	public static final String SCENE7_IMAGE = "http://s7ondemand1.scene7.com";
+	public static final String CENTER = "center";
+	public static final String MEDIUM = "medium";
+	public static final String MEDIUM_BRAND = "M";
+	public static final String IMAGE_JPEG = "image/jpeg";
+	public static final String BRAND_CATEGORIES = " Brand Categories";
+	public static final String ALL = "All ";
+	public static final String SHOP_ALL = "SHOP ALL";
+	public static final String BRAND_WITH_SPACE = " Brand ";
 }

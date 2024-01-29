@@ -2,11 +2,13 @@ package com.roadrunner.search.helper.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -16,7 +18,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.roadrunner.search.config.BloomreachConfiguration;
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
@@ -25,14 +26,15 @@ import com.roadrunner.search.dto.BRSearchBaseDTO;
 import com.roadrunner.search.dto.BloomreachSearchRefinementsDTO;
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
+import com.roadrunner.search.dto.BrandCategoriesResponse;
 import com.roadrunner.search.dto.CatalogElementsFinder;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.helper.BloomreachSearchDTOHelper;
 import com.roadrunner.search.helper.SearchHelper;
-import com.roadrunner.search.repo.SeoContentRepository;
 import com.roadrunner.search.tools.BloomreachBreadcrumSearchResults;
 import com.roadrunner.search.tools.BloomreachProductSearchResults;
 import com.roadrunner.search.tools.BloomreachRefinementSearchResults;
+import com.roadrunner.search.tools.BrandCategoryTool;
 import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.HttpUtil;
 import com.roadrunner.search.util.URLCoderUtil;
@@ -94,6 +96,9 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 
 	@Autowired
 	private BloomreachBreadcrumSearchResults bloomreachBreadcrumSearchResults;
+
+	@Autowired
+	private BrandCategoryTool brandCategoryTool;
 
 	@Override
 	public BloomreachSearchResultsDTO getSearchResults(String qUri, HttpServletRequest request) {
@@ -326,6 +331,29 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			populateSeoContentData(qUri, bloomreachResults);
 		}
 
+		if (null != qUri && qUri.contains(SearchConstants.BRAND_TYPE_AHEAD_URL)) {
+			String qUriString = qUri.toString();
+			String separator = SearchConstants.SLASH;
+			int indexOfSeparator = qUriString.lastIndexOf(separator);
+			String brandname = qUriString.substring(indexOfSeparator + 1);
+
+			brandname = getCatalogElementsFinder().getQueryMap().containsKey(brandname)
+					? getCatalogElementsFinder().getQueryMap().get(brandname)
+					: Arrays.stream(brandname.split(BloomreachConstants.HYPHEN))
+							.map(s -> WordUtils.capitalizeFully(s, BloomreachConstants.SINGLE_QUOTES_SPACE,
+									BloomreachConstants.SINGLE_QUOTES_HYPHEN))
+							.collect(Collectors.joining(BloomreachConstants.PLUS));
+			BrandCategoriesResponse brandCat = brandCategoryTool
+					.getBrandData(brandname.replace(SearchConstants.PLUS, SearchConstants.SPACE));
+			if (brandCat != null && brandCat.getBrandCategories() != null && !brandCat.getBrandCategories().isEmpty()) {
+				bloomreachResults.setBrand(brandCat);
+			}
+		}
+
+		if (bloomreachResults.getBrand() != null
+				&& bloomreachResults.getBrand().getBrandType().equals(BloomreachConstants.LARGE)) {
+			return bloomreachResults;
+		}
 		if (!(giftGuideUrlDisableRefinement.contains(qUri))) {
 			bloomreachRefinementSearchResults.getRefinementSearchResults(searchResults, request, bloomreachResults);
 		}

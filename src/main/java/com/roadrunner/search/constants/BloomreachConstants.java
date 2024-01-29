@@ -159,5 +159,7 @@ public class BloomreachConstants {
 	public static final String PARAMETER_S = "s=";
 	public static final String PARAMETER_R_WITH_COMMA = "r=,";
 	public static final String BRAND_PARAMETER = "brand:";
+	public static final String LARGE = "L";
+	public static final String WOMENS = "Women's";
 
 }

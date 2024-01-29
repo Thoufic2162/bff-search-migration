@@ -21,6 +21,7 @@ import com.roadrunner.search.dto.ColorSkusDTO;
 import com.roadrunner.search.dto.PriceDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.dto.Variants;
+import com.roadrunner.search.helper.CookieHelper;
 import com.roadrunner.search.helper.ProductPriceHelper;
 import com.roadrunner.search.helper.ProductSkuHelper;
 import com.roadrunner.search.service.BloomreachSearchService;
@@ -56,6 +57,9 @@ public class BloomreachProductSearchResults {
 
 	@Autowired
 	private ProductSkuHelper productSkuHelper;
+
+	@Autowired
+	private CookieHelper cookieHelper;
 
 	public void getProductResults(BloomreachSearchResponseDTO searchResult, HttpServletRequest request,
 			BloomreachSearchResultsDTO responseBean) {
@@ -286,6 +290,7 @@ public class BloomreachProductSearchResults {
 					}
 				}
 			}
+			cookieHelper.addCookies(request, searchProductList, responseBean);
 		}
 		if (null != searchResult && null != searchResult.getMetadata()) {
 			responseBean.setMetaData(searchResult.getMetadata());
