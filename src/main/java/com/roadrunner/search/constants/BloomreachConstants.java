@@ -1,0 +1,163 @@
+package com.roadrunner.search.constants;
+
+public class BloomreachConstants {
+	public interface QPARAMS {
+		String QUERY = "Query";
+		String S = "s";
+		String P = "p";
+		String SKIP = "skip";
+		String SZ = "z";
+		String SZ_PARAM_STR = "z=";
+		String R = "r";
+	}
+
+	public interface SKU_FIELD {
+		String SALE_PRICE = "sale_price";
+		String VIP_PRICE = "vip_price";
+		String VARIANTS_COLOR_GROUP = "variants.colorGroup";
+		String VARIANTS_SHOE_SIZE = "variants.Shoe_Size";
+
+	}
+
+	public interface PRODUCT_FIELD {
+		String CATAGORY_QR = "catagory_qr";
+		String BRAND = "brand";
+		String GENDER_TEXT = "gender_text";
+		String KIDS_GENDER = "kids_gender";
+
+	}
+
+	public static final String REGEX = "[{0}]";
+	public static final String EMPTY_STRING = "";
+	public static final String EQUAL = "=";
+	public static final String PLUS = "+";
+	public static final String URL_DELIMETER = "&";
+	public static final String PERCENTAGE_2B = "%2B";
+	public static final String PERCENTAGE_20 = "%20";
+	public static final String PERCENTAGE_26 = "%26";
+	public static final String PERCENTAGE_3A = "%3A";
+	public static final String PERCENTAGE_2C = "%2C";
+	public static final String PERCENTAGE_2F = "%2F";
+	public static final String PERCENTAGE_2C2C = "%2C%2C";
+	public static final String PERCENTAGE_27 = "%27";
+	public static final String SEARCH_REDIRECT_URL = "isSearchRedirectURL";
+	public static final String HYPHEN = "-";
+	public static final String URL_SLASH = "://";
+	public static final String BR_SEO_CATEGORY_ITEM = "scri";
+	public static final String SHOE_SIZE_PARAM = "shoeSize";
+	public static final String CLEAR_FILTER_URL = "clearfilterUrl";
+	public static final String OUTLET_BASEMENT_URL = "/basement/outlet";
+	public static final String OUTLET_BASEMENT_ORDER_URL = "/outlet/basement";
+	public static final String IS_GENDER = "isGender";
+	public static final String URL_KIDS_TYPE = "urlKidsType";
+	public static final String R_EQUAL = "r=";
+	public static final String GENDER = "gender";
+	public static final char SINGLE_QUOTES_HYPHEN = '-';
+	public static final char SINGLE_QUOTES_SPACE = ' ';
+	public static final String BR_QUERY_PARAM_DYNAMIC_URL_REFINMENT = "brqueryParamDynamicUrlRefinment";
+	public static final String R_QUERY = "r_query";
+	public static final String START_COUNT = "0";
+	public static final String KIDS_GENDER_TEXT = "fq=gender_text:\"Kids\"";
+	public static final String ENABLE_IN_PRODUCT_CUSTOM_SEARCH = "fq=disableInProductSearch:\"1\" or disableInProductSearch:\"0\"";
+	public static final String PARAMETER_Q = "q=";
+	public static final String APPAREL_SIZE = "apparelSize";
+	public static final String UID = "uid";
+	public static final String ACCOUNT_ID = "account_id";
+	public static final String AUTH_KEY = "auth_key";
+	public static final String DOMAIN_KEY = "domain_key";
+	public static final String FL = "fl";
+	public static final String COMMA = ",";
+	public static final String URL = "url";
+	public static final String REF_URL = "ref_url";
+	public static final String SEARCH_TYPE = "search_type";
+	public static final String REQUEST_TYPE = "request_type";
+	public static final String SORT = "sort";
+	public static final String START = "start";
+	public static final String UID_PARAM = "_br_uid_2";
+	public static final String ROWS = "rows";
+	public static final String ROWS_COUNT = "48";
+	public static final String WALKING_STRING = "walking";
+	public static final String CAT_RUNNING = "webSubPgc:Running";
+	public static final String COLON_WITH_QUOTES = ":\"";
+	public static final String QUOTES_WITH_FQ = "\"&fq=";
+	public static final String PARAMETER_Q_WITHOUT_STAR = "&q=";
+	public static final String PARAMETER_Q_WITH_STAR = "&q=*";
+	public static final String PARAMETER_FQ = "fq=";
+	public static final String QUOTES = "\"";
+	public static final String Q = "q";
+	public static final String UTF_8 = "UTF-8";
+	public static final String VIP_EXCLUSIVE = "VIP Exclusive";
+	public static final String DOLLER = "$";
+	public static final String EMPTY_EMBED_ID = "\",\"";
+	public static final String NOT_ON_SALE = "Not on Sale";
+	public static final String DROPSHIP_QUERY = "dropship";
+	public static final String RRS_SALE = "sale";
+	public static final String ON_SALE = "On Sale";
+	public static final String CAT_WALKING_AND_RUNNING = "webSubPgc:Walking,webSubPgc:Running";
+	public static final String WALKING_SHOES_STRING = "walking shoes";
+	public static final String BRAND_PAGE_NAME = "brandPageName";
+	public static final String GENDER_TEXT = "gender_text:";
+	public static final String OPEN_BRACKET = "(";
+	public static final String CLOSE_BRACKER = ")";
+	public static final String PERCENTAGE_28 = "%28";
+	public static final String PERCENTAGE_29 = "%29";
+	public static final String OUTLET_STRING = "Outlet Outlet";
+	public static final String LIST_PAGE = "listpage";
+	public static final String KIDS_GENDER = "Kids Gender";
+	public static final String GENDER_FACET = "Gender";
+	public static final String BRAND = "Brand";
+	public static final String CATEGORIES = "Categories";
+	public static final String ACCESSORY_TYPE = "Accessory Type";
+	public static final String APPAREL_TYPE = "Apparel Type";
+	public static final String CUSTOMER_RATING = "Customer Rating";
+	public static final String SHOE_TYPE = "Shoe Type";
+	public static final String SHOE_WIDTH = "Shoe Width";
+	public static final String SHOE_SIZE = "Shoe Size";
+	public static final String CATEGORY = "Category";
+	public static final String AGE_GROUP = "Age Group";
+	public static final String SOCK_THICKNESS = "Sock Thickness";
+	public static final String SOCK_LENGTH = "Sock Length";
+	public static final String SPORTS = "Sports";
+	public static final String SIZE = "Size";
+	public static final String PRICE = "Price";
+	public static final String COLOR = "Color";
+	public static final String SHOE_CUSHION_LEVELS = "Shoe Cushion Levels";
+	public static final String NEW_ARRIVALS = "New Arrivals";
+	public static final String SALE = "Sale";
+	public static final String EXCLUSIVE = "Exclusive";
+	public static final String OUTLET_BASEMENT = "Outlet Basement";
+	public static final String INJURY_RECOVERY = "Injury Recovery";
+	public static final String INJURY_PLACEMENT = "Injury Placement";
+	public static final String OUTLET = "Outlet";
+	public static final String SINGLE_QUOTES = "'";
+	public static final String OUTLET_PARAM = "/outlet";
+	public static final String HYPHEN_WITH_SPACE = " - ";
+	public static final String STRING_OVER = "Over";
+	public static final String START_UP = " stars & up";
+	public static final String ZERO = "0";
+	public static final String STRING_PLUS = "\\+";
+	public static final String PERCENTAGE_2526 = "%2526";
+	public static final String PERCENTAGE_2528 = "%2528";
+	public static final String PERCENTAGE_2529 = "%2529";
+	public static final String SQUARE_BRACKET_OPEN = "[";
+	public static final String SQUARE_BRACKET_CLOSE = "]";
+	public static final String PERCENTAGE_5B = "%5B";
+	public static final String PERCENTAGE_5D = "%5D";
+	public static final String PLUS_WITH_BRACKET = "\\+\\(";
+	public static final String PERCENTAGE_WITH_BRACKET = "%20(";
+	public static final String KDSBNR = "kdsbnr";
+	public static final String URL_START_DELIMETER = "?";
+	public static final String ACTIVE = "active";
+	public static final String INACTIVE = "inactive";
+	public static final String PARAMETER_R_WITH2C = "r=%2C";
+	public static final String TO_STRING = "TO";
+	public static final String REMOVE_SIZE_REGEX_1 = "\\b\\s*";
+	public static final String REMOVE_SIZE_REGEX_2 = "\\s*\\b";
+	public static final String WEBPGC = "webPgc:";
+	public static final String SHOES = "Shoes";
+	public static final String PAGE_ROW = "p=48";
+	public static final String PARAMETER_S = "s=";
+	public static final String PARAMETER_R_WITH_COMMA = "r=,";
+	public static final String BRAND_PARAMETER = "brand:";
+
+}
