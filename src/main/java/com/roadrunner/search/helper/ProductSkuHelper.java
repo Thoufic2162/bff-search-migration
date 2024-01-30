@@ -17,4 +17,6 @@ public interface ProductSkuHelper {
 
 	boolean rearrangeDefaultColor(HttpServletRequest request, RecommendationProductDTO searchProductDTO, BRDoc result);
 
+	String getSkuImage(String identifier);
+
 }

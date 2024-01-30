@@ -1,6 +1,7 @@
 package com.roadrunner.search.service.impl;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -113,6 +114,33 @@ public class BloomreachSearchServiceImpl implements BloomreachSearchService {
 			log.debug("BloomreachServiceImpl::populateBloomreachResponse..END");
 		}
 		return bloomreachSearchResponseDTO;
+	}
+
+	@Override
+	public String bloomreachApiCall(String url) {
+		log.debug("BloomreachServiceImpl::bloomreachApiCall START url{}", url);
+		URI urls = null;
+		try {
+			urls = new URI(url);
+		} catch (URISyntaxException uriSyntaxException) {
+			log.error("BloomreachServiceImpl::bloomreachApiCall Exception url{} exception={}", url, uriSyntaxException);
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		String responseJson = null;
+		try {
+			ResponseEntity<String> response = restTemplate.exchange(urls, HttpMethod.GET, entity, String.class);
+			if (response != null && response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+				responseJson = response.getBody();
+			}
+		} catch (HttpClientErrorException ex) {
+			log.error("BloomreachServiceImpl::bloomreachApiCall HttpClientErrorException :: url : {} exception={}", url,
+					ex);
+		}
+		log.debug("BloomreachServiceImpl::bloomreachApiCall END responseJson{}", responseJson);
+		return responseJson;
 	}
 
 }

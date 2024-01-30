@@ -15,4 +15,8 @@ public interface CookieHelper {
 	void addCookies(HttpServletRequest request, List<RecommendationProductDTO> searchProductList,
 			BloomreachSearchResultsDTO responseBean);
 
+	void hasHokaPage(boolean isHoka);
+
+	void nonVipExceptHokaCookie(boolean isExceptHoka, HttpServletRequest request);
+
 }

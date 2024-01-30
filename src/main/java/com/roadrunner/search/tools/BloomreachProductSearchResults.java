@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
@@ -66,6 +68,9 @@ public class BloomreachProductSearchResults {
 		log.debug(
 				"BloomreachProductsearchResults :: getProductResults() :: START searchResult {} responseBean {} request {}",
 				searchResult, responseBean, request);
+		if (request == null) {
+			request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		}
 		List<RecommendationProductDTO> searchProductList = new ArrayList<>();
 		if (searchResult != null && null != searchResult.getResponse()) {
 			List<BRDoc> results = searchResult.getResponse().getDocs();

@@ -20,11 +20,16 @@ public class BloomreachConstants {
 	}
 
 	public interface PRODUCT_FIELD {
+		String PRODUCT_ID = "product_id";
 		String CATAGORY_QR = "catagory_qr";
 		String BRAND = "brand";
 		String GENDER_TEXT = "gender_text";
 		String KIDS_GENDER = "kids_gender";
-
+		String WEB_PGC = "webPgc";
+		String OUTLET = "outlet";
+		String RANKING = "ranking";
+		String WEB_SUB_PGC = "webSubPgc";
+		String GENDER = "gender";
 	}
 
 	public static final String REGEX = "[{0}]";
@@ -161,5 +166,33 @@ public class BloomreachConstants {
 	public static final String BRAND_PARAMETER = "brand:";
 	public static final String LARGE = "L";
 	public static final String WOMENS = "Women's";
+	public static final String USER_ID = "user_id";
+	public static final String BEST_SELLER_TITLE = "BEST SELLER";
+	public static final String RECENTLY_VIEWED_PRODUCTS_TITLE = "RECENTLY VIEWED PRODUCTS";
+	public static final String RECENTLY_VIEWED_PRODUCTS = "recentlyViewedProducts";
+	public static final String RECOMMENDATION_METHOD = "recommendation_method";
+	public static final String BEST_SELLER = "bestSeller";
+	public static final String OUTFIT_YOUR_RUN = "outfitYourRun";
+	public static final String BEST_SELLER_SORT = "best_seller+desc";
+	public static final String FIELDS = "fields";
+	public static final String ITEM_IDS = "item_ids";
+	public static final String APPAREL = "Apparel";
+	public static final String TOP_PICKS_FOR_YOU = "topPicksForYou";
+	public static final String CAT_ID = "cat_id";
+	public static final String IS_GIFTCARD = "isGiftCard";
+	public static final String AND = "and";
+	public static final String UNISEX_PARAM = "\"Unisex\"";
+	public static final String FILTER_FACET = "filter_facet";
+	public static final String YOU_MAY_ALSO_LIKE = "youMayAlsoLike";
+	public static final String WEBSUBPGC = "webSubPgc:";
+	public static final String BRAND_KORSA = "\"Korsa\"";
+	public static final String RRS = "\"RRS\"";
+	public static final String MEMBERSHIP_LEVEL = "membershipLevel";
+	public static final String RAC100 = "RAC100";
+	public static final String RAC55 = "RAC55";
+	public static final String RAC150 = "RAC150";
+	public static final String NUTRITION = "Nutrition";
+	public static final String YOU_MAY_ALSO_LIKE_OUTLET = "youMayAlsoLikeOutlet";
+	public static final String OUTFIT_YOUR_RUN_OUTLET = "outfitYourRunOutlet";
 
 }

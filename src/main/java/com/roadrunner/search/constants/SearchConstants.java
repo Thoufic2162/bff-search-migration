@@ -182,7 +182,7 @@ public class SearchConstants {
 	public static final String HAS_HOKA_PAGE = "hasHokaPage";
 	public static final String LARGE_BRAND = "L";
 	public static final String UNDERSCORE = "_";
-	public static final Object APPAREL = "apparel";
+	public static final String APPAREL = "apparel";
 	public static final String HOKA_ONE = "hoka-one-one";
 	public static final String RRS_IMAGE = "https://roadrunnersports.scene7.com";
 	public static final String SCENE7_IMAGE = "http://s7ondemand1.scene7.com";
@@ -194,4 +194,19 @@ public class SearchConstants {
 	public static final String ALL = "All ";
 	public static final String SHOP_ALL = "SHOP ALL";
 	public static final String BRAND_WITH_SPACE = " Brand ";
+	public static final String RANKING = "99999";
+	public static final String NEW_TO_OUTLET_PRODUCTS_TITLE = "NEW TO OUTLET";
+	public static final String NO_RESULT_PAGE = "noResultPage";
+	public static final String PAGE = "page";
+	public static final String WEB_PGC_CODE_PARAM = "webPgc";
+	public static final String IS_APPAREL = "isApparel";
+	public static final String MINUS = "-";
+	public static final String RRS = "RRS";
+	public static final String UP_SELL_PRODUCTS_TITLE = "YOU MAY ALSO LIKE";
+	public static final String HOKA_UPPERCASE = "HOKA";
+	public static final String BLACK = "black";
+	public static final String HOKA_ONE_ONE = "HOKA ONE ONE";
+	public static final String ISWEAROMETER = "isWearometer";
+	public static final String CART_PAGE = "cart";
+
 }

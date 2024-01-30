@@ -68,6 +68,7 @@ public class CookieHelperImpl implements CookieHelper {
 		log.debug("CookieHelperImpl :: addCookies() :: END :: responseBean {}", responseBean);
 	}
 
+	@Override
 	public void hasHokaPage(boolean isHoka) {
 		HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getResponse();
@@ -82,6 +83,7 @@ public class CookieHelperImpl implements CookieHelper {
 		}
 	}
 
+	@Override
 	public void nonVipExceptHokaCookie(boolean isExceptHoka, HttpServletRequest request) {
 		HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getResponse();

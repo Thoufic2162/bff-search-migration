@@ -52,4 +52,13 @@ public class StringUtil {
 		return res;
 	}
 
+	public static String getStringFromObject(Object value) {
+		String res = SearchConstants.EMPTY_STRING;
+		if (value == null) {
+			return res;
+		}
+		res = value.toString();
+		return res;
+	}
+
 }

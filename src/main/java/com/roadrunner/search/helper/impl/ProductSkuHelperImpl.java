@@ -268,6 +268,7 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 		return !StringUtils.isEmpty(color) || !StringUtils.isEmpty(flavor);
 	}
 
+	@Override
 	public String getSkuImage(String identifier) {
 		String imageUrlConstructed = "http://s7ondemand1.scene7.com/is/image/roadrunnersports/" + identifier
 				+ "?$productListRRS$";

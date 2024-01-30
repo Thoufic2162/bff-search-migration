@@ -8,6 +8,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
+import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.service.SearchService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,14 @@ public class SearchController {
 		BloomreachSearchResultsDTO response = searchService.restProductSearch(qUri, request);
 		log.info("SearchController::restProductSearch::ENDED");
 		return response;
+	}
+
+	@GetMapping("/v1/related-products")
+	public RelatedProductResponseDTO getRelatedProducts(String productId) {
+		log.info("SearchController::getRelatedProducts::START{} productId={}", productId);
+		RelatedProductResponseDTO relatedProducts = searchService.getRelatedProducts(productId);
+		log.info("SearchController::getRelatedProducts::ENDED");
+		return relatedProducts;
 	}
 
 }

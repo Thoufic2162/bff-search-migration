@@ -19,7 +19,11 @@ public class RRConfiguration {
 	public String topPickSockProduct;
 	public boolean enableWidenImage;
 	public boolean enableAltImagesInPlp;
-    public boolean enableSearchToCategoryUrl;
-    public boolean enablePLPBanner;
+	public boolean enableSearchToCategoryUrl;
+	public boolean enablePLPBanner;
+	public boolean enableBloomreachSearch;
+	public boolean enablePathwayRecommendation;
+	public String RRSDefaultPriceListId;
+	public String RRSSalePriceListId;
 
 }

@@ -22,7 +22,20 @@ bloomreachconfig:
   requestType: search
   searchType: keyword
   catagorytype: category
-
+  refUrl: https://uat.roadrunnersports.com
+  pathWayUrl: https://pathways-staging.dxpapi.com/api/v2/widgets/item/{0}?{1}
+  recommendationId:
+   topPicksForYou: rj0d53l6
+   outfitYourRun: 6j83xqlz
+   youMayAlsoLike: 6j83xqlz
+   topPicksForYouOutlet: nj3w4e9r
+   outfitYourRunOutlet: kjy7gqjv
+   youMayAlsoLikeOutlet: kjy7gqjv
+   bestSeller: 4leqddl2
+   recentlyViewedProducts: rj0z0n96
+  fields: latest_version_pid,disableInProductSearch,embed_id,Apparel_Size,Shoe_Size,accessory_type,apparel_type,availability,bra_activity_level,bra_compression,bra_molded_cups,bra_seamless,bra_support_level,bra_type,bra_underwire,casual_style,classic,color,colorGroup,country_of_origin,creation_date,cup_size,customer_rating,default_color,display_name,drop_ship,exclusive,extended_drop_ship,features_benefits,fit_category,fit_size,flavorGroup,flavor_value,gender_code,gender_text,has_video,injury_placement,injury_recovery,inseam,keywords,kids_size,kids_type,long_description,map_price,map_sale_price,newProduct,outlet,outlet_basement,pgc_code,pid,price,price_range,quantity_on_hand,rac_price,racc_price,ranking,ref_color_code,reg_price,reg_price,sale,sale_price,sale_price,sale_price_range,sandal_type,shoe_cushion,shoe_height,shoe_type,sku_color,sku_ids,sku_price,sku_sale_price,sku_swatch_images,sku_thumb_images,sock_length,sock_thickness,sports,stock_level,sub_category,taxable,thumb_image,title,total_sales,training_type,umap_hide_vip,umap_price,url,vip_price,vip_price,webPgc,webSubPgc,width,widthGroup,workout_type,skuid,vip_exclusive,reviews,description,brand,customer_reviews,rrs_sale,injury_placement,injury_recovery
+  br_uid: uid=2603600622565:v=15.0:ts=1663002355413:hc=1
+  bestSellerField: map_price,sub_category,rrs_sale,outlet,pid,gender_text,brand,title,webPgc,webSubPgc,skuid,embed_id,apparel_size,Shoe_Size,width,sku_color,quantity_on_hand,widthGroup,umap_price,sku_sale_price,reg_price,vip_price,drop_ship,colorGroup,extended_drop_ship,customer_reviews,customer_rating
 
 rrconfig:
  enableDynamicUrl: true #Dynamic url for bloomreach
@@ -37,7 +50,11 @@ rrconfig:
  enableAltImagesInPlp: false
  enableSearchToCategoryUrl: true #to convert search query to category url
  enablePLPBanner: false  #enable/disable fitfinder banner in plp page
-
+ enableBloomreachSearch: true #enable/disable bloomreach
+ enablePathwayRecommendation: true #enable/disable pathway recommendation (bloomreach)
+ RRSDefaultPriceListId: plist3900002
+ RRSSalePriceListId: plist3900003
+ 
 catalogelementsfinder: 
  subCategory: footwear,running,trail-running,racing,cross-training,sandals,walking,casual,hiking,track-field,cross-country,court,other-sports,sportsbra,tops,outerwear,shorts,tightsandpants,undergear,dresses,baselayers,swimwear,trisuits,socks,insoles,brooks-ghost,asics-gel-kayano,brooks-glycerin,asics-gel-nimbus,gearinsoles,shop-all,trail,wrestling,basketball,cleats,sale,sports-tights-pants,sport-shorts,underwear,jackets,headwear,handwear,fitness-trackers-monitors,tights-pants,shorts-skorts,bras,gloves,injury-prevention,safety,sunglasses,holders,hydrationandholders,activitytrackers,fitness,fitness-equipment,electronics,drinks,gels,supplements,bars,skincare,cbd,24.7,unisuits,supplement,snack-foods,watches,towels,jogging-strollers
  brands: adidas,activbody,addaday,aftershokz,altra,amphipod,aravon,armpocket,asics,brooks,balega,bauerfeind,beach-body,biolite,birkenstock,body-glide,boost-oxygen,buff,bumbleride,cali-weights,camelbak,caterpy,cep,chaco,champion,clif,columbia,craft,crescent-moon,cw-x,de-soto,dr.-scholls,dunham,ecco,egg-weights,elektroplate,emergency-id,fabletics,feetures,fitbit,fitletic,footbalance,foot-log,freeze-sleeve,garmin,glamorise,goodr,gu,hammer-nutrition,headsweats,hoka,honey-stinger,hotshot,huma,hydrapak,hydro-flask,hyperice,hush-puppies,injinji,inov-8,jaybird,jlab-audio,k9-sport-sack,keds,keen,kenneth-cole,korsa,lamo,lasso,lifepro,lock-laces,lyric,little-hotties,maisie-jane-s,mbt,mcdavid,triggerpoint,merino,merrell,mizuno,moji,mountain-shades,nike,nathan,new-balance,normatec,nuun,native,oakley,olukai,on,one,one80-light,oofos,pacific-health-labs,polar,prana,pro-compression,pro-tec-athletics,puma,plae,qardio,r-gear,rainbow,reebok,reef,rind-snacks,rockport,rocktape,roll-recovery,rpi,rrs,rudy-project,runguard,ryka,saucony,s-well,sabre,salming,salomon,saltstick,sanuk,scott,showerpill,skechers,skratch-labs,spenco,sperry,sport-beans,spring-energy,spryng,stance,steigen,strassburg,sugoi,superfeet,superga,suunto,stride-rite,tailwind-nutrition,teva,therabody,thule,tidl-sport,tifosi,tiger-tail,timberland,timex,topo-athletic,trakk,ultimate-direction,under-armour,vibram-fivefingers,vitargo,vj-shoes,vooray,ventolation,weckmethod,wigwam,yaktrax,yolo-farmstand,yurbuds,zensah,zero-odor,10-seconds,2undr,2xu,361-degrees,spyder,zamberlan,everlast,larq,untapped,scarpa,ales-grey,road-runner-sports,black-diamond,extreme-mist,g-shock,hydrapatch,kidrunner,lucyd,maurten,one-by-optic-nerve,ray-ban,ryker-roll,shokz,sprints,tru-grit,wahoo,gales,danner,xero-shoes,optic-nerve,h20audio,la-sportiva,k-swiss,kt,nonaste,bu,alleviate,vital-proteins,footlog,os1st,h20-audio,thorlo,muir-energy,ucan,prostretch,tuli-s,shefit,paddletek,selkirk,the-pod-company,tyrol
@@ -861,6 +878,29 @@ brandcategorytool:
   underwear: 7
   accessories: 12
  excludeCarousel: ASICS Brand Women's Apparel,ASICS Brand Men's Apparel
+
+bloomreachsearchrecommendation:
+ skipList: recommendation_method,isApparel,product_id
+ bloomreachUrlMap:
+  gender: gender_code
+ nonPromotionalProducts:
+  GIVEAHA: sdlli9xlpm
+  GIFTCARD: nvebbxkxba
+  RAC55: tr6eydtrei
+  RAC100: ch7hw5wr7e
+  RAC150: gey9p3mqw9
+ vipURLMap:
+  RAC55: /vip/rewards
+  RAC100: /vip/rewards-plus
+  RAC150: /vip/platinum
+ upsellProductsSize: 12
+ pgcSubcodeMap: 
+  Technical Tops: Tops
+  Cross Training: Training
+ webPgccodeMap:
+  Footwear: Shoes
+ crossSellTitle: OUTFIT YOUR RUN
+
 
 
 
