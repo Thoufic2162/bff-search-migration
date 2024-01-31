@@ -648,13 +648,13 @@ searchhelper:
   7: SALE
   8: What's New
  giftGuideUrlMap:
-  /gift-guides/gifts-for-women-runners: gifts-for-women-runners
-  /gift-guides/gifts-for-men-runners: gifts-for-men-runners
-  /gift-guides/tech-gadgets-and-gifts-for-runners: tech-gadgets-and-gifts-for-runners
-  /gift-guides/running-gifts-to-fit-any-budget: running-gifts-to-fit-any-budget
-  /gift-guides/mothers-day: mothers-day
-  /gift-guides/fathers-day: fathers-day
-  /gift-guides/korsa-end-of-season: korsa end of season
+  '[/gift-guides/gifts-for-women-runners]': gifts-for-women-runners
+  '[/gift-guides/gifts-for-men-runners]': gifts-for-men-runners
+  '[/gift-guides/tech-gadgets-and-gifts-for-runners]': tech-gadgets-and-gifts-for-runners
+  '[/gift-guides/running-gifts-to-fit-any-budget]': running-gifts-to-fit-any-budget
+  '[/gift-guides/mothers-day]': mothers-day
+  '[/gift-guides/fathers-day]': fathers-day
+  '[/gift-guides/korsa-end-of-season]': korsa end of season
  sortOptionsMap:
     0: ranking+asc
     3: customer_rating+desc&customer_reviews+desc
@@ -713,15 +713,15 @@ bloomreach-breadcrum-searchresults:
   webPgc: 6
   outlet: 7
  urlMap:
-  /category/equipment: equipment
-  /category/personalcare: personalcare
+  '[/category/equipment]': equipment
+  '[/category/personalcare]': personalcare
  canonicalMap: 
-  /trail/: /trail-running/
-  /fitness/: /fitness-equipment/
-  /activitytrackers: /equipment/activitytrackers
-  /electronics: /equipment/electronics
-  /jogging-strollers: /equipment/jogging-strollers
-  /fitness-equipment: /equipment/fitness-equipment
+  '[/trail/]': /trail-running/
+  '[/fitness/]': /fitness-equipment/
+  '[/activitytrackers]': /equipment/activitytrackers
+  '[/electronics]': /equipment/electronics
+  '[/jogging-strollers]': /equipment/jogging-strollers
+  '[/fitness-equipment]': /equipment/fitness-equipment
  postfixTitle: -Road Runner Sports
  coopBannersMap: 
   /mens/shoes/running: hoka-bondi-x
@@ -897,8 +897,8 @@ bloomreachsearchrecommendation:
   RAC150: /vip/platinum
  upsellProductsSize: 12
  pgcSubcodeMap: 
-  Technical Tops: Tops
-  Cross Training: Training
+  '[Technical Tops]': Tops
+  '[Cross Training]': Training
  webPgccodeMap:
   Footwear: Shoes
  qty: 2

@@ -80,6 +80,36 @@ public class RelatedProductTool {
 		return relatedProductResponse;
 	}
 
+	public RelatedProductResponseDTO fetchNewOutletProducts(Object profile, HttpServletRequest request) {
+		log.debug("RelatedProductTool::fetchNewOutletProducts::() generateNewOutletProducts:START request{}", request);
+		Boolean outlet = (Boolean) request.getAttribute(SearchConstants.PARAM_OUTLET);
+		int sizeLimit = 12;
+		RelatedProductResponseDTO relatedProductResponse = new RelatedProductResponseDTO();
+		UpSellProductsDTO upSellProductsDTO;
+		if (null != outlet && outlet.booleanValue()) {
+			Map<String, String> refParams = new HashMap<String, String>();
+			refParams.put(BloomreachConstants.PRODUCT_FIELD.OUTLET, SearchConstants.OUTLET);
+			refParams.put(BloomreachConstants.PRODUCT_FIELD.RANKING, SearchConstants.RANKING);
+			List<RecommendationProductDTO> upSellProducts = null;
+			if (rrConfiguration.isEnableBloomreachSearch()) {
+				refParams.put(BloomreachConstants.PRODUCT_FIELD.WEB_PGC, SearchConstants.SHOE);
+				upSellProducts = bloomreachSearchRecommendationService.searchRecommendations(profile, refParams);
+				if (upSellProducts != null)
+					upSellProducts = upSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
+			}
+			upSellProductsDTO = new UpSellProductsDTO();
+			upSellProductsDTO.setTitle(SearchConstants.NEW_TO_OUTLET_PRODUCTS_TITLE);
+			if (!CollectionUtils.isEmpty(upSellProducts)) {
+				upSellProductsDTO.setProducts(upSellProducts);
+			}
+			relatedProductResponse.setUpsellProducts(upSellProductsDTO);
+		}
+		log.debug(
+				"RelatedProductTool::fetchNewOutletProducts::() generateNewOutletProducts:END relatedProductResponse{}",
+				relatedProductResponse);
+		return relatedProductResponse;
+	}
+
 	private RelatedProductResponseDTO getRelatedProductResults(ProductDTO products, Object profile,
 			HttpServletRequest request) {
 		log.debug("RelatedProductTool :: getRelatedProductResults() :: STARTED");

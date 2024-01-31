@@ -39,4 +39,12 @@ public class SearchController {
 		return relatedProducts;
 	}
 
+	@GetMapping("/v1/getNewOutletProducts")
+	public RelatedProductResponseDTO getNewOutletProducts() {
+		log.info("SearchController::getNewOutletProducts::START");
+		RelatedProductResponseDTO relatedProducts = searchService.getNewOutletProducts();
+		log.info("SearchController::getNewOutletProducts::ENDED");
+		return relatedProducts;
+	}
+
 }

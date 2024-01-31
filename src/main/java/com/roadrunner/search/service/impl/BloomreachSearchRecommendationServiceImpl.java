@@ -197,7 +197,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		webSubPgc = refParams.get(SearchConstants.WEB_PGC_SUB_CODE_PARAM);
 		genderCode = refParams.get(SearchConstants.GENDER_PARAM);
 		kidsGender = refParams.get(SearchConstants.KIDS_GENDER);
-
 		if (!StringUtils.isEmpty(kidsGender)) {
 			refParams.put(BloomreachConstants.PRODUCT_FIELD.KIDS_GENDER, kidsGender);
 		} else {
@@ -237,7 +236,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 								targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.APPAREL_TYPE));
 						match = true;
 					}
-
 					if (targetRefinement.containsKey(BloomreachConstants.PRODUCT_FIELD.BRAND)) {
 						String targetBrand = targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.BRAND);
 						if (StringUtils.isEmpty(targetBrand)) {
@@ -270,7 +268,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 					}
 				}
 			});
-
 		}
 		if (CollectionUtils.isEmpty(searchRes)) {
 			log.debug("BloomreachSearchRecommendationServiceImpl :: searchRecommendation: search results are empty");
@@ -279,7 +276,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		String ids = StringUtil.listToString(searchRes);
 		log.debug("BloomreachSearchRecommendationService :: searchRecommendation: ids={} refParams={}", ids, refParams);
 		return searchRes;
-
 	}
 
 	private BloomreachSearchResponseDTO doSearch(Map<String, String> refParams, HttpServletRequest request) {

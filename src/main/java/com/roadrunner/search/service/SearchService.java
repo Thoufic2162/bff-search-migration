@@ -14,4 +14,6 @@ public interface SearchService {
 
 	RelatedProductResponseDTO getRelatedProducts(String productId);
 
+	RelatedProductResponseDTO getNewOutletProducts();
+
 }

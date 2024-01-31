@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.helper.BloomreachSearchDTOHelper;
@@ -43,4 +44,14 @@ public class SearchServiceImpl implements SearchService {
 		return relatedProductResponse;
 	}
 
+	@Override
+	public RelatedProductResponseDTO getNewOutletProducts() {
+		log.debug("SearchServiceImpl::getNewOutletProducts::STARTED");
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		request.setAttribute(SearchConstants.PARAM_OUTLET, Boolean.TRUE);
+		RelatedProductResponseDTO relatedProductResponse = relatedProductTool.fetchNewOutletProducts(null, request);
+		log.debug("SearchServiceImpl::getNewOutletProducts::ENDED ");
+		return relatedProductResponse;
+	}
 }
