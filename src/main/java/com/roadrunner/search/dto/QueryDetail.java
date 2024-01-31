@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 
 @Data
-@JsonInclude(content = Include.NON_NULL)
+@JsonInclude(value = Include.NON_NULL)
 public class QueryDetail {
 	private ModificationDTO modification;
 

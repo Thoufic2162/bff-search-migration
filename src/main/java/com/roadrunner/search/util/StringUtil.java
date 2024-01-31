@@ -2,8 +2,10 @@ package com.roadrunner.search.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
@@ -61,4 +63,21 @@ public class StringUtil {
 		return res;
 	}
 
+	public static String listToString(List<String> values) {
+		return listToString(values, SearchConstants.COMMA);
+	}
+
+	public static String listToString(List<String> values, String delimeter) {
+		if (CollectionUtils.isEmpty(values)) {
+			return SearchConstants.EMPTY_STRING;
+		}
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < values.size(); i++) {
+			buffer.append(values.get(i));
+			if (i + 1 < values.size()) {
+				buffer.append(delimeter);
+			}
+		}
+		return buffer.toString();
+	}
 }

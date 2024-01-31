@@ -26,7 +26,6 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 		List<PriceDTO> priceDTOList = new ArrayList<>();
 		DecimalFormat format = new DecimalFormat(SearchConstants.DEC_FORMAT);
 		String saleMessage = null;
-		// MSRP Price
 		String priceMsg = SearchConstants.PRICE_NOW;
 		if (searchProductDTO.isOutlet()) {
 			priceMsg = SearchConstants.PRICE_OUTLET;
@@ -38,7 +37,6 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 			String listPriceS = String.valueOf(format.format(lowestListPrice));
 			addPrice(priceDTOList, SearchConstants.PRICE_MSRP, listPriceS, SearchConstants.STRING_ZERO);
 		}
-		// UMAP Price
 		if (searchProductDTO.isCartOnlyClubPrice() && searchProductDTO.getLowestListPrice() > 0) {
 			if (searchProductDTO.getLowestUmapPrice() > 0
 					&& searchProductDTO.getLowestUmapPrice() != searchProductDTO.getLowestListPrice()) {
@@ -48,7 +46,6 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 				String highestUmapPriceS = String.valueOf(format.format(highestUmapPrice));
 				addPrice(priceDTOList, priceMsg, lowestUmapPriceS, highestUmapPriceS);
 			}
-			// VIP Price
 			if (!searchProductDTO.isUmapHideVIP() && searchProductDTO.getLowestVIPPrice() > 0
 					&& searchProductDTO.getLowestUmapPrice() > 0
 					&& searchProductDTO.getLowestUmapPrice() != searchProductDTO.getLowestListPrice()) {
@@ -68,7 +65,6 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 			}
 
 		} else {
-			// Daily Sale
 			if (searchProductDTO.getSpecialPricing() == SearchConstants.TRUE
 					&& searchProductDTO.getLowestListPrice() > 0) {
 				double lowestSalePrice = searchProductDTO.getLowestSalePrice();
@@ -77,7 +73,6 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 				String highestSalePriceS = String.valueOf(format.format(highestSalePrice));
 
 				addPrice(priceDTOList, SearchConstants.DAILY_SALE, lowestSalePriceS, highestSalePriceS);
-				// NOW/Outlet price
 			} else {
 				if (searchProductDTO.getLowestSalePrice() > 0) {
 					double lowestSalePrice = searchProductDTO.getLowestSalePrice();
@@ -87,7 +82,6 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 					addPrice(priceDTOList, priceMsg, lowestSalePriceS, highestSalePriceS);
 				}
 			}
-			// VIP Price
 			if (!searchProductDTO.isUmapHideVIP() && searchProductDTO.getLowestVIPPrice() > 0) {
 				double lowestVIPPrice = searchProductDTO.getLowestVIPPrice();
 				String lowestVIPPriceS = String.valueOf(format.format(lowestVIPPrice));

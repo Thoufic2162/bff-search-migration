@@ -8,10 +8,6 @@ public class PriceDTO {
 
 	private String amount;
 
-	private String discount;
-
-	private String vipDiscount;
-
 	private String type;
 
 	private String symbol;

@@ -138,7 +138,6 @@ public class BloomreachProductSearchResults {
 							name = name.replaceAll(entry.getKey(), entry.getValue());
 						}
 					}
-					// price starts
 					double lowestListPrice = result.getRegPrice();
 					if (sku.equals(vipPlus)) {
 						searchProductDTO.setLowestListPrice(vipPlusPrice);
@@ -178,13 +177,10 @@ public class BloomreachProductSearchResults {
 					} else {
 						searchProductDTO.setUmapHideVIP(false);
 					}
-					// This method will set the prices for each product.
+					// Setting Price for each product
 					if (!promotionalProducts.contains(sku)) {
 						productPriceHelper.setProdutPrices(searchProductDTO);
 					}
-					// price end
-
-					// skus
 					Map<String, Map<String, ColorSkusDTO>> skus = new HashMap<>();
 					Map<String, ColorSkusDTO> skusDetais = productSkuHelper.createSkus(result, searchProductDTO);
 					if (skusDetais.values().size() > 1) {
@@ -201,14 +197,11 @@ public class BloomreachProductSearchResults {
 								.getColorCode();
 						searchProductDTO.setColorCode(fstColorCode);
 					}
-					// skus end
-
 					if (searchProductDTO.isDisplayVipMessage() && !CollectionUtils.isEmpty(searchProductDTO.getPrice())
 							&& searchProductDTO.getPrice().stream()
 									.anyMatch(price -> price.getType().equals(SearchConstants.VIP))) {
 						searchProductDTO.getPrice().removeIf(price -> price.getType().equals(SearchConstants.VIP));
 					}
-
 					if (!CollectionUtils.isEmpty(searchProductDTO.getPrice())
 							&& searchProductDTO.getPrice().stream()
 									.anyMatch(price -> price.getType().equals(SearchConstants.VIP))
@@ -222,7 +215,6 @@ public class BloomreachProductSearchResults {
 									});
 						}
 					}
-
 					if (!CollectionUtils.isEmpty(searchProductDTO.getPrice())) {
 						boolean hasVIPPrice = searchProductDTO.getPrice().stream()
 								.anyMatch(price -> price.getType().equals(SearchConstants.VIP));
@@ -245,7 +237,6 @@ public class BloomreachProductSearchResults {
 							}
 						}
 					}
-
 					if (!CollectionUtils.isEmpty(searchProductDTO.getPrice())
 							&& searchProductDTO.getPrice().stream()
 									.anyMatch(price -> price.getType().equals(SearchConstants.PRICE_NOW))
@@ -270,16 +261,13 @@ public class BloomreachProductSearchResults {
 								&& vipPrice.getAmount() != null && vipPrice.getAmount().equals(msrpPrice.getAmount())) {
 							searchProductDTO.getPrice().removeIf(price -> price.getType().equals(SearchConstants.VIP));
 						}
-
 					}
-
 					if (!CollectionUtils.isEmpty(searchProductDTO.getPrice())
 							&& searchProductDTO.getPrice().stream()
 									.anyMatch(price -> price.getType().equals(SearchConstants.VIP))
 							&& sku != null && sku.equals(SearchConstants.GIFTCARD)) {
 						searchProductDTO.getPrice().removeIf(price -> price.getType().equals(SearchConstants.VIP));
 					}
-
 					String qUri = URLCoderUtil.decode(request.getParameter(SearchConstants.QURI));
 					if (null != qUri && qUri.contains(SearchConstants.ALES_GREY)) {
 						if (!searchProductDTO.getBrand().contains(SearchConstants.NIKE)) {

@@ -16,7 +16,6 @@ public class BloomreachConstants {
 		String VIP_PRICE = "vip_price";
 		String VARIANTS_COLOR_GROUP = "variants.colorGroup";
 		String VARIANTS_SHOE_SIZE = "variants.Shoe_Size";
-
 	}
 
 	public interface PRODUCT_FIELD {
@@ -30,6 +29,8 @@ public class BloomreachConstants {
 		String RANKING = "ranking";
 		String WEB_SUB_PGC = "webSubPgc";
 		String GENDER = "gender";
+		String XSELLS = "xsells";
+		String APPAREL_TYPE = "apparel_type";
 	}
 
 	public static final String REGEX = "[{0}]";
@@ -194,5 +195,9 @@ public class BloomreachConstants {
 	public static final String NUTRITION = "Nutrition";
 	public static final String YOU_MAY_ALSO_LIKE_OUTLET = "youMayAlsoLikeOutlet";
 	public static final String OUTFIT_YOUR_RUN_OUTLET = "outfitYourRunOutlet";
+	public static final String PID_STRING = "pid:";
+	public static final String OR_STRING = "OR";
+	public static final String QUOTES_WITH_FQ_ = "fq=";
+	public static final String TILDE = "~";
 
 }

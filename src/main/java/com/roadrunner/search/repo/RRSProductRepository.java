@@ -10,7 +10,6 @@ import com.roadrunner.search.dto.ProductDTO;
 
 @Repository
 public interface RRSProductRepository extends JpaRepository<RRSProduct, String> {
-
 	@Query("select new com.roadrunner.search.dto.ProductDTO(r.productId,r.cartOnlyClubPrice,"
 			+ "v.vendorName,r.gender,r.genderText,r.pgcSubCode,r.pgcCodeId,d.brand,d.displayName,d.description,r.videoEmbeddedCode,r.umapHideVip,r.defaultColor) "
 			+ "from RRSProduct r,RRSVendor v,DCSProduct d WHERE r.productId= ?1 and r.vendorId=v.vendorId and r.productId=d.productId")

@@ -1,5 +1,7 @@
 package com.roadrunner.search.tools;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.domain.RRSProductWeb;
+import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
+import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.ColorSkusDTO;
 import com.roadrunner.search.dto.CrossSellProductsDTO;
 import com.roadrunner.search.dto.ProductDTO;
@@ -28,6 +30,7 @@ import com.roadrunner.search.helper.CookieHelper;
 import com.roadrunner.search.repo.RRSProductRepository;
 import com.roadrunner.search.repo.RRSProductWebRepository;
 import com.roadrunner.search.service.BloomreachSearchRecommendationService;
+import com.roadrunner.search.service.BloomreachSearchService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
@@ -52,65 +55,44 @@ public class RelatedProductTool {
 
 	@Autowired
 	private BloomreachSearchRecommendationService bloomreachSearchRecommendationService;
+	@Autowired
+	private BloomreachProductSearchResults bloomreachProductSearchResults;
+	@Autowired
+	private BloomreachSearchService bloomreachSearchService;
 
 	@Autowired
 	private CookieHelper cookieHelper;
 
 	private Map<String, String> pgcSubcodeMap;
 	private Map<String, String> webPgccodeMap;
-	private String crossSellTitle;
+	private String socks;
+	private String insole;
 
-	public RelatedProductResponseDTO generateRelatedProducts(String productId) {
+	public RelatedProductResponseDTO generateRelatedProducts(String productId, HttpServletRequest request) {
 		log.debug("RelatedProductTool::generateRelatedProducts:::START...productId: {}", productId);
 		if (productId.isEmpty()) {
 			log.error("RelatedProductTool::relatedProducts" + "::invalid request");
 		}
 		ProductDTO products = rrsProductRepository.getProducts(productId);
-		RelatedProductResponseDTO relatedProductResponse = getRelatedProductResults(products, null);
+		RelatedProductResponseDTO relatedProductResponse = getRelatedProductResults(products, null, request);
 		log.debug("RelatedProductTool::generateRelatedProducts::() relatedProductResponse:{}", relatedProductResponse);
 		log.debug("RelatedProductTool::generateRelatedProducts:::END...");
 		return relatedProductResponse;
 	}
 
-	private RelatedProductResponseDTO getRelatedProductResults(ProductDTO products, Object profile) {
+	private RelatedProductResponseDTO getRelatedProductResults(ProductDTO products, Object profile,
+			HttpServletRequest request) {
 		log.debug("RelatedProductTool :: getRelatedProductResults() :: STARTED");
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
 		RelatedProductResponseDTO relatedProductResponse = null;
 		UpSellProductsDTO upSellProductsDTO = null;
 		CrossSellProductsDTO crossSellProductsDTO = null;
 		String webPgc = SearchConstants.EMPTY_STRING;
 		String webSubPgc = SearchConstants.EMPTY_STRING;
 		String brand = SearchConstants.EMPTY_STRING;
-		String kidsGender = SearchConstants.EMPTY_STRING;
 		Boolean outlet = SearchConstants.TRUE.equals(request.getParameter(SearchConstants.PARAM_OUTLET));
-		boolean isWearometer = false;
-		if (request.getParameter(SearchConstants.ISWEAROMETER) != null) {
-			isWearometer = request.getParameter(SearchConstants.ISWEAROMETER).equalsIgnoreCase(SearchConstants.TRUE);
-		}
 		int sizeLimit = 0;
 		Integer genderCode = null;
 		sizeLimit = 12;
-		if (null != outlet && outlet.booleanValue()) {
-			relatedProductResponse = new RelatedProductResponseDTO();
-			Map<String, String> refParams = new HashMap<String, String>();
-			refParams.put(BloomreachConstants.PRODUCT_FIELD.OUTLET, SearchConstants.OUTLET);
-			refParams.put(BloomreachConstants.PRODUCT_FIELD.RANKING, SearchConstants.RANKING);
-			List<RecommendationProductDTO> upSellProducts = null;
-			if (rrConfiguration.isEnableBloomreachSearch()) {
-				refParams.put(BloomreachConstants.PRODUCT_FIELD.WEB_PGC, SearchConstants.SHOE);
-				upSellProducts = bloomreachSearchRecommendationService.searchRecommendations(profile, refParams, false,
-						false);
-				if (upSellProducts != null)
-					upSellProducts = upSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
-			}
-			upSellProductsDTO = new UpSellProductsDTO();
-			upSellProductsDTO.setTitle(SearchConstants.NEW_TO_OUTLET_PRODUCTS_TITLE);
-			if (!CollectionUtils.isEmpty(upSellProducts)) {
-				upSellProductsDTO.setProducts(upSellProducts);
-			}
-			relatedProductResponse.setUpsellProducts(upSellProductsDTO);
-		}
 		// populating best seller products and recently viewed products for
 		// no search result page
 		String noResutlPage = request.getParameter(SearchConstants.PAGE);
@@ -122,7 +104,7 @@ public class RelatedProductTool {
 			upSellProductsDTO = new UpSellProductsDTO();
 			refParams.put(BloomreachConstants.RECOMMENDATION_METHOD, BloomreachConstants.BEST_SELLER);
 			upSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForUpSell(profile, refParams,
-					false, upSellProductsDTO);
+					upSellProductsDTO);
 			if (!CollectionUtils.isEmpty(upSellProducts)) {
 				upSellProducts = upSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
 			}
@@ -133,7 +115,7 @@ public class RelatedProductTool {
 			refParams.put(BloomreachConstants.USER_ID, null);// user id should be passes
 			CrossSellProductsDTO crossSell = new CrossSellProductsDTO();
 			crossSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForCrossSell(profile,
-					refParams, false, crossSellProductsDTO);
+					refParams, crossSellProductsDTO);
 			if (!CollectionUtils.isEmpty(crossSellProducts)) {
 				crossSellProducts = crossSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
 			}
@@ -198,10 +180,7 @@ public class RelatedProductTool {
 									BloomreachConstants.YOU_MAY_ALSO_LIKE);
 						}
 						upSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForUpSell(profile,
-								refParams, false, upSellProductsDTO);
-					} else {
-						upSellProducts = bloomreachSearchRecommendationService.searchRecommendations(profile, refParams,
-								false, false);
+								refParams, upSellProductsDTO);
 					}
 					if (!CollectionUtils.isEmpty(upSellProducts)) {
 						upSellProducts = upSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
@@ -210,13 +189,7 @@ public class RelatedProductTool {
 
 				log.debug("ReleatedProductTool:: getRelatedProductResults :: refParams {}", refParams);
 				boolean isHokaPage = false;
-				if (!isWearometer) {
-					upSellProductsDTO.setTitle(SearchConstants.UP_SELL_PRODUCTS_TITLE);
-				} else {
-					for (RecommendationProductDTO upsellProduct : upSellProducts) {
-						upsellProduct.setRecommendedProduct(true);
-					}
-				}
+				upSellProductsDTO.setTitle(SearchConstants.UP_SELL_PRODUCTS_TITLE);
 				if (!CollectionUtils.isEmpty(upSellProducts) && upSellProducts.size() > 0) {
 					if (!CollectionUtils.isEmpty(upSellProducts)) {
 						upSellProducts.stream().forEach(results -> {
@@ -243,11 +216,101 @@ public class RelatedProductTool {
 					cookieHelper.hasHokaPage(false);
 					cookieHelper.nonVipExceptHokaCookie(true, request);
 				}
-
+				String page = request.getParameter(SearchConstants.PAGE);
+				if (page != null && page.equalsIgnoreCase(SearchConstants.CART_PAGE)) {
+					List<RecommendationProductDTO> crossSellProductsList = null;
+					crossSellProductsDTO = new CrossSellProductsDTO();
+					crossSellProductsDTO.setTitle(SearchConstants.CORSS_SELL_PRODUCTS_TITLE);
+					if (outlet == null || !outlet) {
+						refParams.put(BloomreachConstants.RECOMMENDATION_METHOD, BloomreachConstants.OUTFIT_YOUR_RUN);
+					} else {
+						refParams.put(BloomreachConstants.RECOMMENDATION_METHOD,
+								BloomreachConstants.OUTFIT_YOUR_RUN_OUTLET);
+					}
+					crossSellProductsList = bloomreachSearchRecommendationService
+							.searchRecommendationsForCrossSell(profile, refParams, crossSellProductsDTO);
+					crossSellProductsDTO.setProducts(crossSellProductsList);
+					relatedProductResponse.setCrossSellProducts(crossSellProductsDTO);
+				} else {
+					List<RecommendationProductDTO> crossSellProductsList = null;
+					if (rrConfiguration.isEnablePathwayRecommendation() && webPgc != null
+							&& !SearchConstants.APPAREL.equalsIgnoreCase(webPgc)) {
+						crossSellProductsDTO = new CrossSellProductsDTO();
+						crossSellProductsDTO.setTitle(SearchConstants.CORSS_SELL_PRODUCTS_TITLE);
+						if (outlet == null || !outlet) {
+							refParams.put(BloomreachConstants.RECOMMENDATION_METHOD,
+									BloomreachConstants.OUTFIT_YOUR_RUN);
+						} else {
+							refParams.put(BloomreachConstants.RECOMMENDATION_METHOD,
+									BloomreachConstants.OUTFIT_YOUR_RUN_OUTLET);
+						}
+						crossSellProductsList = bloomreachSearchRecommendationService
+								.searchRecommendationsForCrossSell(profile, refParams, crossSellProductsDTO);
+						crossSellProductsDTO.setProducts(crossSellProductsList);
+						relatedProductResponse.setCrossSellProducts(crossSellProductsDTO);
+					} else {
+						refParams.put(SearchConstants.IS_APPAREL, SearchConstants.TRUE);
+						List<String> recommendationIds = new ArrayList<String>();
+						if (rrConfiguration.isEnableBloomreachSearch()) {
+							recommendationIds = bloomreachSearchRecommendationService.searchRecommendation(refParams,
+									products, request);
+						}
+						if (recommendationIds.contains(insole)) {
+							int index = recommendationIds.indexOf(insole);
+							recommendationIds.remove(index);
+							recommendationIds.add(index, socks);
+						}
+						if (webPgc != null && BloomreachConstants.SHOES.equalsIgnoreCase(webPgc)) {
+							crossSellProductsList = new ArrayList<>();
+						} else {
+							BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
+							BloomreachSearchResultsDTO crossSellList = new BloomreachSearchResultsDTO();
+							bloomreachSearchResponse = bloomreachSearchService
+									.populateProductsFromBR(recommendationIds);
+							bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null,
+									crossSellList);
+							crossSellProductsList = crossSellList.getResults();
+							crossSellProductsList = (crossSellProductsList != null) ? crossSellProductsList.stream()
+									.sorted(Comparator.comparing(sort -> ((RecommendationProductDTO) sort).getSku(),
+											Comparator.comparingInt(recommendationIds::indexOf)))
+									.collect(Collectors.toList()) : null;
+						}
+						int limit = 14;
+						if (webPgc != null && BloomreachConstants.SHOES.equalsIgnoreCase(webPgc)) {
+							limit = 24;
+						}
+						if (null != crossSellProductsList) {
+							crossSellProductsList = crossSellProductsList.stream().limit(limit)
+									.collect(Collectors.toList());
+						}
+						if (crossSellProductsList != null && !CollectionUtils.isEmpty(crossSellProductsList)
+								&& crossSellProductsList.size() > 1) {
+							crossSellProductsDTO = new CrossSellProductsDTO();
+							crossSellProductsDTO.setTitle(SearchConstants.CORSS_SELL_PRODUCTS_TITLE);
+							if (crossSellProductsList.stream()
+									.anyMatch(prod -> prod.getSku().contains(SearchConstants.RAC))) {
+								crossSellProductsList.removeIf(prod -> prod.getSku().contains(SearchConstants.RAC));
+							}
+							if (!CollectionUtils.isEmpty(crossSellProductsList)) {
+								crossSellProductsList.stream().forEach(results -> {
+									if (null != results.getColorsSkus() && results.getColorsSkus().size() > 1) {
+										Optional<ColorSkusDTO> colorCode = results.getColorsSkus().stream()
+												.filter(colorSkus -> !colorSkus.getColorDescription().toLowerCase()
+														.contains(SearchConstants.BLACK))
+												.findFirst();
+										if (null != colorCode && colorCode.isPresent()) {
+											results.setColorCode(colorCode.get().getColorCode());
+										}
+									}
+								});
+							}
+							crossSellProductsDTO.setProducts(crossSellProductsList);
+							relatedProductResponse.setCrossSellProducts(crossSellProductsDTO);
+						}
+					}
+				}
 			}
-
 		}
-
 		return relatedProductResponse;
 	}
 

@@ -17,5 +17,5 @@ public class RRSProductWeb {
 	private String WebPgcSubCode;
 	private String kidsCategory;
 	private int vipExclusive;
-	private Integer clearance ;
+	private Integer clearance;
 }

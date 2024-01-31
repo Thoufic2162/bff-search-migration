@@ -206,7 +206,11 @@ public class SearchConstants {
 	public static final String HOKA_UPPERCASE = "HOKA";
 	public static final String BLACK = "black";
 	public static final String HOKA_ONE_ONE = "HOKA ONE ONE";
-	public static final String ISWEAROMETER = "isWearometer";
 	public static final String CART_PAGE = "cart";
-
+	public static final String KIDS_GENDER = "kids_gender";
+	public static final String BRAND_PARAM = "brand";
+	public static final String INSOLES = "Insoles";
+	public static final String GENDER_TEXT = "gender_text";
+	public static final String RAC = "RAC";
+	public static final String CORSS_SELL_PRODUCTS_TITLE = "OUTFIT YOUR RUN";
 }

@@ -186,7 +186,6 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 						}
 					}
 				}
-
 				if (query.toLowerCase().contains(SearchConstants.RIDE)
 						&& queryParams.getProperty(BloomreachConstants.QPARAMS.SZ) == null
 						&& !query.toLowerCase().contains(SearchConstants.WAVE_RIDER)) {
@@ -283,7 +282,6 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 					queryParams.remove(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR);
 					searchResults = searchHelper.performSearch(queryParams, request, true);
 				}
-
 				if ((isMyPerfectFit != null && isMyPerfectFit.equalsIgnoreCase(SearchConstants.TRUE))
 						&& (searchResults == null || null == searchResults.getResponse()
 								|| searchResults.getResponse().getNumFound() == 0)) {
@@ -316,27 +314,22 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			log.debug("BloomreachSearchDTOHelperImpl getSearchResults() keyword redirecting");
 			return bloomreachResults;
 		}
-
 		if (rrConfiguration.isEnableSearchToCategoryUrl()
 				&& null != queryParams.getProperty(BloomreachConstants.SEARCH_REDIRECT_URL)) {
 			bloomreachResults.setSearchRedirectURL(qUri);
 		}
-
 		if (null != qUri && qUri.length() > 0) {
 			String pageUrl = bloomreachSearchUtil.getPageURL(qUri);
 			bloomreachResults.setPageUrl(pageUrl);
 		}
-
 		if (null != qUri && qUri.contains(SearchConstants.BRAND_TYPE_AHEAD_URL)) {
 			populateSeoContentData(qUri, bloomreachResults);
 		}
-
 		if (null != qUri && qUri.contains(SearchConstants.BRAND_TYPE_AHEAD_URL)) {
 			String qUriString = qUri.toString();
 			String separator = SearchConstants.SLASH;
 			int indexOfSeparator = qUriString.lastIndexOf(separator);
 			String brandname = qUriString.substring(indexOfSeparator + 1);
-
 			brandname = getCatalogElementsFinder().getQueryMap().containsKey(brandname)
 					? getCatalogElementsFinder().getQueryMap().get(brandname)
 					: Arrays.stream(brandname.split(BloomreachConstants.HYPHEN))
@@ -349,7 +342,6 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 				bloomreachResults.setBrand(brandCat);
 			}
 		}
-
 		if (bloomreachResults.getBrand() != null
 				&& bloomreachResults.getBrand().getBrandType().equals(BloomreachConstants.LARGE)) {
 			return bloomreachResults;
@@ -387,7 +379,6 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 						canonicalUrl.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase());
 			}
 		}
-
 		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.HEADER_CONTENT))) {
 			String headerContent = request.getParameter(SearchConstants.HEADER_CONTENT);
 			bloomreachResults.setHeaderContent(headerContent);
@@ -396,14 +387,11 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			String pageTitle = request.getParameter(SearchConstants.TITLE);
 			bloomreachResults.setTitle(pageTitle);
 		}
-
 		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.DESCRIPTION))) {
 			String description = request.getParameter(SearchConstants.DESCRIPTION);
 			bloomreachResults.setDescription(description);
 		}
-
 		bloomreachResults.setResultQuery(resultQuery);
-
 		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.PAGE_TITLE))) {
 			String title = request.getParameter(SearchConstants.PAGE_TITLE).toLowerCase();
 			title = title.replace("<h1>", BloomreachConstants.EMPTY_STRING).replace("</h1>",
@@ -414,11 +402,9 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 		if (count != null && count.equalsIgnoreCase(SearchConstants.TRUE)) {
 			bloomreachResults.setStatus(BloomreachConstants.INACTIVE);
 		}
-
 		if (isCustomQuery != null && isCustomQuery.equalsIgnoreCase(SearchConstants.FALSE)) {
 			bloomreachResults.setStatus(BloomreachConstants.INACTIVE);
 		}
-
 		if (StringUtils.isNotEmpty((String) queryParams.get(SearchConstants.REMOVE_CATAGORY))
 				&& queryParams.get(SearchConstants.REMOVE_CATAGORY).equals(SearchConstants.TRUE)
 				&& bloomreachResults.getRefinements() != null && !bloomreachResults.getRefinements().isEmpty()) {
@@ -431,9 +417,7 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			} else {
 				bloomreachResults.getRefinements().keySet().removeAll(categoryList);
 			}
-
 		}
-
 		AtomicInteger positionToInsert = new AtomicInteger();
 		Map<String, List<BloomreachSearchRefinementsDTO>> refinementsOrder = new LinkedHashMap<String, List<BloomreachSearchRefinementsDTO>>();
 		if (!CollectionUtils.isEmpty(bloomreachResults.getRefinements())
@@ -450,7 +434,6 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			});
 			bloomreachResults.setRefinements(refinementsOrder);
 		}
-
 		if (!CollectionUtils.isEmpty(bloomreachResults.getRefinements())
 				&& !CollectionUtils.isEmpty(bloomreachResults.getRefinements().get(BloomreachConstants.BRAND))) {
 			bloomreachResults.getRefinements().get(BloomreachConstants.BRAND).stream()
@@ -505,18 +488,15 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			}
 			sortList.add(BRSearchBase);
 		}
-
 		if (bloomreachResults.getResultQuery() != null) {
 			String webpgc = bloomreachResults.getResultQuery();
 			if (webpgc.contains(BloomreachConstants.WEBPGC) && !webpgc.contains(BloomreachConstants.SHOES)) {
 				bloomreachResults.setApparel(Boolean.TRUE);
 			}
 		}
-
 		bloomreachResults.setSorting(sortList);
 		log.debug("BloomreachSearchDTOHelperImpl getSearchResults() END ");
 		return bloomreachResults;
-
 	}
 
 	private void populateSeoContentData(String qUri, BloomreachSearchResultsDTO bloomreachResults) {

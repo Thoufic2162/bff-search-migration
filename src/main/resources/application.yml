@@ -880,6 +880,8 @@ brandcategorytool:
  excludeCarousel: ASICS Brand Women's Apparel,ASICS Brand Men's Apparel
 
 bloomreachsearchrecommendation:
+ insole: 34259
+ socks: 40320
  skipList: recommendation_method,isApparel,product_id
  bloomreachUrlMap:
   gender: gender_code
@@ -899,7 +901,8 @@ bloomreachsearchrecommendation:
   Cross Training: Training
  webPgccodeMap:
   Footwear: Shoes
- crossSellTitle: OUTFIT YOUR RUN
+ qty: 2
+
 
 
 

@@ -3,7 +3,6 @@ package com.roadrunner.search.tools;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import com.roadrunner.search.config.BloomreachConfiguration;
-import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.domain.SeoContent;
@@ -32,8 +29,6 @@ import com.roadrunner.search.dto.BRSearchBaseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.CatalogElementsFinder;
-import com.roadrunner.search.helper.SearchHelper;
-import com.roadrunner.search.repo.SeoContentRepository;
 import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.HttpUtil;
 import com.roadrunner.search.util.URLCoderUtil;
@@ -46,7 +41,6 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 @ConfigurationProperties(prefix = "bloomreach-breadcrum-searchresults")
-@SuppressWarnings({ "unused" })
 @Getter
 @Setter
 public class BloomreachBreadcrumSearchResults {

@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +32,14 @@ import com.roadrunner.search.domain.DCSProductChildSkus;
 import com.roadrunner.search.domain.RRSProductRating;
 import com.roadrunner.search.domain.RRSProductWeb;
 import com.roadrunner.search.domain.RRSSku;
+import com.roadrunner.search.domain.SeoCategory;
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.CrossSellProductsDTO;
 import com.roadrunner.search.dto.PriceDTO;
 import com.roadrunner.search.dto.ProductDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
+import com.roadrunner.search.dto.SeoRecommendationBean;
 import com.roadrunner.search.dto.UpSellProductsDTO;
 import com.roadrunner.search.helper.ProductSkuHelper;
 import com.roadrunner.search.repo.DCSPriceRepository;
@@ -45,6 +48,7 @@ import com.roadrunner.search.repo.RRSProductRatingRepository;
 import com.roadrunner.search.repo.RRSProductRepository;
 import com.roadrunner.search.repo.RRSProductWebRepository;
 import com.roadrunner.search.repo.RRSSkuRepository;
+import com.roadrunner.search.repo.SeoCategoryRepository;
 import com.roadrunner.search.service.BloomreachSearchRecommendationService;
 import com.roadrunner.search.service.BloomreachSearchService;
 import com.roadrunner.search.tools.BloomreachProductSearchResults;
@@ -98,27 +102,30 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 	@Autowired
 	private ProductSkuHelper productSkuHelper;
 
+	@Autowired
+	private SeoCategoryRepository seoCategoryRepository;
+
 	private Map<String, String> bloomreachUrlMap;
 	private List<String> skipList;
 	private Map<String, String> nonPromotionalProducts;
 	private Map<String, String> vipURLMap;
 	private int upsellProductsSize;
+	private int qty;
+
+	private Map<String, SeoRecommendationBean> seoRecommendationsMap = new HashMap<String, SeoRecommendationBean>(); // webPgc:webSubPgc=bean
 
 	@Override
-	public List<RecommendationProductDTO> searchRecommendations(Object profile, Map<String, String> refParams,
-			boolean kidsSite, boolean isWearometer) {
-
+	public List<RecommendationProductDTO> searchRecommendations(Object profile, Map<String, String> refParams) {
 		if (CollectionUtils.isEmpty(refParams)) {
 			log.debug("BloomreachSearchRecommendationServiceImpl :: searchRecommendations: input params are empty");
 		}
-		profile = new Object();// need to set up the profile data
 		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
 		BloomreachSearchResultsDTO upSellProducts = new BloomreachSearchResultsDTO();
 		List<RecommendationProductDTO> upsellProductResults = new ArrayList<>();
-		bloomreachSearchResponse = doSearch(refParams);
+		bloomreachSearchResponse = doSearch(refParams, null);
 		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, upSellProducts);
 		upsellProductResults = upSellProducts.getResults();
-		if (null != profile && !isWearometer) {
+		if (null != profile) {
 			upsellProductResults = populateVIPProducts(profile, upSellProducts.getResults());
 			log.debug("BloomreachSearchRecommendationServiceImpl::searchRecommendations::  upSellProducts {}",
 					upSellProducts);
@@ -128,7 +135,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 
 	@Override
 	public List<RecommendationProductDTO> searchRecommendationsForUpSell(Object profile, Map<String, String> refParams,
-			boolean isWearometer, UpSellProductsDTO pUpSellProductsDTO) {
+			UpSellProductsDTO pUpSellProductsDTO) {
 		if (CollectionUtils.isEmpty(refParams)) {
 			log.debug(
 					"BloomreachSearchRecommendationServiceImplImpl:: searchRecommendationsForUpSell: input params are empty");
@@ -138,12 +145,11 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		BloomreachSearchResultsDTO upSellProducts = new BloomreachSearchResultsDTO();
 		List<RecommendationProductDTO> upsellProductResults = new ArrayList<>();
 		String methodName = refParams.get(BloomreachConstants.RECOMMENDATION_METHOD);
-		bloomreachSearchResponse = doSearch(refParams);
+		bloomreachSearchResponse = doSearch(refParams, null);
 		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, upSellProducts);
 		upsellProductResults = upSellProducts.getResults();
 		pUpSellProductsDTO.setMetadata(bloomreachSearchResponse.getMetadata());
-		if (null != profile && !isWearometer && null != methodName
-				&& !methodName.contains(BloomreachConstants.OUTFIT_YOUR_RUN)
+		if (null != profile && null != methodName && !methodName.contains(BloomreachConstants.OUTFIT_YOUR_RUN)
 				&& !methodName.contains(BloomreachConstants.BEST_SELLER)) {
 			upsellProductResults = populateVIPProducts(profile, upSellProducts.getResults());
 			log.debug("BloomreachSearchRecommendationServiceImpl::searchRecommendationsForUpSell::  upSellProducts {}",
@@ -154,7 +160,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 
 	@Override
 	public List<RecommendationProductDTO> searchRecommendationsForCrossSell(Object profile,
-			Map<String, String> refParams, boolean isWearometer, CrossSellProductsDTO crossSellProductsDTO) {
+			Map<String, String> refParams, CrossSellProductsDTO crossSellProductsDTO) {
 		if (CollectionUtils.isEmpty(refParams)) {
 			log.debug(
 					"BloomreachSearchRecommendationServiceImpl :: searchRecommendationsForCrossSell: input params are empty");
@@ -163,24 +169,128 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
 		BloomreachSearchResultsDTO crossSellProducts = new BloomreachSearchResultsDTO();
 		List<RecommendationProductDTO> crossSellProductResults = new ArrayList<>();
-		bloomreachSearchResponse = doSearch(refParams);
+		bloomreachSearchResponse = doSearch(refParams, null);
 		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, crossSellProducts);
 		crossSellProductResults = crossSellProducts.getResults();
-		if (null != profile && !isWearometer && null != crossSellProductResults && !crossSellProductResults.isEmpty()) {
+		if (null != profile && null != crossSellProductResults && !crossSellProductResults.isEmpty()) {
 			crossSellProductsDTO.setMetadata(bloomreachSearchResponse.getMetadata());
 			log.debug(
-					"BloomreachSearchRecommendationService::searchRecommendationsForCrossSell::  crossSellProducts {}",
+					"BloomreachSearchRecommendationServiceImpl::searchRecommendationsForCrossSell::  crossSellProducts {}",
 					crossSellProducts);
 		}
 		return crossSellProductResults;
 	}
 
-	private BloomreachSearchResponseDTO doSearch(Map<String, String> refParams) {
+	@Override
+	public List<String> searchRecommendation(Map<String, String> refParams, ProductDTO products,
+			HttpServletRequest request) {
+		List<String> searchRes = new LinkedList<String>();
+		if (refParams == null) {
+			log.warn("BloomreachSearchRecommendationServiceImpl.searchRecommendation: input param is empty");
+			return searchRes;
+		}
+		String webPgc = BloomreachConstants.EMPTY_STRING;
+		String webSubPgc = BloomreachConstants.EMPTY_STRING;
+		String kidsGender = BloomreachConstants.EMPTY_STRING;
+		String genderCode = null;
+		webPgc = refParams.get(SearchConstants.WEB_PGC_CODE_PARAM);
+		webSubPgc = refParams.get(SearchConstants.WEB_PGC_SUB_CODE_PARAM);
+		genderCode = refParams.get(SearchConstants.GENDER_PARAM);
+		kidsGender = refParams.get(SearchConstants.KIDS_GENDER);
+
+		if (!StringUtils.isEmpty(kidsGender)) {
+			refParams.put(BloomreachConstants.PRODUCT_FIELD.KIDS_GENDER, kidsGender);
+		} else {
+			if (!StringUtils.isEmpty(genderCode)) {
+				String gender = String.valueOf(products.getGenderText());
+				refParams.put(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT, gender);
+			}
+		}
+		List<Map<String, String>> targetRefinements = getTargetRefinements(webPgc, webSubPgc, genderCode);
+		if (!CollectionUtils.isEmpty(targetRefinements)) {
+			targetRefinements.parallelStream().forEachOrdered(targetRefinement -> {
+				if (!CollectionUtils.isEmpty(targetRefinement)) {
+					refParams.remove(BloomreachConstants.PRODUCT_FIELD.WEB_PGC);
+					refParams.remove(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC);
+					refParams.remove(BloomreachConstants.PRODUCT_FIELD.BRAND);
+					refParams.remove(BloomreachConstants.PRODUCT_FIELD.APPAREL_TYPE);
+					boolean match = false;
+					if (targetRefinement.containsKey(BloomreachConstants.PRODUCT_FIELD.WEB_PGC)) {
+						refParams.put(BloomreachConstants.PRODUCT_FIELD.WEB_PGC,
+								targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.WEB_PGC));
+						String webPgcRefinement = targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.WEB_PGC);
+						if (webPgcRefinement.equalsIgnoreCase(SearchConstants.INSOLES)
+								|| webPgcRefinement.equalsIgnoreCase(SearchConstants.PGC_CODE_VALUE)) {
+							refParams.remove(SearchConstants.GENDER_PARAM);
+							refParams.remove(SearchConstants.GENDER_TEXT);
+						}
+						match = true;
+					}
+					if (targetRefinement.containsKey(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC)) {
+						refParams.put(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC,
+								targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC));
+						match = true;
+					}
+
+					if (targetRefinement.containsKey(BloomreachConstants.PRODUCT_FIELD.APPAREL_TYPE)) {
+						refParams.put(BloomreachConstants.PRODUCT_FIELD.APPAREL_TYPE,
+								targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.APPAREL_TYPE));
+						match = true;
+					}
+
+					if (targetRefinement.containsKey(BloomreachConstants.PRODUCT_FIELD.BRAND)) {
+						String targetBrand = targetRefinement.get(BloomreachConstants.PRODUCT_FIELD.BRAND);
+						if (StringUtils.isEmpty(targetBrand)) {
+							targetBrand = refParams.get(SearchConstants.BRAND_PARAM);
+						}
+						if (!StringUtils.isEmpty(targetBrand)) {
+							refParams.put(BloomreachConstants.PRODUCT_FIELD.BRAND, targetBrand);
+							match = true;
+						}
+					}
+					log.debug("BloomreachSearchRecommendationServiceImpl :: searchRecommendation: targetRefinement={}",
+							targetRefinement);
+					if (match) {
+						BloomreachSearchResponseDTO upsellProductResults = crossSellRecommendations(null, refParams);
+						List<String> recommendationIds = new ArrayList<>();
+						if (null != upsellProductResults && null != upsellProductResults.getResponse()
+								&& !CollectionUtils.isEmpty(upsellProductResults.getResponse().getDocs())) {
+							upsellProductResults.getResponse().getDocs().stream().limit(qty).forEach(product -> {
+								recommendationIds.add(product.getPid());
+							});
+						}
+						log.debug(
+								"BloomreachSearchRecommendationServiceImpl :: searchRecommendation: refParams={}, recommendationIds={}",
+								refParams, recommendationIds);
+
+						if (!CollectionUtils.isEmpty(recommendationIds)) {
+							int endIdx = (recommendationIds.size() > qty) ? qty : recommendationIds.size();
+							searchRes.addAll(recommendationIds.subList(0, endIdx));
+						}
+					}
+				}
+			});
+
+		}
+		if (CollectionUtils.isEmpty(searchRes)) {
+			log.debug("BloomreachSearchRecommendationServiceImpl :: searchRecommendation: search results are empty");
+			return searchRes;
+		}
+		String ids = StringUtil.listToString(searchRes);
+		log.debug("BloomreachSearchRecommendationService :: searchRecommendation: ids={} refParams={}", ids, refParams);
+		return searchRes;
+
+	}
+
+	private BloomreachSearchResponseDTO doSearch(Map<String, String> refParams, HttpServletRequest request) {
 		BloomreachSearchResponseDTO bloomreachSearchResponseDTO = new BloomreachSearchResponseDTO();
 		String url;
 		String apparel = refParams.get(SearchConstants.IS_APPAREL);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+		if (request != null) {
+			request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		}
 		log.debug("BloomreachSearchRecommendationServiceImpl::doSearch START...{}", stopWatch.getTime());
 		boolean isApparel = false;
 		if (null != apparel && apparel.equalsIgnoreCase(SearchConstants.TRUE)) {
@@ -197,7 +307,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		try {
 			if (!rrConfiguration.isEnablePathwayRecommendation() || isApparel || isOutlet) {
 				url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(),
-						getParamsString(populateRequestParam(), refParams));
+						getParamsString(populateRequestParam(request), refParams));
 			} else {
 				url = MessageFormat.format(bloomreachConfiguration.getPathWayUrl(),
 						bloomreachConfiguration.getRecommendationId()
@@ -217,10 +327,8 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return bloomreachSearchResponseDTO;
 	}
 
-	public Map<String, String> populateRequestParam() {
+	public Map<String, String> populateRequestParam(HttpServletRequest request) {
 		String domain = null;
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
 		if (null != request) {
 			StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
 					.getRequestURL();
@@ -280,8 +388,10 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 						.replaceAll(SearchConstants.SPACE, BloomreachConstants.PERCENTAGE_20)
 						.replaceAll(BloomreachConstants.PERCENTAGE_3A, SearchConstants.COLON)
 						.replaceAll(BloomreachConstants.PERCENTAGE_2C, BloomreachConstants.COMMA);
-				result.append(BloomreachConstants.PARAMETER_FQ + key + SearchConstants.COLON
-						+ BloomreachConstants.QUOTES + value + BloomreachConstants.QUOTES);
+				result.append(BloomreachConstants.PARAMETER_FQ);
+				result.append(URLEncoder.encode(
+						key + SearchConstants.COLON + BloomreachConstants.QUOTES + value + BloomreachConstants.QUOTES,
+						BloomreachConstants.UTF_8));
 				result.append(BloomreachConstants.URL_DELIMETER);
 			}
 			result.append(BloomreachConstants.PARAMETER_Q + SearchConstants.STAR);
@@ -429,7 +539,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		} else if (SearchConstants.VIP3.equalsIgnoreCase(memberShipLevel)) {
 			upSellProducts = addVIPProduct(upSellProducts, BloomreachConstants.RAC150);
 		}
-		log.info("BloomreachSearchRecommendationServiceImpl::populateVIPProducts::  upSellProducts {}", upSellProducts);
+		log.debug("BloomreachSearchRecommendationServiceImpl::populateVIPProducts::  upSellProducts {}", upSellProducts);
 		return upSellProducts;
 	}
 
@@ -529,7 +639,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		DCSPrice dcsPrice = dcsPriceRepository.findBypriceList(priceList, product.getProductId(), sku.getSkuId());
 		if (dcsPrice != null) {
 			price = (Double) dcsPrice.getListPrice();
-			log.debug("RelatedProductUtil :: getDoubleSkuPrice()==> price :: {} ", price);
+			log.debug("BloomreachSearchRecommendationServiceImpl :: getDoubleSkuPrice()==> price :: {} ", price);
 			if (price == null) {
 				price = 0.0;
 				log.warn(
@@ -559,6 +669,112 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			priceDtos.add(priceDTO);
 		}
 		log.debug("BloomreachSearchRecommendationServiceImpl :: addPrice() :: END priceDtos {}", priceDtos);
+	}
+
+	private List<Map<String, String>> getTargetRefinements(String webPgcCode, String webPgcSubCode, String genderCode) {
+		List<Map<String, String>> res = new LinkedList<Map<String, String>>();
+		seoRecommendation();
+		SeoRecommendationBean recBean = seoRecommendationsMap.get(getMapKey(genderCode, null, webPgcSubCode));
+		if (recBean == null) {
+			recBean = seoRecommendationsMap.get(getMapKey(genderCode, webPgcCode, null));
+		}
+		String webPgcCodeTarget = recBean.getWebPgcCodeTarget();
+		String webPgcSubCodeTarget = recBean.getWebPgcSubCodeTarget();
+		if (!StringUtils.isEmpty(webPgcSubCodeTarget)) {
+			processTargets(res, webPgcSubCodeTarget);
+		}
+		if (res.isEmpty() && !StringUtils.isEmpty(webPgcCodeTarget)) {
+			processTargets(res, webPgcCodeTarget);
+		}
+		return res;
+	}
+
+	private void seoRecommendation() {
+		seoRecommendationsMap = new HashMap<String, SeoRecommendationBean>();
+		List<SeoCategory> seoCategory = seoCategoryRepository.getSeoCategory();
+		SeoRecommendationBean bean = new SeoRecommendationBean();
+		String webPgcCode = null;
+		String webPgcSubCode = null;
+		String webPgcCodeTarget = null;
+		String webPgcSubCodeTarget = null;
+		String gender = null;
+		String qty = null;
+		if (!seoCategory.isEmpty()) {
+			for (SeoCategory seoItem : seoCategory) {
+				webPgcCode = seoItem.getWebPgcCode();
+				webPgcSubCode = seoItem.getWebPgcSubCode();
+				webPgcCodeTarget = seoItem.getWebPgcCodeTarget();
+				webPgcSubCodeTarget = seoItem.getWebPgcSubCodeTarget();
+				gender = seoItem.getGender();
+				qty = seoItem.getQty();
+				bean = new SeoRecommendationBean();
+				bean.setWebPgcCode(webPgcCode);
+				bean.setWebPgcSubCode(webPgcSubCode);
+				bean.setWebPgcCodeTarget(webPgcCodeTarget);
+				bean.setWebPgcSubCodeTarget(webPgcSubCodeTarget);
+				bean.setGender(gender);
+				bean.setQty(qty);
+				seoRecommendationsMap.put(getMapKey(gender, webPgcCode, webPgcSubCode), bean);
+			}
+		}
+	}
+
+	private void processTargets(List<Map<String, String>> res, String target) {
+		if (StringUtils.isEmpty(target) || res == null) {
+			return;
+		}
+		String[] targets = target.split(SearchConstants.COMMA);
+		if (!(targets == null || targets.length <= 0)) {
+			Map<String, String> targetRefinement = null;
+			for (String targetEl : targets) {
+				String[] targetEls = targetEl.split(":");
+				if (!(targetEls == null || targetEls.length <= 0) && targetEls.length > 1) {
+					targetRefinement = new HashMap<String, String>();
+					targetRefinement.put(BloomreachConstants.PRODUCT_FIELD.WEB_PGC, targetEls[0]);
+					targetRefinement.put(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC, targetEls[1]);
+					if (targetEls.length >= 3 && !StringUtils.isEmpty(targetEls[2])) {
+						String[] brandArr = targetEls[2].split("brand=");
+						if (brandArr != null && brandArr.length > 0) {
+							String brand = SearchConstants.EMPTY_STRING;
+							if (brandArr.length == 2 && !StringUtils.isEmpty(brandArr[1])) {
+								brand = brandArr[1];
+							}
+							targetRefinement.put(BloomreachConstants.PRODUCT_FIELD.BRAND, brand);
+						}
+					}
+					if (targetEls.length == 4 && !StringUtils.isEmpty(targetEls[3])) {
+						String[] xsellsArr = targetEls[3].split("xsells=");
+						if (xsellsArr != null && xsellsArr.length == 2) {
+							targetRefinement.put(BloomreachConstants.PRODUCT_FIELD.XSELLS, xsellsArr[1]);
+						}
+					}
+					res.add(targetRefinement);
+				}
+			}
+		}
+	}
+
+	public static String getMapKey(String gender, String webPgcCode, String webPgcSubCode) {
+		String res = SearchConstants.EMPTY_STRING;
+		if (!StringUtils.isEmpty(gender)) {
+			res = gender;
+		}
+		if (!StringUtils.isEmpty(webPgcCode)) {
+			res = res + SearchConstants.COLON + webPgcCode;
+		}
+		if (!StringUtils.isEmpty(webPgcSubCode)) {
+			res = res + SearchConstants.COLON + webPgcSubCode;
+		}
+		return res;
+	}
+
+	public BloomreachSearchResponseDTO crossSellRecommendations(Object pProfile, Map<String, String> refParams) {
+		if (CollectionUtils.isEmpty(refParams)) {
+			log.debug("BloomreachSearchRecommendationService :: crossSellRecommendations: input params are empty");
+		}
+		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
+		bloomreachSearchResponse = doSearch(refParams, null);
+		return bloomreachSearchResponse;
 	}
 
 }

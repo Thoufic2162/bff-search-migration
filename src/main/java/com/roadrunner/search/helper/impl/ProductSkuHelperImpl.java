@@ -83,7 +83,6 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 			skuId = entries.getSkuid();
 			skuId = StringUtil.getEncodedValue(skuId);
 			colorSkusDTO.setSku(skuId);
-			// color/color code
 			String skuColorCode = null;
 			String refColorCode = null;
 			String stylesSku = null;

@@ -13,31 +13,17 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "bloomreachconfig")
 public class BloomreachConfiguration {
 	private String searchApiUrl;
-
 	private String accountId;
-
 	private String authKey;
-
 	private String domainKey;
-
 	private List<String> fl;
-
 	private String requestType;
-
 	private String searchType;
-
 	private String catagorytype;
-
 	private String pathWayUrl;
-
 	private Map<String, String> recommendationId;
-
 	private String refUrl;
-
 	private String br_uid;
-	
 	private List<String> bestSellerField;
-	
 	private List<String> fields;
-
 }

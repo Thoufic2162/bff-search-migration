@@ -2,6 +2,8 @@ package com.roadrunner.search.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
@@ -33,7 +35,10 @@ public class SearchServiceImpl implements SearchService {
 	@Override
 	public RelatedProductResponseDTO getRelatedProducts(String productId) {
 		log.debug("SearchServiceImpl::getRelatedProducts::STARTED productId={}", productId);
-		RelatedProductResponseDTO relatedProductResponse = relatedProductTool.generateRelatedProducts(productId);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		RelatedProductResponseDTO relatedProductResponse = relatedProductTool.generateRelatedProducts(productId,
+				request);
 		log.debug("SearchServiceImpl::getRelatedProducts::ENDED ");
 		return relatedProductResponse;
 	}
