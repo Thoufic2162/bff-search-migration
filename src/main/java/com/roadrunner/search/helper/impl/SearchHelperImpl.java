@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -42,10 +43,8 @@ import lombok.extern.log4j.Log4j2;
 @ConfigurationProperties(prefix = "searchhelper")
 @Getter
 @Setter
+@SuppressWarnings("deprecation")
 public class SearchHelperImpl implements SearchHelper {
-
-	private Map<String, String> sortOptionsMap;
-	private Map<String, String> bloomreachUrlMap;
 
 	@Autowired
 	private CatalogElementsFinder catalogElementsFinder;
@@ -61,6 +60,9 @@ public class SearchHelperImpl implements SearchHelper {
 
 	@Autowired
 	private Gson gson;
+
+	private Map<String, String> sortOptionsMap;
+	private Map<String, String> bloomreachUrlMap;
 
 	@Override
 	public String getBrSearchToCategoryUrl(String query) {
@@ -541,6 +543,8 @@ public class SearchHelperImpl implements SearchHelper {
 		String resultString = null;
 		String pRParams = null;
 		String urlQuery = null;
+		String smartZone = pQueryParams.getProperty(BloomreachConstants.QPARAMS.SZ);
+		boolean szb = null != smartZone && SearchConstants.TRUE.equalsIgnoreCase(smartZone);
 		if (pQueryParams != null && pQueryParams.get(BloomreachConstants.QPARAMS.R) != null) {
 			pRParams = pQueryParams.get(BloomreachConstants.QPARAMS.R).toString();
 		}
@@ -608,13 +612,73 @@ public class SearchHelperImpl implements SearchHelper {
 							.concat((String) pQueryParams.get(BloomreachConstants.IS_GENDER)));
 				}
 			}
-
+			if (!szb) {
+				result.append(BloomreachConstants.URL_DELIMETER.concat(BloomreachConstants.DISABLE_IN_PRODUCTSEARCH));
+				formSearchColorFilters(pQueryParams, result);
+			}
 			resultString = result.toString();
-
 		}
 		log.debug("SearchHelperImpl.getParamsString: urlString{}", resultString);
 		log.debug("SearchHelperImpl.getParamsString: END::");
 		return resultString;
+	}
+
+	public void formSearchColorFilters(Properties pQueryParams, StringBuilder pResult) {
+		if (pQueryParams.get(SearchConstants.SEARCH_COLOR) != null) {
+			String[] colors = ((String) pQueryParams.get(SearchConstants.SEARCH_COLOR))
+					.split(BloomreachConstants.COMMA);
+			for (String color : colors) {
+				pResult.append(BloomreachConstants.URL_DELIMETER);
+				pResult.append(BloomreachConstants.PARAMETER_FQ);
+				pResult.append(BloomreachConstants.COLOR_GROUP.concat(BloomreachConstants.QUOTES)
+						.concat(WordUtils.capitalize(color)).concat(BloomreachConstants.QUOTES));
+			}
+		}
+		if (pQueryParams.get(SearchConstants.SEARCH_BRAND) != null && getCatalogElementsFinder().getBloomreachBrandMap()
+				.get(pQueryParams.get(SearchConstants.SEARCH_BRAND)) != null) {
+			String brandName = (String) pQueryParams.get(SearchConstants.SEARCH_BRAND);
+			pResult.append(BloomreachConstants.URL_DELIMETER);
+			pResult.append(BloomreachConstants.PARAMETER_FQ);
+			pResult.append(BloomreachConstants.BRAND_PARAMETER.concat(BloomreachConstants.QUOTES)
+					.concat(getCatalogElementsFinder().getBloomreachBrandMap().get(brandName))
+					.concat(BloomreachConstants.QUOTES));
+			if (brandName.equalsIgnoreCase(SearchConstants.OPTIC_NERVE)
+					|| brandName.equalsIgnoreCase(SearchConstants.ONE_BY_OPTIC_NERVE_WITH_HYPHEN)) {
+				pResult.append(BloomreachConstants.URL_DELIMETER);
+				pResult.append(BloomreachConstants.PARAMETER_FQ);
+				pResult.append(BloomreachConstants.BRAND_PARAMETER.concat(BloomreachConstants.QUOTES)
+						.concat(brandName.equalsIgnoreCase(SearchConstants.OPTIC_NERVE)
+								? SearchConstants.ONE_BY_OPTIC_NERVE
+								: SearchConstants.OPTICNERVE)
+						.concat(BloomreachConstants.QUOTES));
+			}
+		}
+		if (pQueryParams.get(SearchConstants.SEARCH_GENDER) != null) {
+			String genderName = (String) pQueryParams.get(SearchConstants.SEARCH_GENDER);
+			pResult.append(BloomreachConstants.URL_DELIMETER);
+			pResult.append(BloomreachConstants.PARAMETER_FQ);
+			if (genderName.equalsIgnoreCase(SearchConstants.KIDS)) {
+				pResult.append(BloomreachConstants.KIDS_GENDER.concat(BloomreachConstants.QUOTES)
+						.concat(WordUtils.capitalize(SearchConstants.KIDS)).concat(BloomreachConstants.QUOTES));
+			} else {
+				pResult.append(BloomreachConstants.GENDER_TEXT.concat(BloomreachConstants.QUOTES).concat(genderName)
+						.concat(BloomreachConstants.QUOTES));
+			}
+		}
+		if (pQueryParams.get(BloomreachConstants.SHOE_SIZE_PARAM) != null) {
+			String shoeSize = (String) pQueryParams.get(BloomreachConstants.SHOE_SIZE_PARAM);
+			pResult.append(BloomreachConstants.URL_DELIMETER);
+			pResult.append(BloomreachConstants.SHOE_SIZE_WITH_FILTER
+					.concat(shoeSize.replace(SearchConstants.SIZE_WITH_SPACE, BloomreachConstants.EMPTY_STRING))
+					.concat(BloomreachConstants.QUOTES));
+		}
+		if (pQueryParams.get(BloomreachConstants.APPAREL_SIZE) != null) {
+			String apparelSize = (String) pQueryParams.get(BloomreachConstants.APPAREL_SIZE);
+			pResult.append(BloomreachConstants.URL_DELIMETER);
+			pResult.append(BloomreachConstants.APPAREL_SIZE_WITH_FILTER
+					.concat(getCatalogElementsFinder().getApparelSizeMap().get(apparelSize))
+					.concat(BloomreachConstants.QUOTES));
+		}
 	}
 
 }

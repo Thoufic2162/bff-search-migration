@@ -12,73 +12,73 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BloomreachSearchResultsDTO {
 
-	String pageTitle;
+	private String pageTitle;
 
-	long totalSearchCount;
+	private long totalSearchCount;
 
-	BrandCategoriesResponse brand;
+	private BrandCategoriesResponse brand;
 
-	String redirectUrl;
+	private String redirectUrl;
 
-	String resultQuery;
+	private String resultQuery;
 
-	String seoFooterText;
+	private String seoFooterText;
 
-	List<BRSearchBaseDTO> breadcrums;
+	private List<BRSearchBaseDTO> breadcrums;
 
-	Map<String, List<BloomreachSearchRefinementsDTO>> refinements;
+	private Map<String, List<BloomreachSearchRefinementsDTO>> refinements;
 
-	List<RecommendationProductDTO> results;
+	private List<RecommendationProductDTO> results;
 
-	List<BRSearchBaseDTO> sorting;
+	private List<BRSearchBaseDTO> sorting;
 
-	String canonicalUrl;
+	private String canonicalUrl;
 
-	String title;
+	private String title;
 
-	String headerContent;
+	private String headerContent;
 
-	String description;
+	private String description;
 
-	List<String> banners;
+	private List<String> banners;
 
-	boolean isRetailUser;
+	private boolean isRetailUser;
 
-	String pageUrl;
+	private String pageUrl;
 
-	String clearRefUrl;
+	private String clearRefUrl;
 
-	boolean enableDynamicUrl;
+	private boolean enableDynamicUrl;
 
-	String h2;
+	private String h2;
 
-	String h3;
+	private String h3;
 
-	String h1;
+	private String h1;
 
-	String keywords;
+	private String keywords;
 
-	List<BRSearchBaseDTO> customUrl;
+	private List<BRSearchBaseDTO> customUrl;
 
-	String seoFooterTextFaq;
+	private String seoFooterTextFaq;
 
-	String seoRedirectUrl;
+	private String seoRedirectUrl;
 
-	String status = SearchConstants.ACTIVE;
+	private String status = SearchConstants.ACTIVE;
 
-	boolean displayBrandLandingPage;
+	private boolean displayBrandLandingPage;
 
-	boolean enableFitProfile;
+	private boolean enableFitProfile;
 
-	List<Map<String, String>> customerFitProfiles;
+	private List<Map<String, String>> customerFitProfiles;
 
-	String brandName;
+	private String brandName;
 
-	boolean isBrandSearch;
+	private boolean isBrandSearch;
 
-	boolean enabledisplayFTVmodal;
+	private boolean enabledisplayFTVmodal;
 
-	String searchPageBanner;
+	private String searchPageBanner;
 
 	private BRMetadata metaData;
 

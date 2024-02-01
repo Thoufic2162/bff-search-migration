@@ -59,8 +59,10 @@ public class RelatedProductTool {
 
 	@Autowired
 	private BloomreachSearchRecommendationService bloomreachSearchRecommendationService;
+
 	@Autowired
 	private BloomreachProductSearchResults bloomreachProductSearchResults;
+
 	@Autowired
 	private BloomreachSearchService bloomreachSearchService;
 
@@ -169,7 +171,7 @@ public class RelatedProductTool {
 			upSellProductsDTO.setTitle(BloomreachConstants.BEST_SELLER_TITLE);
 			relatedProductResponse.setUpsellProducts(upSellProductsDTO);
 			refParams.put(BloomreachConstants.RECOMMENDATION_METHOD, BloomreachConstants.RECENTLY_VIEWED_PRODUCTS);
-			refParams.put(BloomreachConstants.USER_ID,SearchConstants.EMPTY_STRING);// user id should be passes
+			refParams.put(BloomreachConstants.USER_ID, SearchConstants.EMPTY_STRING);// user id should be passes
 			CrossSellProductsDTO crossSell = new CrossSellProductsDTO();
 			crossSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForCrossSell(profile,
 					refParams, crossSellProductsDTO);
@@ -377,8 +379,7 @@ public class RelatedProductTool {
 			log.debug("RelatedProductTool :: isOutletProduct :: null product arg products: {}", products);
 			return false;
 		}
-		Boolean outlet = products.getClearance() != null && products.getClearance() == 1 ? true : false;
-		return outlet;
+		return products.getClearance() != null && products.getClearance() == 1 ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 }

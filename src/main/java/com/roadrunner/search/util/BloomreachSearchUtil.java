@@ -239,13 +239,13 @@ public class BloomreachSearchUtil {
 						}
 					} else {
 						StringBuffer brQueryParam = new StringBuffer(BloomreachConstants.EMPTY_STRING);
-						String[] queryStringurls = query.split(SearchConstants.SLASH);
-						String customQuery = null;
-						String seourl = query;
 						if (null != query && query.endsWith(BloomreachConstants.OUTLET_BASEMENT_URL)) {
 							query = query.replaceAll(BloomreachConstants.OUTLET_BASEMENT_URL,
 									BloomreachConstants.OUTLET_BASEMENT_ORDER_URL);
 						}
+						String[] queryStringurls = query.split(SearchConstants.SLASH);
+						String customQuery = null;
+						String seourl = query;
 						if (null != queryStringurls && queryStringurls.length > 1) {
 							customQuery = queryStringurls[queryStringurls.length - 1];
 						}

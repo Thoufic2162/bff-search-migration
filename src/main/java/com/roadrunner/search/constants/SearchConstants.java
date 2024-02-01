@@ -213,4 +213,6 @@ public class SearchConstants {
 	public static final String GENDER_TEXT = "gender_text";
 	public static final String RAC = "RAC";
 	public static final String CORSS_SELL_PRODUCTS_TITLE = "OUTFIT YOUR RUN";
+    public static final String ONE_BY_OPTIC_NERVE = "ONE by Optic Nerve";
+    public static final String OPTICNERVE = "Optic Nerve";
 }

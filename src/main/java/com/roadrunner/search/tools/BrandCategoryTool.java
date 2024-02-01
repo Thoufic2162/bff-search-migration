@@ -51,7 +51,7 @@ import lombok.extern.log4j.Log4j2;
 public class BrandCategoryTool {
 
 	@Autowired
-	Gson gson;
+	private Gson gson;
 
 	@Autowired
 	private BrandCategoryDataRepository brandCategoryDataRepository;

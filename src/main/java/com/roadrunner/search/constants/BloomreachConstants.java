@@ -199,5 +199,8 @@ public class BloomreachConstants {
 	public static final String OR_STRING = "OR";
 	public static final String QUOTES_WITH_FQ_ = "fq=";
 	public static final String TILDE = "~";
-
+    public static final String COLOR_GROUP = "colorGroup:";
+    public static final String SHOE_SIZE_WITH_FILTER = "&fq=Shoe_Size:\"";
+    public static final String APPAREL_SIZE_WITH_FILTER = "&fq=Apparel_Size:\"";
+    public static final String DISABLE_IN_PRODUCTSEARCH = "fq=disableInProductSearch:\"0\"";
 }
