@@ -12,7 +12,6 @@ import lombok.Data;
 @Component
 @ConfigurationProperties(prefix = "catalogelementsfinder")
 public class CatalogElementsFinder {
-
 	private List<String> gender;
 	private List<String> brands;
 	private List<String> subCategory;

@@ -31,7 +31,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.google.gson.Gson;
 import com.roadrunner.search.config.BloomreachConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
-import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.service.BloomreachSearchService;
 import com.roadrunner.search.util.BloomreachSearchUtil;
@@ -99,28 +98,6 @@ public class BloomreachSearchServiceImpl implements BloomreachSearchService {
 	}
 
 	@Override
-	public BloomreachSearchResponseDTO populateBloomreachResponse(String productId) {
-		BloomreachSearchResponseDTO bloomreachSearchResponseDTO = null;
-		if (!StringUtils.isEmpty(productId)) {
-			log.debug("BloomreachServiceImpl::populateBloomreachResponse..productId={}", productId);
-			bloomreachSearchResponseDTO = new BloomreachSearchResponseDTO();
-			Map<String, String> paramMap = new HashMap<>();
-			paramMap.put(BloomreachConstants.Q, productId);
-			Map<String, String> populateRequestParam = bloomreachSearchUtil.populateRequestParam(paramMap);
-			String paramString = bloomreachSearchUtil.formBloomreachParamUrl(populateRequestParam);
-			String url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(), paramString);
-			log.debug("BloomreachServiceImpl::populateBloomreachResponse..url={}", url);
-			String responseJson = null;
-			responseJson = bloomreachSearchApiCall(url);
-			if (null != responseJson) {
-				bloomreachSearchResponseDTO = gson.fromJson(responseJson.toString(), BloomreachSearchResponseDTO.class);
-			}
-			log.debug("BloomreachServiceImpl::populateBloomreachResponse..END");
-		}
-		return bloomreachSearchResponseDTO;
-	}
-
-	@Override
 	public String bloomreachApiCall(String url) {
 		log.debug("BloomreachServiceImpl::bloomreachApiCall START url{}", url);
 		URI urls = null;
@@ -148,28 +125,30 @@ public class BloomreachSearchServiceImpl implements BloomreachSearchService {
 	}
 
 	@Override
-	public BloomreachSearchResponseDTO populateProductsFromBR(List<String> productIds) {
+	public BloomreachSearchResponseDTO populateBloomreachResponse(String productId, List<String> productIds) {
 		BloomreachSearchResponseDTO bloomreachSearchResponseDTO = null;
-		if (!CollectionUtils.isEmpty(productIds)) {
-			log.debug("BloomreachServiceImpl::populateProductsFromBR.START.productId={}", productIds);
+		if (!StringUtils.isEmpty(productId) || !CollectionUtils.isEmpty(productIds)) {
+			log.debug("BloomreachServiceImpl::populateBloomreachResponse..productId={} productIds={}", productId,
+					productIds);
 			bloomreachSearchResponseDTO = new BloomreachSearchResponseDTO();
 			Map<String, String> paramMap = new HashMap<>();
-			paramMap.put(BloomreachConstants.Q, SearchConstants.STAR);
+			paramMap.put(BloomreachConstants.Q, productId);
 			Map<String, String> populateRequestParam = bloomreachSearchUtil.populateRequestParam(paramMap);
 			String paramString = bloomreachSearchUtil.formBloomreachParamUrl(populateRequestParam);
-			productIds = productIds.stream().map(id -> BloomreachConstants.QUOTES + id + BloomreachConstants.QUOTES)
-					.collect(Collectors.toList());
-			paramString = paramString.concat(BloomreachConstants.QUOTES_WITH_FQ_)
-					.concat(BloomreachConstants.PID_STRING + String.join(BloomreachConstants.OR_STRING, productIds));
 			String url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(), paramString);
-			log.debug("BloomreachServiceImpl::populateProductsFromBR..url={}", url);
-			String responseJson = null;
-			responseJson = bloomreachSearchApiCall(url);
+			if (!CollectionUtils.isEmpty(productIds)) {
+				productIds = productIds.stream().map(id -> BloomreachConstants.QUOTES + id + BloomreachConstants.QUOTES)
+						.collect(Collectors.toList());
+				paramString = paramString.concat(BloomreachConstants.QUOTES_WITH_FQ_).concat(
+						BloomreachConstants.PID_STRING + String.join(BloomreachConstants.OR_STRING, productIds));
+
+			}
+			log.debug("BloomreachServiceImpl::populateBloomreachResponse..url={}", url);
+			String responseJson = bloomreachSearchApiCall(url);
 			if (null != responseJson) {
 				bloomreachSearchResponseDTO = gson.fromJson(responseJson.toString(), BloomreachSearchResponseDTO.class);
 			}
-			log.debug("BloomreachServiceImpl::populateProductsFromBR..END bloomreachSearchResponseDTO={}",
-					bloomreachSearchResponseDTO);
+			log.debug("BloomreachServiceImpl::populateBloomreachResponse..END");
 		}
 		return bloomreachSearchResponseDTO;
 	}

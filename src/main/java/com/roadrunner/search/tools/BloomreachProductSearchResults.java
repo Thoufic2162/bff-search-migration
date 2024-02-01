@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -80,7 +81,7 @@ public class BloomreachProductSearchResults {
 			}
 			if (topPicks && rrConfiguration.isEnableSockInTopPicks()) {
 				BloomreachSearchResponseDTO bloomreachSearchResponse = bloomreachSearchService
-						.populateBloomreachResponse(rrConfiguration.getTopPickSockProduct());
+						.populateBloomreachResponse(rrConfiguration.getTopPickSockProduct(), null);
 				if (null != bloomreachSearchResponse.getResponse()
 						&& !CollectionUtils.isEmpty(bloomreachSearchResponse.getResponse().getDocs())) {
 					BRDoc product = bloomreachSearchResponse.getResponse().getDocs().get(0);
@@ -171,7 +172,7 @@ public class BloomreachProductSearchResults {
 					} else {
 						searchProductDTO.setHighestVIPPrice(highestVIPPrice);
 					}
-					if (!result.getUmapHideVip().isEmpty()
+					if (!StringUtils.isEmpty(result.getUmapHideVip())
 							&& SearchConstants.ONE_STRING.equals(result.getUmapHideVip())) {
 						searchProductDTO.setUmapHideVIP(true);
 					} else {

@@ -11,10 +11,8 @@ public interface BloomreachSearchService {
 
 	String bloomreachSearchApiCall(String reqURL);
 
-	BloomreachSearchResponseDTO populateBloomreachResponse(String productId);
-
 	String bloomreachApiCall(String url);
 
-	BloomreachSearchResponseDTO populateProductsFromBR(List<String> productIds);
+	BloomreachSearchResponseDTO populateBloomreachResponse(String productId, List<String> productIds);
 
 }

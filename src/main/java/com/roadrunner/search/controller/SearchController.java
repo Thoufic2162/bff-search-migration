@@ -9,6 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
+import com.roadrunner.search.dto.response.BaseResponseDTO;
 import com.roadrunner.search.service.SearchService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,27 +23,30 @@ public class SearchController {
 	private SearchService searchService;
 
 	@GetMapping(value = "/v1/rest-product-search")
-	private BloomreachSearchResultsDTO restProductSearch(@RequestParam("qUri") String qUri) {
+	private BaseResponseDTO<BloomreachSearchResultsDTO> restProductSearch(
+			@RequestParam(name = "qUri", required = true) String qUri) {
 		log.info("SearchController::restProductSearch::STARTED qUri={}", qUri);
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getRequest();
-		BloomreachSearchResultsDTO response = searchService.restProductSearch(qUri, request);
+		BaseResponseDTO<BloomreachSearchResultsDTO> response = searchService.restProductSearch(qUri, request);
 		log.info("SearchController::restProductSearch::ENDED");
 		return response;
 	}
 
 	@GetMapping("/v1/related-products")
-	public RelatedProductResponseDTO getRelatedProducts(String productId) {
-		log.info("SearchController::getRelatedProducts::START{} productId={}", productId);
-		RelatedProductResponseDTO relatedProducts = searchService.getRelatedProducts(productId);
+	public BaseResponseDTO<RelatedProductResponseDTO> getRelatedProducts(
+			@RequestParam(name = "productId", required = false) String productId,
+			@RequestParam(name = "page", required = false) String page) {
+		log.info("SearchController::getRelatedProducts::START{} productId={} page={}", productId, page);
+		BaseResponseDTO<RelatedProductResponseDTO> relatedProducts = searchService.getRelatedProducts(productId, page);
 		log.info("SearchController::getRelatedProducts::ENDED");
 		return relatedProducts;
 	}
 
 	@GetMapping("/v1/getNewOutletProducts")
-	public RelatedProductResponseDTO getNewOutletProducts() {
+	public BaseResponseDTO<RelatedProductResponseDTO> getNewOutletProducts() {
 		log.info("SearchController::getNewOutletProducts::START");
-		RelatedProductResponseDTO relatedProducts = searchService.getNewOutletProducts();
+		BaseResponseDTO<RelatedProductResponseDTO> relatedProducts = searchService.getNewOutletProducts();
 		log.info("SearchController::getNewOutletProducts::ENDED");
 		return relatedProducts;
 	}

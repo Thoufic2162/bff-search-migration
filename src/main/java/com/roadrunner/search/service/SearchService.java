@@ -4,16 +4,17 @@ import org.springframework.stereotype.Service;
 
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
+import com.roadrunner.search.dto.response.BaseResponseDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public interface SearchService {
 
-	BloomreachSearchResultsDTO restProductSearch(String qUri, HttpServletRequest request);
+	BaseResponseDTO<BloomreachSearchResultsDTO> restProductSearch(String qUri, HttpServletRequest request);
 
-	RelatedProductResponseDTO getRelatedProducts(String productId);
+	BaseResponseDTO<RelatedProductResponseDTO> getRelatedProducts(String productId, String page);
 
-	RelatedProductResponseDTO getNewOutletProducts();
+	BaseResponseDTO<RelatedProductResponseDTO> getNewOutletProducts();
 
 }

@@ -399,7 +399,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 
 	public String populatePathwaysRequestParam(Map<String, String> pRefParams) {
 		log.debug(
-				"BloomreachSearchRecommendationServiceImpl :: populatePathwaysRequestParam :: START :: pRefParams: {0}",
+				"BloomreachSearchRecommendationServiceImpl :: populatePathwaysRequestParam :: START :: pRefParams: {}",
 				pRefParams);
 		String recommendationMethod = pRefParams.get(BloomreachConstants.RECOMMENDATION_METHOD);
 		StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
@@ -535,7 +535,8 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		} else if (SearchConstants.VIP3.equalsIgnoreCase(memberShipLevel)) {
 			upSellProducts = addVIPProduct(upSellProducts, BloomreachConstants.RAC150);
 		}
-		log.debug("BloomreachSearchRecommendationServiceImpl::populateVIPProducts::  upSellProducts {}", upSellProducts);
+		log.debug("BloomreachSearchRecommendationServiceImpl::populateVIPProducts::  upSellProducts {}",
+				upSellProducts);
 		return upSellProducts;
 	}
 
@@ -669,7 +670,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 
 	private List<Map<String, String>> getTargetRefinements(String webPgcCode, String webPgcSubCode, String genderCode) {
 		List<Map<String, String>> res = new LinkedList<Map<String, String>>();
-		seoRecommendation();
+		featchSeoRecommendationData();
 		SeoRecommendationBean recBean = seoRecommendationsMap.get(getMapKey(genderCode, null, webPgcSubCode));
 		if (recBean == null) {
 			recBean = seoRecommendationsMap.get(getMapKey(genderCode, webPgcCode, null));
@@ -685,7 +686,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return res;
 	}
 
-	private void seoRecommendation() {
+	private void featchSeoRecommendationData() {
 		seoRecommendationsMap = new HashMap<String, SeoRecommendationBean>();
 		List<SeoCategory> seoCategory = seoCategoryRepository.getSeoCategory();
 		SeoRecommendationBean bean = new SeoRecommendationBean();
@@ -695,7 +696,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		String webPgcSubCodeTarget = null;
 		String gender = null;
 		String qty = null;
-		if (!seoCategory.isEmpty()) {
+		if (!CollectionUtils.isEmpty(seoCategory)) {
 			for (SeoCategory seoItem : seoCategory) {
 				webPgcCode = seoItem.getWebPgcCode();
 				webPgcSubCode = seoItem.getWebPgcSubCode();

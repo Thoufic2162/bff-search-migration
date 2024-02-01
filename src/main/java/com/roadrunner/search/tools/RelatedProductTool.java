@@ -2,6 +2,7 @@ package com.roadrunner.search.tools;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,13 @@ import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.ColorSkusDTO;
 import com.roadrunner.search.dto.CrossSellProductsDTO;
+import com.roadrunner.search.dto.ErrorConstants;
+import com.roadrunner.search.dto.ErrorDetailDTO;
 import com.roadrunner.search.dto.ProductDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.dto.UpSellProductsDTO;
+import com.roadrunner.search.dto.response.BaseResponseDTO;
 import com.roadrunner.search.helper.CookieHelper;
 import com.roadrunner.search.repo.RRSProductRepository;
 import com.roadrunner.search.repo.RRSProductWebRepository;
@@ -68,25 +72,48 @@ public class RelatedProductTool {
 	private String socks;
 	private String insole;
 
-	public RelatedProductResponseDTO generateRelatedProducts(String productId, HttpServletRequest request) {
+	public BaseResponseDTO<RelatedProductResponseDTO> generateRelatedProducts(String productId, String page,
+			HttpServletRequest request) {
 		log.debug("RelatedProductTool::generateRelatedProducts:::START...productId: {}", productId);
-		if (productId.isEmpty()) {
-			log.error("RelatedProductTool::relatedProducts" + "::invalid request");
+		BaseResponseDTO<RelatedProductResponseDTO> response = new BaseResponseDTO<>();
+		try {
+			if (StringUtils.isEmpty(productId)) {
+				log.error("RelatedProductTool::relatedProducts" + "::invalid request");
+			}
+			ProductDTO products = rrsProductRepository.getProducts(productId);
+			if (products == null && page == null) {
+				log.error("RelatedProductTool::relatedProducts::Cannot find the productId::product={}", productId);
+				response.setSuccess(Boolean.FALSE);
+				response.getErrors().add(new ErrorDetailDTO(new Date(), ErrorConstants.PRODUCT_NOT_FOUND));
+			} else {
+				RelatedProductResponseDTO relatedProductResponse = getRelatedProductResults(products, null, request);
+				if (relatedProductResponse == null) {
+					response.setSuccess(Boolean.FALSE);
+					response.getErrors()
+							.add(new ErrorDetailDTO(new Date(), ErrorConstants.FETCH_RELATED_PRODUCTS_ERROR));
+				} else {
+					response.setState(relatedProductResponse);
+					response.setSuccess(Boolean.TRUE);
+				}
+			}
+		} catch (Exception exception) {
+			log.error("RelatedProductTool::generateRelatedProducts::() exception:{}", exception);
+			response.setSuccess(Boolean.FALSE);
+			response.getErrors().add(new ErrorDetailDTO(new Date(), exception.getMessage()));
 		}
-		ProductDTO products = rrsProductRepository.getProducts(productId);
-		RelatedProductResponseDTO relatedProductResponse = getRelatedProductResults(products, null, request);
-		log.debug("RelatedProductTool::generateRelatedProducts::() relatedProductResponse:{}", relatedProductResponse);
+		log.debug("RelatedProductTool::generateRelatedProducts::() response:{}", response);
 		log.debug("RelatedProductTool::generateRelatedProducts:::END...");
-		return relatedProductResponse;
+		return response;
 	}
 
 	public RelatedProductResponseDTO fetchNewOutletProducts(Object profile, HttpServletRequest request) {
 		log.debug("RelatedProductTool::fetchNewOutletProducts::() generateNewOutletProducts:START request{}", request);
 		Boolean outlet = (Boolean) request.getAttribute(SearchConstants.PARAM_OUTLET);
 		int sizeLimit = 12;
-		RelatedProductResponseDTO relatedProductResponse = new RelatedProductResponseDTO();
+		RelatedProductResponseDTO relatedProductResponse = null;
 		UpSellProductsDTO upSellProductsDTO;
 		if (null != outlet && outlet.booleanValue()) {
+			relatedProductResponse = new RelatedProductResponseDTO();
 			Map<String, String> refParams = new HashMap<String, String>();
 			refParams.put(BloomreachConstants.PRODUCT_FIELD.OUTLET, SearchConstants.OUTLET);
 			refParams.put(BloomreachConstants.PRODUCT_FIELD.RANKING, SearchConstants.RANKING);
@@ -142,7 +169,7 @@ public class RelatedProductTool {
 			upSellProductsDTO.setTitle(BloomreachConstants.BEST_SELLER_TITLE);
 			relatedProductResponse.setUpsellProducts(upSellProductsDTO);
 			refParams.put(BloomreachConstants.RECOMMENDATION_METHOD, BloomreachConstants.RECENTLY_VIEWED_PRODUCTS);
-			refParams.put(BloomreachConstants.USER_ID, null);// user id should be passes
+			refParams.put(BloomreachConstants.USER_ID,SearchConstants.EMPTY_STRING);// user id should be passes
 			CrossSellProductsDTO crossSell = new CrossSellProductsDTO();
 			crossSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForCrossSell(profile,
 					refParams, crossSellProductsDTO);
@@ -295,8 +322,8 @@ public class RelatedProductTool {
 						} else {
 							BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
 							BloomreachSearchResultsDTO crossSellList = new BloomreachSearchResultsDTO();
-							bloomreachSearchResponse = bloomreachSearchService
-									.populateProductsFromBR(recommendationIds);
+							bloomreachSearchResponse = bloomreachSearchService.populateBloomreachResponse(null,
+									recommendationIds);
 							bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null,
 									crossSellList);
 							crossSellProductsList = crossSellList.getResults();
