@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
+import com.roadrunner.search.domain.RRSCategoryMap;
 import com.roadrunner.search.domain.SeoContent;
 import com.roadrunner.search.dto.BRSearchBaseDTO;
 import com.roadrunner.search.dto.BloomreachSearchRefinementsDTO;
@@ -28,6 +29,7 @@ import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.BrandCategoriesResponse;
 import com.roadrunner.search.dto.CatalogElementsFinder;
+import com.roadrunner.search.dto.CategoryItemDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.helper.BloomreachSearchDTOHelper;
 import com.roadrunner.search.helper.SearchHelper;
@@ -236,6 +238,29 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 					} else {
 						queryParams.setProperty(BloomreachConstants.QPARAMS.R,
 								BloomreachConstants.CAT_WALKING_AND_RUNNING);
+					}
+				}
+				boolean querySearch = !StringUtils.isEmpty(query);
+				if (querySearch) {
+					List<CategoryItemDTO> categoryItem = null;
+					categoryItem = bloomreachSearchUtil.getCategoryItem(query);
+					if (!CollectionUtils.isEmpty(categoryItem)) {
+						List<String> refinements = categoryItem.stream().map(CategoryItemDTO::getRefinements).flatMap(
+								refinementsList -> Arrays.stream(refinementsList.split(SearchConstants.SEMICOLON)))
+								.collect(Collectors.toList());
+						String categoryName = categoryItem.get(0).getCategoryName();
+						String param = queryParams.getProperty(BloomreachConstants.QPARAMS.R);
+						param = null != param ? BloomreachConstants.COMMA.concat(param)
+								: BloomreachConstants.EMPTY_STRING;
+						if ((!CollectionUtils.isEmpty(refinements) && null != param
+								&& !param.contains(BloomreachConstants.DROP_SHIP))
+								|| (!CollectionUtils.isEmpty(refinements) && null != categoryName
+										&& categoryName.equalsIgnoreCase(BloomreachConstants.SHOE_DOG_SEARCH))) {
+							String rParam = String.join(BloomreachConstants.COMMA, refinements);
+							queryParams.setProperty(BloomreachConstants.QPARAMS.QUERY,
+									BloomreachConstants.EMPTY_STRING);
+							queryParams.setProperty(BloomreachConstants.QPARAMS.R, rParam.concat(param));
+						}
 					}
 				}
 				if (StringUtils.isNotBlank(queryParams.getProperty(BloomreachConstants.QPARAMS.QUERY))) {

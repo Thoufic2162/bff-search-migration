@@ -568,6 +568,7 @@ catalogelementsfinder:
  
 bloomreachsearchutil:
  searchGenders: womens,mens,unisex,kids
+ siteId: 1
  excludeDynamicurlList: /category/brooks-shop-all-new-arrivals,/category/hoka-one-one-shop-all-new-arrivals,/category/asics-shop-all-new-arrivals,/category/nike-shop-all-new-arrivals,/category/new-balance-shop-all-new-arrivals,/category/saucony-shop-all-new-arrivals,/category/on-shop-all-new-arrivals,/category/altra-shop-all-new-arrivals,/category/adidas-shop-all-new-arrivals,/category/reebok-shop-all-new-arrivals,/category/mizuno-shop-all-new-arrivals,/category/korsa-shop-all-new-arraival,/category/rgear-drymax-socks,/category/rgear-compression-socks,/category/rgear-all-cuts,/category/rgear-socks-all-cushion,/category/superfeet-all-styles,/category/superfeet-run-comfort-max-insole,/category/superfeet-blue-insole,/category/superfeet-green-insole,/category/superfeet-berry-insole,/category/superfeet-blue-insole,/category/superfeet-green-insole,/category/superfeet-berry-insole,/category/womens-run-comfort-insole,/category/hyperice-hypervolt,/category/hyperice-normatec,/category/hyperice-venom,/category/hyperice-vibration,/category/hyperice-ice-compression,/category/hyperice-bags-holders,/category/balega-all-styles,/category/balega-hidden-comfort-socks,/category/balega-silver-performance-socks,/category/balega-blister-resist-socks,/category/balega-hidden-dry-socks,/category/womens-balega-euduro-socks,/category/rgear-proplush-socks,/category/korsa-best-sellers,/category/korsa-seasonal-stories,/category/shop-all-new-arrivals,/category/shop-all-brands,/category/compression-shorts,/category/cycling-bike-shorts,/category/golf-shoes,/category/headlamps,/category/knee-high-socks,/category/weightlifting-shoes,/category/tennis-apparel,/category/womens-5-inch-running-shorts
  urlOrderMap: 
   gender: 1
@@ -679,6 +680,12 @@ searchhelper:
   h20-audio: h20audio
 
 bloomreachproductsearchresults:
+ nonPromotionalProducts:
+  GIVEAHA: sdlli9xlpm
+  GIFTCARD: nvebbxkxba
+  RAC55: tr6eydtrei
+  RAC100: ch7hw5wr7e
+  RAC150: gey9p3mqw9
  brandNameMap:
   '[H20 Audio]': H20Audio
  productLandingSeoURL: 

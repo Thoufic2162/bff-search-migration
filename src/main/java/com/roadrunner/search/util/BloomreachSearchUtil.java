@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,7 +32,9 @@ import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.domain.SeoContent;
 import com.roadrunner.search.dto.CatalogElementsFinder;
+import com.roadrunner.search.dto.CategoryItemDTO;
 import com.roadrunner.search.helper.SearchHelper;
+import com.roadrunner.search.repo.RRSCategoryMapRepository;
 import com.roadrunner.search.repo.SeoContentRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +59,7 @@ public class BloomreachSearchUtil {
 	private List<String> excludedSubCategoryOrderList;
 	private Map<String, String> sportsMap;
 	private Map<String, String> sortOptionsMap;
+	private Integer siteId;
 
 	@Autowired
 	private SearchHelper searchHelper;
@@ -73,6 +75,9 @@ public class BloomreachSearchUtil {
 
 	@Autowired
 	private BloomreachConfiguration bloomreachConfiguration;
+
+	@Autowired
+	private RRSCategoryMapRepository rrsCategoryMapRepository;
 
 	public void constructQueryParams(HttpServletRequest request) {
 		String queryString = request.getQueryString();
@@ -802,6 +807,17 @@ public class BloomreachSearchUtil {
 		}
 		log.debug("BloomreachSearchUtil :: selectedNavigation :: selectedNavigationMap: {}", selectedNavigationMap);
 		return selectedNavigationMap;
+	}
+
+	public List<CategoryItemDTO> getCategoryItem(String query) {
+		log.debug("BloomreachSearchUtil :: getCategoryItem :: query: {}", query);
+		List<CategoryItemDTO> itemList = null;
+		if (StringUtils.isEmpty(query)) {
+
+		}
+		itemList = rrsCategoryMapRepository.getCategoryItem(siteId, query);
+		log.debug("BloomreachSearchUtil :: getCategoryItem :: itemList: {}", itemList);
+		return itemList;
 	}
 
 }

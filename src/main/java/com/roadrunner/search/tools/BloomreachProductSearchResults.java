@@ -48,6 +48,7 @@ public class BloomreachProductSearchResults {
 	private String vipPlus;
 	private double vipPlusPrice;
 	private List<String> promotionalProducts;
+	private Map<String, String> nonPromotionalProducts;
 
 	@Autowired
 	private RRConfiguration rrConfiguration;
@@ -131,6 +132,9 @@ public class BloomreachProductSearchResults {
 						isVideoIcon = true;
 					}
 					searchProductDTO.setDisplayVideo(isVideoIcon);
+					if (rrConfiguration.isEnableWidenImage() && nonPromotionalProducts.containsKey(sku)) {
+						searchProductDTO.setImageId(nonPromotionalProducts.get(sku));
+					}
 					searchProductDTO.setName(name);
 					String seoURl = getProductSeoUrl(sku, true, null, null, name);
 					searchProductDTO.setUrl(seoURl);
