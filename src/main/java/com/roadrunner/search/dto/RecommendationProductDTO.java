@@ -3,8 +3,8 @@ package com.roadrunner.search.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +15,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({ "isSku", "umapHideVIP", "lowestListPrice", "lowestSalePrice", "highestSalePrice",
+		"lowestVIPPrice", "highestVIPPrice", "lowestUmapPrice", "highestUmapPrice", "hasSkus", "hideMsrp",
+		"specialPricing", "displayVideo" })
 public class RecommendationProductDTO extends SearchBaseDTO {
 
 	private String sku = "";
@@ -45,7 +48,6 @@ public class RecommendationProductDTO extends SearchBaseDTO {
 
 	private int reviews;
 
-	@JsonIgnore
 	private boolean displayVideo;
 
 	private String saleMessage;
@@ -56,47 +58,35 @@ public class RecommendationProductDTO extends SearchBaseDTO {
 
 	private InventoryDTO inventory;
 
-	@JsonIgnore
 	private String specialPricing = "";
 
-	@JsonIgnore
 	private boolean umapHideVIP;
 
-	@JsonIgnore
 	private double lowestListPrice = 0.0;
 
-	@JsonIgnore
 	private double lowestSalePrice = 0.0;
 
-	@JsonIgnore
 	private double highestSalePrice = 0.0;
 
-	@JsonIgnore
 	private double lowestVIPPrice = 0.0;
 
-	@JsonIgnore
 	private double highestVIPPrice = 0.0;
 
-	@JsonIgnore
 	private double lowestUmapPrice = 0.0;
 
-	@JsonIgnore
 	private double highestUmapPrice = 0.0;
 
-	@JsonIgnore
 	private String isSku = "false";
 
-	@JsonIgnore
 	private String hasSkus = "false";
 
-	@JsonIgnore
 	private boolean hideMsrp;
 
 	private boolean displayVipMessage;
 
 	private boolean recommendedProduct;
 
-	@SerializedName("imageId")
+	@JsonProperty("imageId")
 	private String imageId;
 
 	private boolean sflSkuInStock;

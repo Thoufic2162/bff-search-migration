@@ -68,8 +68,7 @@ public class BloomreachBreadcrumSearchResults {
 		log.debug(
 				"BloomreachBreadcrumSearchResults :: getBreadCrumbs() START :: searchResults {} request {} bloomreachSearchResults {}",
 				searchResults, request, bloomreachSearchResults);
-
-		Properties queryParams = HttpUtil.getRequestAttribute(request);
+		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String selNavs = null;
 		String qUri = URLCoderUtil.decode(request.getParameter(SearchConstants.QURI));
 		if (null != queryParams.getProperty(BloomreachConstants.SEARCH_REDIRECT_URL)) {
@@ -132,150 +131,156 @@ public class BloomreachBreadcrumSearchResults {
 				if (seoRepo != null && seoRepo.getBreadCrums() != null) {
 					String breadcrumString = (String) seoRepo.getBreadCrums();
 					setBreadCrumFromSeo(bloomreachSearchResults, breadcrumString);
-				}
-			} else {
-				bloomreachSearchResults.getBreadcrums()
-						.removeIf(breadcrum -> breadcrum.getName().equals(SearchConstants.UNISEX));
-				final String finalQRI = qUri;
-				bloomreachSearchResults.getBreadcrums().stream().forEach(breadcrum -> {
-					String[] urls = finalQRI.split(SearchConstants.SLASH);
-					int urlLength = 0;
-					if (finalQRI.contains(SearchConstants.SITE_KIDS)) {
-						urlLength = urls.length - 3;
-					} else {
-						urlLength = urls.length - 2;
-					}
-					if (urlCount.get() + 1 <= urlLength) {
-						StringBuilder urlBuilder = new StringBuilder();
-						for (int i = 1; i <= urlCount.get() + 2; i++) {
-							urlBuilder.append(SearchConstants.SLASH);
-							if (finalQRI.contains(SearchConstants.SITE_KIDS)) {
-								urlBuilder.append(urls[i + 1]);
-							} else {
-								urlBuilder.append(urls[i]);
-							}
-						}
+				} else {
+					bloomreachSearchResults.getBreadcrums()
+							.removeIf(breadcrum -> breadcrum.getName().equals(SearchConstants.UNISEX));
+					final String finalQRI = qUri;
+					bloomreachSearchResults.getBreadcrums().stream().forEach(breadcrum -> {
+						String[] urls = finalQRI.split(SearchConstants.SLASH);
+						int urlLength = 0;
 						if (finalQRI.contains(SearchConstants.SITE_KIDS)) {
-							breadcrum.setUrl(SearchConstants.CATEGORY_U + urlBuilder.toString());
+							urlLength = urls.length - 3;
 						} else {
-							breadcrum.setUrl(urlBuilder.toString());
+							urlLength = urls.length - 2;
 						}
-						urlCount.getAndIncrement();
-						if (breadcrum.getDimensionName() != null && titelOrderMap.containsKey(breadcrum
-								.getDimensionName().replace(SearchConstants.DOT, BloomreachConstants.EMPTY_STRING))) {
-							int titleOrder = Integer.parseInt((String) titelOrderMap.get(breadcrum.getDimensionName()
-									.replace(SearchConstants.DOT, BloomreachConstants.EMPTY_STRING)).trim());
-							breadcrum.setTextIndex(titleOrder);
-						}
-					} else {
-						toRemove.add(breadcrum);
-					}
-				});
-				bloomreachSearchResults.getBreadcrums().removeAll(toRemove);
-				bloomreachSearchResults.getBreadcrums().stream().filter(br -> null != br.getName()).forEach(bt -> {
-					int index = StringUtils.ordinalIndexOf(finalQRI, SearchConstants.SLASH, 3);
-					String prefixUrl = index > 0 ? finalQRI.substring(0, index) : finalQRI;
-					if (null != bt.getDimensionName()
-							&& bt.getDimensionName().equals(SearchConstants.ENDANGERED.toLowerCase())) {
-						bt.setName(SearchConstants.LAST_CHANCE_NAME);
-					} else if (null != bt.getDimensionName()
-							&& bt.getDimensionName().equals(SearchConstants.RACING.toLowerCase())) {
-						bt.setName(SearchConstants.RACING);
-					} else if (null != prefixUrl && (urlMap.containsKey(prefixUrl))
-							&& bt.getName().equalsIgnoreCase(SearchConstants.PGC_CODE_VALUE)) {
-						bt.setName(urlMap.get(prefixUrl));
-					}
-				});
-				if (!CollectionUtils.isEmpty(bloomreachSearchResults.getBreadcrums())) {
-					bloomreachSearchResults.getBreadcrums().get(bloomreachSearchResults.getBreadcrums().size() - 1)
-							.setUrl(null);
-				}
-				List<BRSearchBaseDTO> titleList = new ArrayList<BRSearchBaseDTO>(
-						bloomreachSearchResults.getBreadcrums());
-				Collections.sort(titleList, new SeoRefinementsBeanComparator());
-				titleList.forEach(title -> {
-					titleString.add(title.getName());
-				});
-				String title = BloomreachConstants.EMPTY_STRING;
-				title = String.join(SearchConstants.SPACE, titleString);
-				if (title.contains(BloomreachConstants.OUTLET_STRING)) {
-					title = title.replace(BloomreachConstants.OUTLET_STRING, SearchConstants.OUTLET);
-				}
-				bloomreachSearchResults.setPageTitle(title);
-				bloomreachSearchResults.setTitle(title + postfixTitle);
-			}
-			if (seoRepo != null && seoRepo.getBannerContent() != null) {
-				String bannerContent = (String) seoRepo.getBannerContent();
-				List<String> breadcrums = null;
-				breadcrums = getBreadcrumList(bannerContent, breadcrums);
-				if (null != breadcrums && !breadcrums.contains(SearchConstants.GIFT_CARD_BANNER)) {
-					if (breadcrums.size() > 1) {
-						breadcrums.add(1, SearchConstants.GIFT_CARD_BANNER);
-					} else {
-						breadcrums.add(SearchConstants.GIFT_CARD_BANNER);
-					}
-				}
-				bloomreachSearchResults.setBanners(breadcrums);
-			} else {
-				bloomreachSearchResults.setBanners(getBannersList(qUri, resultQuery));
-			}
-			if (seoRepo != null && seoRepo.getFooterContent() != null) {
-				bloomreachSearchResults.setSeoFooterText((String) seoRepo.getFooterContent());
-			}
-			if (seoRepo != null && seoRepo.getCanonicalUrl() != null) {
-				String canonicalUrl = (String) seoRepo.getCanonicalUrl();
-				if (null != canonicalUrl) {
-					for (String entryKey : canonicalMap.keySet()) {
-						if (canonicalUrl.contains(entryKey) && !canonicalUrl.contains(SearchConstants.EQUIPMENT)) {
-							canonicalUrl = canonicalUrl.replace(entryKey, canonicalMap.get(entryKey));
-						}
-					}
-				}
-				bloomreachSearchResults.setCanonicalUrl(canonicalUrl.toLowerCase());
-			} else {
-				if (null != qUri) {
-					String finalurl = SearchConstants.EMPTY_STRING;
-					String canonical = SearchConstants.EMPTY_STRING;
-					String words[] = qUri.split(SearchConstants.SLASH);
-					String canonicalResult = qUri;
-					if ((qUri.contains(SearchConstants.SITE_KIDS) && words.length == 8)
-							|| (!qUri.contains(SearchConstants.SITE_KIDS) && words.length == 9)) {
-						for (int i = 0; i < words.length - 2; i++) {
-							finalurl = finalurl + words[i] + SearchConstants.SLASH;
-
-						}
-						StringBuffer removeIndex = new StringBuffer(finalurl);
-						canonical = removeIndex.deleteCharAt(finalurl.length() - 1).toString();
-						String canonicalUrl = (SearchConstants.ROADRUNNERSPORTS) + canonical;
-						if (canonicalUrl != null) {
-							bloomreachSearchResults.setCanonicalUrl(canonicalUrl
-									.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase());
-						}
-					} else {
-						if (null != canonicalResult) {
-							for (String entryKey : canonicalMap.keySet()) {
-								if (canonicalResult.contains(entryKey)
-										&& !canonicalResult.contains(SearchConstants.EQUIPMENT)) {
-									canonicalResult = canonicalResult.replace(entryKey, canonicalMap.get(entryKey));
+						if (urlCount.get() + 1 <= urlLength) {
+							StringBuilder urlBuilder = new StringBuilder();
+							for (int i = 1; i <= urlCount.get() + 2; i++) {
+								urlBuilder.append(SearchConstants.SLASH);
+								if (finalQRI.contains(SearchConstants.SITE_KIDS)) {
+									urlBuilder.append(urls[i + 1]);
+								} else {
+									urlBuilder.append(urls[i]);
 								}
 							}
-						}
-						String canonicalUrl = (SearchConstants.ROADRUNNERSPORTS).concat(canonicalResult);
-						if (canonicalUrl != null && !canonicalUrl.endsWith(SearchConstants.SLASH)) {
-							bloomreachSearchResults.setCanonicalUrl(canonicalUrl
-									.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase());
+							if (finalQRI.contains(SearchConstants.SITE_KIDS)) {
+								breadcrum.setUrl(SearchConstants.CATEGORY_U + urlBuilder.toString());
+							} else {
+								breadcrum.setUrl(urlBuilder.toString());
+							}
+							urlCount.getAndIncrement();
+							if (breadcrum.getDimensionName() != null
+									&& titelOrderMap.containsKey(breadcrum.getDimensionName()
+											.replace(SearchConstants.DOT, BloomreachConstants.EMPTY_STRING))) {
+								int titleOrder = Integer
+										.parseInt((String) titelOrderMap.get(breadcrum.getDimensionName()
+												.replace(SearchConstants.DOT, BloomreachConstants.EMPTY_STRING))
+												.trim());
+								breadcrum.setTextIndex(titleOrder);
+							}
 						} else {
-							canonicalUrl = canonicalUrl.substring(0, canonicalUrl.length() - 1);
-							bloomreachSearchResults.setCanonicalUrl(canonicalUrl
-									.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase());
+							toRemove.add(breadcrum);
+						}
+					});
+					bloomreachSearchResults.getBreadcrums().removeAll(toRemove);
+					bloomreachSearchResults.getBreadcrums().stream().filter(br -> null != br.getName()).forEach(bt -> {
+						int index = StringUtils.ordinalIndexOf(finalQRI, SearchConstants.SLASH, 3);
+						String prefixUrl = index > 0 ? finalQRI.substring(0, index) : finalQRI;
+						if (null != bt.getDimensionName()
+								&& bt.getDimensionName().equals(SearchConstants.ENDANGERED.toLowerCase())) {
+							bt.setName(SearchConstants.LAST_CHANCE_NAME);
+						} else if (null != bt.getDimensionName()
+								&& bt.getDimensionName().equals(SearchConstants.RACING.toLowerCase())) {
+							bt.setName(SearchConstants.RACING);
+						} else if (null != prefixUrl && (urlMap.containsKey(prefixUrl))
+								&& bt.getName().equalsIgnoreCase(SearchConstants.PGC_CODE_VALUE)) {
+							bt.setName(urlMap.get(prefixUrl));
+						}
+					});
+					if (!CollectionUtils.isEmpty(bloomreachSearchResults.getBreadcrums())) {
+						bloomreachSearchResults.getBreadcrums().get(bloomreachSearchResults.getBreadcrums().size() - 1)
+								.setUrl(null);
+					}
+					List<BRSearchBaseDTO> titleList = new ArrayList<BRSearchBaseDTO>(
+							bloomreachSearchResults.getBreadcrums());
+					Collections.sort(titleList, new SeoRefinementsBeanComparator());
+					titleList.forEach(title -> {
+						titleString.add(title.getName());
+					});
+					String title = BloomreachConstants.EMPTY_STRING;
+					title = String.join(SearchConstants.SPACE, titleString);
+					if (title.contains(BloomreachConstants.OUTLET_STRING)) {
+						title = title.replace(BloomreachConstants.OUTLET_STRING, SearchConstants.OUTLET);
+					}
+					bloomreachSearchResults.setPageTitle(title);
+					bloomreachSearchResults.setTitle(title + postfixTitle);
+				}
+				if (seoRepo != null && seoRepo.getBannerContent() != null) {
+					String bannerContent = (String) seoRepo.getBannerContent();
+					List<String> breadcrums = null;
+					breadcrums = getBreadcrumList(bannerContent, breadcrums);
+					if (null != breadcrums && !breadcrums.contains(SearchConstants.GIFT_CARD_BANNER)) {
+						if (breadcrums.size() > 1) {
+							breadcrums.add(1, SearchConstants.GIFT_CARD_BANNER);
+						} else {
+							breadcrums.add(SearchConstants.GIFT_CARD_BANNER);
+						}
+					}
+					bloomreachSearchResults.setBanners(breadcrums);
+				} else {
+					bloomreachSearchResults.setBanners(getBannersList(qUri, resultQuery));
+				}
+				if (seoRepo != null && seoRepo.getFooterContent() != null) {
+					bloomreachSearchResults.setSeoFooterText((String) seoRepo.getFooterContent());
+				}
+				if (seoRepo != null && seoRepo.getCanonicalUrl() != null) {
+					String canonicalUrl = (String) seoRepo.getCanonicalUrl();
+					if (null != canonicalUrl) {
+						for (String entryKey : canonicalMap.keySet()) {
+							if (canonicalUrl.contains(entryKey) && !canonicalUrl.contains(SearchConstants.EQUIPMENT)) {
+								canonicalUrl = canonicalUrl.replace(entryKey, canonicalMap.get(entryKey));
+							}
+						}
+					}
+					bloomreachSearchResults.setCanonicalUrl(canonicalUrl.toLowerCase());
+				} else {
+					if (null != qUri) {
+						String finalurl = SearchConstants.EMPTY_STRING;
+						String canonical = SearchConstants.EMPTY_STRING;
+						String words[] = qUri.split(SearchConstants.SLASH);
+						String canonicalResult = qUri;
+						if ((qUri.contains(SearchConstants.SITE_KIDS) && words.length == 8)
+								|| (!qUri.contains(SearchConstants.SITE_KIDS) && words.length == 9)) {
+							for (int i = 0; i < words.length - 2; i++) {
+								finalurl = finalurl + words[i] + SearchConstants.SLASH;
+
+							}
+							StringBuffer removeIndex = new StringBuffer(finalurl);
+							canonical = removeIndex.deleteCharAt(finalurl.length() - 1).toString();
+							String canonicalUrl = (SearchConstants.ROADRUNNERSPORTS) + canonical;
+							if (canonicalUrl != null) {
+								bloomreachSearchResults.setCanonicalUrl(
+										canonicalUrl.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING)
+												.toLowerCase());
+							}
+						} else {
+							if (null != canonicalResult) {
+								for (String entryKey : canonicalMap.keySet()) {
+									if (canonicalResult.contains(entryKey)
+											&& !canonicalResult.contains(SearchConstants.EQUIPMENT)) {
+										canonicalResult = canonicalResult.replace(entryKey, canonicalMap.get(entryKey));
+									}
+								}
+							}
+							String canonicalUrl = (SearchConstants.ROADRUNNERSPORTS).concat(canonicalResult);
+							if (canonicalUrl != null && !canonicalUrl.endsWith(SearchConstants.SLASH)) {
+								bloomreachSearchResults.setCanonicalUrl(
+										canonicalUrl.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING)
+												.toLowerCase());
+							} else {
+								canonicalUrl = canonicalUrl.substring(0, canonicalUrl.length() - 1);
+								bloomreachSearchResults.setCanonicalUrl(
+										canonicalUrl.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING)
+												.toLowerCase());
+							}
 						}
 					}
 				}
-			}
-			setSeoData(bloomreachSearchResults, seoRepo);
-			setCustomUrl(bloomreachSearchResults, seoRepo);
-			if (bloomreachSearchResults.getClearRefUrl() == null) {
-				bloomreachSearchResults.setClearRefUrl(getClearRefUrl(qUri, request));
+				setSeoData(bloomreachSearchResults, seoRepo);
+				setCustomUrl(bloomreachSearchResults, seoRepo);
+				if (bloomreachSearchResults.getClearRefUrl() == null) {
+					bloomreachSearchResults.setClearRefUrl(getClearRefUrl(qUri, request));
+				}
 			}
 		}
 		log.debug("BloomreachBreadcrumSearchResults :: constructBreadCrums() END :: bloomreachSearchResults {}",

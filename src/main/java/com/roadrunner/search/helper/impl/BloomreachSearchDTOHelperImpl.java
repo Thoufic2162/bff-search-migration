@@ -108,7 +108,7 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 		BloomreachSearchResultsDTO bloomreachResults = null;
 		BloomreachSearchResponseDTO searchResults = null;
 		bloomreachSearchUtil.constructQueryParams(request);
-		Properties queryParams = HttpUtil.getRequestAttribute(request);
+		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String isMyPerfectFit = request.getParameter(SearchConstants.IS_PERFECT_FIT);
 		qUri = URLCoderUtil.decode(request.getParameter(SearchConstants.QURI));
 		if (null != queryParams.getProperty(BloomreachConstants.SEARCH_REDIRECT_URL)) {

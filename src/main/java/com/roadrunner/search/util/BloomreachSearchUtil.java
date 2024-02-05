@@ -103,7 +103,7 @@ public class BloomreachSearchUtil {
 						request.setAttribute(SearchConstants.ISDECODE, SearchConstants.TRUE);
 					});
 		}
-		Properties queryParams = HttpUtil.getRequestAttribute(request);
+		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String scriParam = queryParams.getProperty(BloomreachConstants.BR_SEO_CATEGORY_ITEM);
 		String cQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.COLOR));
 		String catQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.CATEGORY_Q));

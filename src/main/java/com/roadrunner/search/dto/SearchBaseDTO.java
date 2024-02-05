@@ -1,20 +1,21 @@
 package com.roadrunner.search.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
 @Data
-@JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties({ "sequence", "baseUrl", "index", "textIndex" })
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchBaseDTO {
 	private String state;
 	private String name;
 	private String dimensionName;
 	private String url;
+	@JsonProperty("seoURL")
 	private boolean seoUrl = true;
-	@JsonIgnore
 	private int sequence;
 	private String baseUrl;
 	private Integer index;

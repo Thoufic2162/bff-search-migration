@@ -81,7 +81,7 @@ public class BloomreachRefinementSearchResults {
 					"BloomreachRefinementSearchResults :: getRefinementSearchResults() ::RefinementSearchResults: Results are empty");
 			return;
 		}
-		Properties queryParams = HttpUtil.getRequestParams(request);
+		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		Map<String, List<BloomreachSearchRefinementsDTO>> refinements = doSearch(searchResults, queryParams, request,
 				responseBean);
 		responseBean.setRefinements(refinements);
@@ -94,7 +94,7 @@ public class BloomreachRefinementSearchResults {
 		log.debug(
 				"BloomreachRefinementSearchResults :: doSearch() :: START :: searchResults {} pQueryParams {} responseBean {}",
 				searchResults, pQueryParams, responseBean);
-		Properties queryParams = HttpUtil.getRequestParams(request);
+		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String selNavs = SearchConstants.EMPTY_STRING;
 		String pListParameter = request.getParameter(BloomreachConstants.LIST_PAGE);
 		String qUri = URLCoderUtil.decode(request.getParameter(SearchConstants.QURI));
@@ -480,7 +480,7 @@ public class BloomreachRefinementSearchResults {
 				qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
 			}
 			refs.stream().forEach(ref -> {
-				if (ref.getBaseUrl()!=null && !ref.getBaseUrl().isEmpty()) {
+				if (ref.getBaseUrl() != null && !ref.getBaseUrl().isEmpty()) {
 					ref.setUrl(ref.getBaseUrl());
 				}
 			});
@@ -1021,7 +1021,6 @@ public class BloomreachRefinementSearchResults {
 				}
 
 				url = BloomreachConstants.URL_START_DELIMETER + refURL;
-
 				String smartZone = queryParams.getProperty(BloomreachConstants.QPARAMS.SZ);
 				try {
 					if (null != queryParams.getProperty(BloomreachConstants.KDSBNR)
@@ -1059,7 +1058,8 @@ public class BloomreachRefinementSearchResults {
 					url += SearchConstants.URL_DELIMETER2 + BloomreachConstants.BR_SEO_CATEGORY_ITEM
 							+ BloomreachConstants.EQUAL + scriParam;
 				}
-
+				refinementBean.setUrl(url.replaceAll(BloomreachConstants.PERCENTAGE_20, BloomreachConstants.PLUS)
+						.replace(BloomreachConstants.PARAMETER_R_WITH2C, BloomreachConstants.R_EQUAL));
 				log.debug("BloomreachRefinementSearchResults :: buildRefinementDetails() refinments url {}", url);
 				if (null != searchRefinementQuery) {
 					searchRefinementQuery = searchRefinementQuery.replaceAll(SearchConstants.SPACE_REGEX,

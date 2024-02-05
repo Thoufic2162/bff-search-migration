@@ -200,7 +200,7 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 		Optional<ColorSkusDTO> colorCode = null;
 		Optional<ColorSkusDTO> colorData = null;
 		if (request != null) {
-			queryParams = HttpUtil.getRequestParams(request);
+			queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 			if (null != queryParams && null != queryParams.get(BloomreachConstants.QPARAMS.R)) {
 				rParam = queryParams.get(BloomreachConstants.QPARAMS.R).toString();
 			}

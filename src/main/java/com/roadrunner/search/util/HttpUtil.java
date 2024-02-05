@@ -6,42 +6,18 @@ import java.util.Properties;
 
 import com.roadrunner.search.constants.SearchConstants;
 
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
-@SuppressWarnings("rawtypes")
 public class HttpUtil {
 
-	public static Properties getRequestAttribute(ServletRequest request) {
+	public static Properties getRequestAttributesAndParameters(HttpServletRequest request) {
 		Properties requestParams = new Properties();
-		Enumeration e = request.getAttributeNames();
+		Enumeration<String> attributes = request.getAttributeNames();
+		Enumeration<String> params = request.getParameterNames();
 		String name = null;
 		Object value = null;
-		while (e.hasMoreElements()) {
-			name = (String) e.nextElement();
-			value = null;
-			String paramArr = request.getAttribute(name).toString();
-			if (paramArr != null) {
-				if (paramArr.length() > 1) {
-					value = paramArr;
-				} else {
-					value = paramArr;
-				}
-				if (!name.equalsIgnoreCase(SearchConstants.QURI)) {
-					requestParams.put(name, value);
-				}
-			}
-		}
-		return requestParams;
-	}
-
-	public static Properties getRequestParams(HttpServletRequest request) {
-		Properties requestParams = new Properties();
-		Enumeration e = request.getParameterNames();
-		String name = null;
-		Object value = null;
-		while (e.hasMoreElements()) {
-			name = (String) e.nextElement();
+		while (params.hasMoreElements()) {
+			name = (String) params.nextElement();
 			value = null;
 			String[] paramArr = request.getParameterValues(name);
 			if (paramArr != null) {
@@ -55,6 +31,16 @@ public class HttpUtil {
 				}
 			}
 		}
+		while (attributes.hasMoreElements()) {
+			name = (String) attributes.nextElement();
+			value = request.getAttribute(name).toString();
+			if (value != null) {
+				if (!name.equalsIgnoreCase(SearchConstants.QURI)) {
+					requestParams.put(name, value);
+				}
+			}
+		}
 		return requestParams;
 	}
+
 }
