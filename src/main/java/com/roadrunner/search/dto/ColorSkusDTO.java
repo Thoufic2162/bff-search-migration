@@ -2,7 +2,7 @@ package com.roadrunner.search.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
@@ -19,9 +19,9 @@ public class ColorSkusDTO {
 
 	private String colorDescription = "";
 
-	@SerializedName("imageId")
+	@JsonProperty("imageId")
 	private String embedId;
 
-	@SerializedName("altImageId")
+	@JsonProperty("altImageId")
 	private String altEmbedId;
 }
