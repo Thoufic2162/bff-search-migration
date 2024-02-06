@@ -163,12 +163,6 @@ public class SearchConstants {
 	public static final String RGEAR = "R-Gear";
 	public static final String HASH = "#";
 	public static final String RUNNING = "running";
-	public static final String CANONICAL_URL = "canonicalUrl";
-	public static final String TITLE = "title";
-	public static final String DESCRIPTION = "description";
-	public static final String HEADER_CONTENT = "headerContent";
-	public static final String PAGE_TITLE = "pageTitle";
-	public static final String SEO_FOOTER = "seoFooter";
 	public static final String HOKA = "hoka";
 	public static final String REFERENCE = "referer";
 	public static final String MEMBERSHIPLEVEL = "membershipLevel";

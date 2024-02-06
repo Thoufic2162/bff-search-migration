@@ -21,7 +21,6 @@ import org.springframework.util.CollectionUtils;
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
-import com.roadrunner.search.domain.RRSCategoryMap;
 import com.roadrunner.search.domain.SeoContent;
 import com.roadrunner.search.dto.BRSearchBaseDTO;
 import com.roadrunner.search.dto.BloomreachSearchRefinementsDTO;
@@ -397,33 +396,7 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 				&& null != request.getAttribute(BloomreachConstants.CLEAR_FILTER_URL)) {
 			bloomreachResults.setClearRefUrl((String) request.getAttribute(BloomreachConstants.CLEAR_FILTER_URL));
 		}
-		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.CANONICAL_URL))) {
-			String canonicalUrl = request.getParameter(SearchConstants.CANONICAL_URL);
-			if (canonicalUrl != null) {
-				bloomreachResults.setCanonicalUrl(
-						canonicalUrl.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase());
-			}
-		}
-		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.HEADER_CONTENT))) {
-			String headerContent = request.getParameter(SearchConstants.HEADER_CONTENT);
-			bloomreachResults.setHeaderContent(headerContent);
-		}
-		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.TITLE))) {
-			String pageTitle = request.getParameter(SearchConstants.TITLE);
-			bloomreachResults.setTitle(pageTitle);
-		}
-		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.DESCRIPTION))) {
-			String description = request.getParameter(SearchConstants.DESCRIPTION);
-			bloomreachResults.setDescription(description);
-		}
 		bloomreachResults.setResultQuery(resultQuery);
-		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.PAGE_TITLE))) {
-			String title = request.getParameter(SearchConstants.PAGE_TITLE).toLowerCase();
-			title = title.replace("<h1>", BloomreachConstants.EMPTY_STRING).replace("</h1>",
-					BloomreachConstants.EMPTY_STRING);
-			bloomreachResults.setPageTitle(title);
-			bloomreachResults.setSeoFooterText(request.getParameter(SearchConstants.SEO_FOOTER));
-		}
 		if (count != null && count.equalsIgnoreCase(SearchConstants.TRUE)) {
 			bloomreachResults.setStatus(BloomreachConstants.INACTIVE);
 		}

@@ -80,7 +80,7 @@ public class RelatedProductTool {
 		BaseResponseDTO<RelatedProductResponseDTO> response = new BaseResponseDTO<>();
 		try {
 			if (StringUtils.isEmpty(productId)) {
-				log.error("RelatedProductTool::relatedProducts" + "::invalid request");
+				log.error("RelatedProductTool::relatedProducts ::invalid request productId={}", productId);
 			}
 			ProductDTO products = rrsProductRepository.getProducts(productId);
 			if (products == null && page == null) {
@@ -148,7 +148,7 @@ public class RelatedProductTool {
 		String webPgc = SearchConstants.EMPTY_STRING;
 		String webSubPgc = SearchConstants.EMPTY_STRING;
 		String brand = SearchConstants.EMPTY_STRING;
-		Boolean outlet = SearchConstants.TRUE.equals(request.getParameter(SearchConstants.PARAM_OUTLET));
+		Boolean outlet = SearchConstants.TRUE.equals(request.getAttribute(SearchConstants.PARAM_OUTLET));
 		int sizeLimit = 0;
 		Integer genderCode = null;
 		sizeLimit = 12;

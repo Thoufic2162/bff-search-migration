@@ -77,7 +77,7 @@ public class BloomreachProductSearchResults {
 		if (searchResult != null && null != searchResult.getResponse()) {
 			List<BRDoc> results = searchResult.getResponse().getDocs();
 			boolean topPicks = false;
-			if (request.getParameter(SearchConstants.TOP_PICKS_SECTION) != null) {
+			if (request.getAttribute(SearchConstants.TOP_PICKS_SECTION) != null) {
 				topPicks = true;
 			}
 			if (topPicks && rrConfiguration.isEnableSockInTopPicks()) {
