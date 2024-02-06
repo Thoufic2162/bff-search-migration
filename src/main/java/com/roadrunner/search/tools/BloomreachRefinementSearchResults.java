@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,6 @@ import com.roadrunner.search.util.HttpUtil;
 import com.roadrunner.search.util.StringUtil;
 import com.roadrunner.search.util.URLCoderUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

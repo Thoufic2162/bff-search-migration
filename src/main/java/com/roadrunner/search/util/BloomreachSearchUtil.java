@@ -18,6 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,6 @@ import com.roadrunner.search.helper.SearchHelper;
 import com.roadrunner.search.repo.RRSCategoryMapRepository;
 import com.roadrunner.search.repo.SeoContentRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

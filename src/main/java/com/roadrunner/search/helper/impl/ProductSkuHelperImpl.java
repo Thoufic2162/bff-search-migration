@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +19,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.roadrunner.search.config.BloomreachConfiguration;
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.dto.BRDoc;
-import com.roadrunner.search.dto.CatalogElementsFinder;
 import com.roadrunner.search.dto.ColorSkusDTO;
 import com.roadrunner.search.dto.InventoryDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.dto.Variants;
 import com.roadrunner.search.helper.ProductSkuHelper;
-import com.roadrunner.search.helper.SearchHelper;
-import com.roadrunner.search.repo.SeoContentRepository;
 import com.roadrunner.search.util.HttpUtil;
 import com.roadrunner.search.util.StringUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

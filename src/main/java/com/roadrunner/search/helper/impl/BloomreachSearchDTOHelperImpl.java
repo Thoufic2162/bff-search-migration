@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,6 @@ import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.HttpUtil;
 import com.roadrunner.search.util.URLCoderUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

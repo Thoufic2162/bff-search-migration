@@ -3,11 +3,11 @@ package com.roadrunner.search.helper;
 import java.util.Optional;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
 
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public interface SearchHelper {

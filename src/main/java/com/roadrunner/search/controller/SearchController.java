@@ -1,5 +1,7 @@
 package com.roadrunner.search.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,7 +14,6 @@ import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.dto.response.BaseResponseDTO;
 import com.roadrunner.search.service.SearchService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 
 @RestController

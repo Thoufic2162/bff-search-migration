@@ -3,14 +3,14 @@ package com.roadrunner.search.service;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
 
 import com.roadrunner.search.dto.CrossSellProductsDTO;
 import com.roadrunner.search.dto.ProductDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.dto.UpSellProductsDTO;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public interface BloomreachSearchRecommendationService {

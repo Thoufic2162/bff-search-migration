@@ -2,6 +2,8 @@ package com.roadrunner.search.service.impl;
 
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -17,7 +19,6 @@ import com.roadrunner.search.helper.BloomreachSearchDTOHelper;
 import com.roadrunner.search.service.SearchService;
 import com.roadrunner.search.tools.RelatedProductTool;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 
 @Service

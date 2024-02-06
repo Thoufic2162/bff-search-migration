@@ -2,6 +2,10 @@ package com.roadrunner.search.helper.impl;
 
 import java.util.List;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -13,9 +17,6 @@ import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.helper.CookieHelper;
 import com.roadrunner.search.util.URLCoderUtil;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 
 @Component

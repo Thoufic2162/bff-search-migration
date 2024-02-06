@@ -1,12 +1,12 @@
 package com.roadrunner.search.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
 
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.dto.response.BaseResponseDTO;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public interface SearchService {
