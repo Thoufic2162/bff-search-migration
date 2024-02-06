@@ -1,0 +1,854 @@
+catalogelementsfinder: 
+ subCategory: footwear,running,trail-running,racing,cross-training,sandals,walking,casual,hiking,track-field,cross-country,court,other-sports,sportsbra,tops,outerwear,shorts,tightsandpants,undergear,dresses,baselayers,swimwear,trisuits,socks,insoles,brooks-ghost,asics-gel-kayano,brooks-glycerin,asics-gel-nimbus,gearinsoles,shop-all,trail,wrestling,basketball,cleats,sale,sports-tights-pants,sport-shorts,underwear,jackets,headwear,handwear,fitness-trackers-monitors,tights-pants,shorts-skorts,bras,gloves,injury-prevention,safety,sunglasses,holders,hydrationandholders,activitytrackers,fitness,fitness-equipment,electronics,drinks,gels,supplements,bars,skincare,cbd,24.7,unisuits,supplement,snack-foods,watches,towels,jogging-strollers
+ brands: adidas,activbody,addaday,aftershokz,altra,amphipod,aravon,armpocket,asics,brooks,balega,bauerfeind,beach-body,biolite,birkenstock,body-glide,boost-oxygen,buff,bumbleride,cali-weights,camelbak,caterpy,cep,chaco,champion,clif,columbia,craft,crescent-moon,cw-x,de-soto,dr.-scholls,dunham,ecco,egg-weights,elektroplate,emergency-id,fabletics,feetures,fitbit,fitletic,footbalance,foot-log,freeze-sleeve,garmin,glamorise,goodr,gu,hammer-nutrition,headsweats,hoka,honey-stinger,hotshot,huma,hydrapak,hydro-flask,hyperice,hush-puppies,injinji,inov-8,jaybird,jlab-audio,k9-sport-sack,keds,keen,kenneth-cole,korsa,lamo,lasso,lifepro,lock-laces,lyric,little-hotties,maisie-jane-s,mbt,mcdavid,triggerpoint,merino,merrell,mizuno,moji,mountain-shades,nike,nathan,new-balance,normatec,nuun,native,oakley,olukai,on,one,one80-light,oofos,pacific-health-labs,polar,prana,pro-compression,pro-tec-athletics,puma,plae,qardio,r-gear,rainbow,reebok,reef,rind-snacks,rockport,rocktape,roll-recovery,rpi,rrs,rudy-project,runguard,ryka,saucony,s-well,sabre,salming,salomon,saltstick,sanuk,scott,showerpill,skechers,skratch-labs,spenco,sperry,sport-beans,spring-energy,spryng,stance,steigen,strassburg,sugoi,superfeet,superga,suunto,stride-rite,tailwind-nutrition,teva,therabody,thule,tidl-sport,tifosi,tiger-tail,timberland,timex,topo-athletic,trakk,ultimate-direction,under-armour,vibram-fivefingers,vitargo,vj-shoes,vooray,ventolation,weckmethod,wigwam,yaktrax,yolo-farmstand,yurbuds,zensah,zero-odor,10-seconds,2undr,2xu,361-degrees,spyder,zamberlan,everlast,larq,untapped,scarpa,ales-grey,road-runner-sports,black-diamond,extreme-mist,g-shock,hydrapatch,kidrunner,lucyd,maurten,one-by-optic-nerve,ray-ban,ryker-roll,shokz,sprints,tru-grit,wahoo,gales,danner,xero-shoes,optic-nerve,h20audio,la-sportiva,k-swiss,kt,nonaste,bu,alleviate,vital-proteins,footlog,os1st,h20-audio,thorlo,muir-energy,ucan,prostretch,tuli-s,shefit,paddletek,selkirk,the-pod-company,tyrol
+ gender: womens,mens,unisex,boys,girls
+ category: shoes,apparel,accessories,nutrition
+ kidsGender: boys,girls,kids
+ kidsAccessoriesList: headwear
+ categoriesWithGear: shoes,apparel,accessories,nutrition,equipment,personalcare
+ nutritionSearchToCategoryList: drinks,gels,supplements,bars
+ colors: black,blue,grey,white,brown,green,pink,purple,red,beige,yellow,multi,orange
+ genderCategoryMap: 
+  men: mens
+  women: womens
+  boy: boys
+  girl: girls
+ pgcCategoryMap:
+  shoe: shoes
+  apparels: apparel
+  nutritions: nutrition
+  equipments: equipment
+ accessoriesSubPgc:
+  socks: socks
+  insoles: insoles
+  gloves: gloves
+  headwear: headwear
+  injury-prevention-and-recovery: injury-prevention
+  safety-and-recovery: safety
+  sunglasses: sunglasses
+  bags: holders
+  bottles: hydrationandholders
+  hat: headwear
+  hydrationandholders: hydrationandholders
+  holders: holders
+  '[hat-&-headwear]': headwear
+  '[injury-prevention-&-recovery]': injury-prevention
+  '[bottles-&-hydration-packs]': hydrationandholders
+  injury-prevention: injury-prevention
+  safety: safety
+ apparelSearchToCategoryMap:
+  tights-and-pants: tightsandpants
+  sports-bra: sportsbra
+  shorts-and-skorts: shorts-skorts
+  trisuits: trisuits
+  korsa: korsa
+  tops: tops
+  jackets: outerwear
+  underwear: underwear
+  socks: socks
+  insoles: insoles
+  top: tops
+  trisuit: trisuits
+  jacket: outerwear
+  underwears: underwear
+  sock: socks
+  '[shorts-&-skorts]': shorts-skorts
+  '[tights-&-pants]': tightsandpants
+  '[trisuits-and-singlets]': trisuits
+  shorts-skorts: shorts-skorts
+  shorts: shorts
+  outerwear: outerwear
+  '[sports-bras-&-bra-tops]': sportsbra
+  '[tights-pants-&-capris]': tightsandpants
+  tights-pants: tightsandpants
+  tightsandpants: tightsandpants
+  sports-bras: sportsbra
+  tights-pants-and-capris: tightsandpants
+  bras: sportsbra
+  sportsbra: sportsbra
+ shoesSearchToCategoryMap:
+  track-and-field: track-field
+  '[track-&-field]': track-field
+  running: running
+  trail: trail-running
+  cross-training: cross-training
+  racing: racing
+  sandals: sandals
+  walking: walking
+  casual: casual
+  hiking: hiking
+  track-field: track-field
+  cross-country: cross-country
+  court: court
+  wrestling: wrestling
+  basketball: basketball
+  cleats: cleats
+  trail-running: trail-running
+ boysSearchToCategoryMap:
+  tights-and-pants: sports-tights-pants
+  shorts: sport-shorts
+  bras: bras
+#  shorts: shorts
+ girlsSearchToCategoryMap:
+  tights-and-pants: tights-pants
+  shorts: shorts-skorts
+  bras: bras
+  socks: socks
+  tops: tops
+ equipmentSearchToCategoryMap:
+  fitness-trackers: activitytrackers
+  fitness-equipment: fitness-equipment
+  electronics: electronics
+  jogging-strollers: jogging-strollers
+  fitness-trackers-and-monitors: activitytrackers
+ personalCareSearchToCategoryMap: 
+  skin-care: skincare
+  skincare: skincare
+ mensApparelSubCategoryMap: 
+  tops: top
+  jackets: outerwear
+  jacket: outerwear
+  shorts: shorts
+  tights-and-pants: tightsandpants
+  underwear: underwear
+  trisuits-and-singlets: unisuits
+  socks: socks
+  insoles: insoles
+  shorts-and-skorts: shorts
+ womensApparelSubCategoryMap: 
+  sports-bras-and-bra-tops: sportsbra
+  sports-bras: sportsbra
+  sports-bra: sportsbra
+  bra-tops: sportsbra
+  tops: tops
+  jackets: outerwear
+  jacket: outerwear
+  shorts-and-skorts: shorts-skorts
+  tights-and-pants: tightsandpants
+  underwear: underwear
+  trisuits-and-singlets: unisuits
+  socks: socks
+  insoles: insoles
+ searchQueryMap: 
+  kids: /catalog/kids
+  kid: /catalog/kids
+  '[jogging+strollers]': /category/equipment/jogging-strollers
+  '[jogging+stroller]': /category/equipment/jogging-strollers
+  '[fitness+equipment]': /category/equipment/fitness-equipment
+  '[bottles+and+hydration+packs]': /category/accessories/hydrationandholders
+  '[hat+and+headwear]': /category/accessories/headwear
+ outletSubCategoryList: running,cross-training,trail
+ apparelSizeMap: 
+    xs: XS
+    s: S
+    m: M
+    l: L
+    xl: XL
+    xxl: XXL
+    xxxl: XXXL
+    small: S
+    large: L
+    medium: M
+    '[extra large]': XL
+    2x: XXL
+    3x: XXXL 
+ genderMap: 
+  womens: Women's
+  mens: Men's
+  unisex: Unisex
+  boys: Boys
+  girls: Girls
+ bloomreachUrlQueryMap: 
+  '[/category/womens/brooks/glycerin]': womens+brooks+glycerin
+  '[/category/womens/asics/gel-nimbus]': womens+asics+nimbus
+  '[/category/womens/brooks/ghost]': Womens+Brooks+Ghost
+  '[/category/mens/asics/gel-kayano]': mens+gel+kayano
+  '[/category/mens/asics/gel-nimbus]': mens+asics+nimbus
+  '[/category/mens/shoes/endangered]': mens+endangered+shoes
+  '[/category/womens/shoes/endangered]': womens+endangered+shoes
+  '[/category/mens/brooks/glycerin]': mens+brooks+glycerin
+  '[/category/womens/asics/gel-kayano]': womens+gel+kayano
+  '[/category/mens/brooks/ghost]': mens+Brooks+Ghost
+  '[/category/equipment/jogging-strollers]': jogging+strollers
+ #used to set the values for catagory_qr(value for q in brquery)for the links in top navigation
+ bloomreachExcludeSearchMap: 
+  '[/category/kids/boys/shoes/0-2years]': boys+shoes+0-2+years
+  '[/category/kids/boys/shoes/2-6years]': boys+shoes+2-6+years
+  '[/category/kids/boys/shoes/6years]': boys+shoes+6+years
+  '[/category/kids/girls/shoes/0-2years]': girls+shoes+0-2+years
+  '[/category/kids/girls/shoes/2-6years]': girls+shoes+2-6+years
+  '[/category/kids/girls/shoes/6years]': girls+shoes+6+years
+  '[/category/basement/outlet]': outlet
+  '[/category/apparel/basement/outlet]': outlet+basement+apparel
+  '[/category/shoes/basement/outlet]': outlet+basement+shoes
+  '[/category/accessories/basement/outlet]': outlet+basement+accessories
+  '[/category/outlet]': '*'
+  '[/category/socks]': socks
+  '[/category/personalcare/skincare]': skincare
+  '[/category/shoes]': shoes
+  '[/category/socks/r-gear]': socks+r-gear
+  '[/category/apparel]': apparel
+ queryMap: 
+   tennis: Tennis+%26+Volleyball
+   track-field: Track and Field
+   injury-prevention: Injury+Prevention+%26+Recovery
+   korsa: Korsa
+   cross-training: Training
+   sportsbra: Sport+Bras+%26+Bra+Tops
+   tightsandpants: Tights+%26+Pants
+   outerwear: Jackets
+   hoka: HOKA
+   sale: On+Sale
+   gloves: Handwear
+   safety: Safety+%26+Reflective
+   holders: Bags+%26+Holders
+   activitytrackers: Fitness+Trackers+%26+Monitors
+   hydrationandholders: Bottles+%26+Hydration+Packs
+   trail: Trail Running
+   cleats: Other+Sports
+   basketball: Tennis+%26+Volleyball
+   sports-tights-pants: Tights+%26+Pants
+   sport-shorts: Shorts
+   tights-pants: Tights+%26+Pants
+   shorts-skorts: Shorts+%26+Skorts
+   0-2years: 0-2+Years+%280C-7C%29
+   2-6years: 2-6+Years+%287.5C-13.5C%29
+   6years: 6-13+Years+%281Y-7Y%29
+   asics: ASICS
+   gels: Gels+%26+Chews
+   skincare: Skin+Care
+   fitness: Fitness+Equipment
+   supplements: Supplement
+   2xu: 2XU
+   biolite: BioLite
+   cep: CEP
+   inov-8: Inov-8
+   mbt: MBT
+   olukai: OluKai
+   oofos: OOFOS
+   r-gear: R-Gear
+   runguard: RunGuard
+   showerpill: ShowerPill
+   vibram-fivefingers: Vibram+FiveFingers
+   2undr: 2UNDR
+   cw-x: CW-X
+   trisuits: UniSuits
+   baselayers: Underwear
+   pro-tec-athletics: Pro-Tec+Athletics
+   '[dr.-scholls]': Dr.+Scholls
+   '[24.7]': 24.7
+   gu: GU
+   basement: Outlet+Basement
+   unisuits: UniSuits
+ bloomreachBrandMap: 
+  adidas: Adidas
+  activbody: Activbody
+  addaday: Addaday
+  altra: Altra
+  amphipod: Amphipod
+  aravon: Aravon
+  armpocket: Armpocket
+  asics: ASICS
+  brooks: Brooks
+  balega: Balega
+  bauerfeind: Bauerfeind
+  beach-body: Beach Body
+  biolite: BioLite
+  birkenstock: Birkenstock
+  body-glide: Body Glide
+  boost-oxygen: Boost Oxygen
+  buff: Buff
+  bumbleride: Bumbleride
+  cali-weights: Cali Weights
+  camelbak: Camelbak
+  caterpy: Caterpy
+  cep: CEP
+  chaco: Chaco
+  champion: Champion
+  clif: Clif
+  columbia: Columbia
+  craft: Craft
+  crescent-moon: Crescent Moon
+  cw-x: CW-X
+  de-soto: De Soto
+  '[dr.-scholls]': Dr. Scholls
+  dunham: Dunham
+  ecco: Ecco
+  egg-weights: Egg Weights
+  elektroplate: Elektroplate
+  emergency-id: Emergency ID
+  fabletics: Fabletics
+  feetures: Feetures
+  fitbit: Fitbit
+  fitletic: Fitletic
+  footbalance: FootBalance
+  foot-log: Foot Log
+  freeze-sleeve: Freeze Sleeve
+  garmin: Garmin
+  glamorise: Glamorise
+  goodr: Goodr
+  gu: GU
+  hammer-nutrition: Hammer Nutrition
+  headsweats: Headsweats
+  hoka: HOKA
+  honey-stinger: Honey Stinger
+  hotshot: HOTSHOT
+  huma: Huma
+  hydrapak: HydraPak
+  hydro-flask: Hydro Flask
+  hyperice: Hyperice
+  hush-puppies: Hush Puppies
+  injinji: Injinji
+  inov-8: Inov-8
+  jaybird: Jaybird
+  jlab-audio: JLab Audio
+  k9-sport-sack: K9 Sport Sack
+  kidrunner: KidRunner
+  keds: Keds
+  keen: Keen
+  kenneth-cole: Kenneth Cole
+  korsa: Korsa
+  lamo: Lamo
+  lasso: Lasso
+  lifepro: Lifepro
+  lock-laces: Lock Laces
+  lyric: Lyric
+  little-hotties: Little Hotties
+  lucyd: Lucyd
+  maisie-jane-s: Maisie Jane's
+  mbt: MBT
+  mcdavid: McDavid
+  triggerpoint: TriggerPoint
+  maurten: Maurten
+  merino: Merino
+  merrell: Merrell
+  mizuno: Mizuno
+  moji: Moji
+  nike: Nike
+  nathan: Nathan
+  new-balance: New Balance
+  normatec: Normatec
+  nuun: Nuun
+  native: Native
+  oakley: Oakley
+  olukai: OluKai
+  on: On
+  one80-light: One80 Light
+  one-by-optic-nerve: ONE by Optic Nerve
+  optic-nerve: Optic Nerve
+  oofos: OOFOS
+  pacific-health-labs: Pacific Health Labs
+  polar: Polar
+  prana: Prana
+  pro-compression: PRO Compression
+  pro-tec-athletics: Pro-Tec Athletics
+  puma: Puma
+  plae: Plae
+  qardio: Qardio
+  r-gear: R-Gear
+  rainbow: Rainbow
+  ray-ban: Ray-Ban
+  reebok: Reebok
+  reef: Reef
+  rind-snacks: RIND Snacks
+  rockport: Rockport
+  rocktape: ROCKTAPE
+  roll-recovery: ROLL Recovery
+  rpi: RPI
+  rrs: RRS
+  rudy-project: Rudy Project
+  runguard: RunGuard
+  ryka: Ryka
+  ryker-roll: Ryker Roll
+  saucony: Saucony
+  s-well: S'well
+  sabre: Sabre
+  salming: Salming
+  salomon: Salomon
+  saltstick: SaltStick
+  sanuk: Sanuk
+  scott: Scott
+  shokz: Shokz
+  sprints: SPRINTS
+  showerpill: ShowerPill
+  skechers: Skechers
+  skratch-labs: Skratch Labs
+  spenco: Spenco
+  sperry: Sperry
+  sport-beans: Sport Beans
+  spring-energy: Spring Energy
+  spryng: Spryng
+  stance: Stance
+  steigen: Steigen
+  strassburg: Strassburg
+  sugoi: Sugoi
+  superfeet: Superfeet
+  superga: Superga
+  suunto: Suunto
+  stride-rite: Stride Rite
+  tailwind-nutrition: Tailwind Nutrition
+  teva: Teva
+  therabody: Therabody
+  thule: Thule
+  tidl-sport: TIDL Sport
+  tifosi: Tifosi
+  tiger-tail: Tiger Tail
+  timberland: Timberland
+  timex: Timex
+  topo-athletic: Topo Athletic
+  trakk: TRAKK
+  trigger-point-systems: Trigger Point Systems
+  tru-grit: Tru Grit
+  ultimate-direction: Ultimate Direction
+  under-armour: Under Armour
+  vibram-fivefingers: Vibram FiveFingers
+  vitargo: Vitargo
+  vj-shoes: VJ Shoes
+  vooray: Vooray
+  wahoo: Wahoo
+  weckmethod: WeckMethod
+  wigwam: Wigwam
+  xero-shoes: Xero Shoes
+  yaktrax: Yaktrax
+  yolo-farmstand: Yolo Farmstand
+  yurbuds: Yurbuds
+  zensah: Zensah
+  zero-odor: Zero Odor
+  10-seconds: 10 Seconds
+  2undr: 2UNDR
+  2xu: 2XU
+  extreme-mist: Extreme Mist
+  g-shock: G-Shock
+  gales: Gales
+  hydrapatch: Hydrapatch
+  361-degrees: 361 Degrees
+  black-diamond: Black Diamond
+  spyder: Spyder
+  zamberlan: Zamberlan
+  everlast: Everlast
+  larq: Larq
+  untapped: UnTapped
+  scarpa: SCARPA
+  ales-grey: Ales Grey
+  danner: Danner
+  road-runner-sports: Road Runner Sports
+  h20audio: H20Audio
+  la-sportiva: La Sportiva
+  k-swiss: K-SWISS
+  kt: KT
+  alleviate: Alleviate
+  bu: Bu
+  nonaste: Nonaste
+  aftershokz: Aftershokz
+  mountain-shades: Mountain Shades
+  vital-proteins: Vital Proteins
+  footlog: Footlog
+  os1st: OS1st
+  thorlo: Thorlo
+  h20-audio: H20 Audio
+  muir-energy: Muir Energy
+  ucan: UCAN
+  prostretch: ProStretch
+  tuli-s: Tuli's
+  shefit: SHEFIT
+  paddletek: Paddletek
+  selkirk: Selkirk
+  the-pod-company: The Pod Company
+  tyrol: Tyrol
+ bloomreachDashBoardCategoryMap: 
+  '[/category/accessories/insoles]': accessories insoles
+  '[/category/mens/apparel/tops]': mens apparel tops
+  '[/category/womens/shoes/running]': womens shoes running
+  '[/category/mens/shoes/running]': mens shoes running
+  '[/category/mens/apparel/korsa]': mens apparel korsa
+  '[/category/womens/apparel/korsa]': womens apparel korsa
+  '[/category/womens/new-balance/outlet]': womens new-balance outlet
+  '[/category/mens/new-balance/outlet]': mens new-balance outlet
+  '[/category/new-balance/outlet]': new-balance outlet
+  '[/category/mens/reebok/outlet]': mens reebok outlet
+  '[/category/womens/reebok/outlet]': womens reebok outlet
+  '[/category/mens/cross-training/reebok/outlet]': mens cross-training reebok outlet
+  '[/category/womens/cross-training/reebok/outlet]': womens cross-training reebok outlet
+  '[/category/reebok/outlet]': reebok outlet
+ bloomreachCategoryMap:
+  baselayers: underwear
+  swimwear: Swim
+  cleats: Cleated
+  tights-pants: Tights and pant
+  fitness: fitness-equipment
+  skincare: Skin Care
+  '[24.7]': cross-training
+  jackets: outerwear
+ size: 0-2years,2-6years,6years
+ shoeType: neutral,stability,motion-control,performance-neutral
+ sportsMap: 
+  Tennis: Tennis
+  Pickleball: Pickleball
+  Volleyball: Volleyball
+  Wrestling: Wrestling-Court
+  Golf: Golf
+  '[Indoor Court]': Indoor-Court
+  Soccer: Soccer
+ webPgcMap: 
+  '[tennis-&-volleyball]': tennis
+  '[injury-prevention-&-recovery]': injury-prevention
+  training: cross-training
+  track-and-field: track-field
+  '[tights-&-pants]': tightsandpants
+  '[shorts-&-skorts]': shorts-skorts
+  '[sport-bras-&-bra-tops]': sportsbra
+  '[sport-shorts]': shorts
+  fitness: fitness-equipment
+  '[bottles-&-hydration-packs]': hydrationandholders
+  '[fitness-trackers-&-monitors]': activitytrackers
+  '[safety-&-reflective]': safety
+  '[bags-&-holders]': holders
+  '[skin-care]': skincare
+  '[gels-&-chews]': gels
+  '[24.7]': 24.7
+  footwear: shoes
+  '[aha-donation]': AHA Donation
+ 
+bloomreachsearchutil:
+ searchGenders: womens,mens,unisex,kids
+ siteId: 1
+ excludeDynamicurlList: /category/brooks-shop-all-new-arrivals,/category/hoka-one-one-shop-all-new-arrivals,/category/asics-shop-all-new-arrivals,/category/nike-shop-all-new-arrivals,/category/new-balance-shop-all-new-arrivals,/category/saucony-shop-all-new-arrivals,/category/on-shop-all-new-arrivals,/category/altra-shop-all-new-arrivals,/category/adidas-shop-all-new-arrivals,/category/reebok-shop-all-new-arrivals,/category/mizuno-shop-all-new-arrivals,/category/korsa-shop-all-new-arraival,/category/rgear-drymax-socks,/category/rgear-compression-socks,/category/rgear-all-cuts,/category/rgear-socks-all-cushion,/category/superfeet-all-styles,/category/superfeet-run-comfort-max-insole,/category/superfeet-blue-insole,/category/superfeet-green-insole,/category/superfeet-berry-insole,/category/superfeet-blue-insole,/category/superfeet-green-insole,/category/superfeet-berry-insole,/category/womens-run-comfort-insole,/category/hyperice-hypervolt,/category/hyperice-normatec,/category/hyperice-venom,/category/hyperice-vibration,/category/hyperice-ice-compression,/category/hyperice-bags-holders,/category/balega-all-styles,/category/balega-hidden-comfort-socks,/category/balega-silver-performance-socks,/category/balega-blister-resist-socks,/category/balega-hidden-dry-socks,/category/womens-balega-euduro-socks,/category/rgear-proplush-socks,/category/korsa-best-sellers,/category/korsa-seasonal-stories,/category/shop-all-new-arrivals,/category/shop-all-brands,/category/compression-shorts,/category/cycling-bike-shorts,/category/golf-shoes,/category/headlamps,/category/knee-high-socks,/category/weightlifting-shoes,/category/tennis-apparel,/category/womens-5-inch-running-shorts
+ urlOrderMap: 
+  gender: 1
+  color: 6
+  '[shoe_type]': 7
+  brand: 5
+  subCatagory: 3
+  catagory: 2
+  kidsGender: 1
+  outlet: 8
+  '[kids_type]': 4
+  basement: 9
+  sports: 10
+ genderUrlList: /category/mens,/category/womens
+ urlMap: 
+  gender: gender_text
+  kidsGender: kids_gender
+  catagory: webPgc
+  subCatagory: webSubPgc
+  brand: brand
+  color: variants.colorGroup
+  outlet: outlet
+  newProduct: newProduct
+  sale: sale
+  '[kids_type]': kids_type
+  basement: outlet_basement
+  '[shoe_type]': shoe_type
+  new: new
+  endangered: endangered
+  sports: sports
+ excludedCategoryList: personalcare
+ excludedSubCategoryOrderList: racing,walking
+ sportsMap:
+  tennis: Tennis
+  pickleball: Pickleball
+  volleyball: Volleyball
+  wrestling-court: Wrestling
+  golf: Golf
+  indoor-court: Indoor Court
+  soccer: Soccer
+ sortOptionsMap: 
+  0: ranking+asc
+  3: customer_rating+desc
+  4: total_sales+desc
+  5: price+asc
+  6: price+desc
+  7: rrs_sale+asc
+  8: newProduct+asc
+  
+searchhelper:
+ bannerName: gift-promo-card
+ bannerIndex: 5
+ refinementSortList: shoe_type,color,brand,cat,sports
+ categoryList: Kids Gender,Gender,Category
+ skipCategoryList: /category/shoes,/category/apparel
+ giftGuideUrlDisableRefinement: /gift-guides/mothers-day,/gift-guides/fathers-day,/gift-guides/korsa-end-of-season
+ brandList: adidas,activbody,addaday,altra,amphipod,aravon,armpocket,asics,brooks,balega,bauerfeind,beach-body,biolite,birkenstock,body-glide,boost-oxygen,buff,bumbleride,cali-weights,camelbak,caterpy,cep,chaco,champion,clif,columbia,craft,crescent-moon,cw-x,de-soto,dr.-scholls,dunham,ecco,egg-weights,elektroplate,emergency-id,fabletics,feetures,fitbit,fitletic,footbalance,foot-log,freeze-sleeve,garmin,glamorise,goodr,gu,hammer-nutrition,headsweats,honey-stinger,hotshot,huma,hydrapak,hydro-flask,hyperice,hush-puppies,injinji,inov-8,jaybird,jlab-audio,k9-sport-sack,keds,keen,kenneth-cole,korsa,kidrunner,lamo,lasso,lifepro,lock-laces,lyric,little-hotties,maisie-jane-s,mbt,mcdavid,triggerpoint,merino,merrell,mizuno,moji,nike,nathan,new-balance,normatec,nuun,native,oakley,olukai,on,one,one80-light,oofos,os1st,pacific-health-labs,polar,prana,pro-compression,pro-tec-athletics,puma,plae,qardio,r-gear,rainbow,reebok,reef,rind-snacks,rockport,rocktape,roll-recovery,rpi,rrs,rudy-project,runguard,ryka,saucony,s-well,sabre,salming,salomon,saltstick,sanuk,scott,showerpill,skechers,skratch-labs,spenco,sperry,sport-beans,spring-energy,spryng,stance,steigen,strassburg,sugoi,superfeet,superga,suunto,stride-rite,tailwind-nutrition,teva,therabody,thorlo,thule,tidl-sport,tifosi,tiger-tail,timberland,timex,topo-athletic,trakk,ultimate-direction,under-armour,vibram-fivefingers,vitargo,vj-shoes,vooray,ventolation,weckmethod,wigwam,yaktrax,yolo-farmstand,yurbuds,zensah,zero-odor,10-seconds,2undr,2xu,361-degrees,black-diamond,maurten,tru-grit,spyder,zamberlan,everlast,larq,untapped,on-cloud,scarpa,ales-grey,gales,g-shock,wahoo,hydrapatch,ryker-roll,danner,hoka,h20audio,h20-audio,la-sportiva,k-swiss,kt,nonaste,bu,alleviate,vital-proteins,prostretch,tuli-s,shefit,paddletek,selkirk,the-pod-company,one-by-optic-nerve,tyrol
+ dropShipNavigation: drop_ship:1
+ dropShipOnlyNavigation: extended_drop_ship:0
+ sauconyBrandNavigation: brand:Saucony
+ reebokBrandNavigation: brand:Reebok
+ dropShipQueryList: dropship,dropshipall,dropshiponly
+ sprintsNavigation: brand:SPRINTS
+ brandQueryList: scarpa,hoka,ales-grey,g-shock,puma,s-well,sprints,rainbow,polar,addaday,black-diamond,body-glide,buff,hyperice,lamo,mbt,native,normatec,pro-compression,roll-recovery,sperry,superfeet,timex,gales,merino,superga,road-runner-sports
+ seoTitleText: Shop {0} Products at Road Runner Sports
+ customQueryBannersMap: 
+  '[korsa_accelerate_collection]': korsa-accelerate-collection
+  '[korsa_ventilation_collection]': korsa-ventilation-collection
+  '[korsa_metropolitan_collection]': korsa-metropolitan-collection
+  '[korsa_aero_collection]': korsa-aero-collection
+  '[brooks spring 23 catalog]': brooks-spring-23-catalog
+ sortOptions:
+  0: Popularity
+  5: Price:Low to High
+  6: Price:High to Low
+  3: Top Rated
+  4: Best Sellers
+  7: SALE
+  8: What's New
+ giftGuideUrlMap:
+  '[/gift-guides/gifts-for-women-runners]': gifts-for-women-runners
+  '[/gift-guides/gifts-for-men-runners]': gifts-for-men-runners
+  '[/gift-guides/tech-gadgets-and-gifts-for-runners]': tech-gadgets-and-gifts-for-runners
+  '[/gift-guides/running-gifts-to-fit-any-budget]': running-gifts-to-fit-any-budget
+  '[/gift-guides/mothers-day]': mothers-day
+  '[/gift-guides/fathers-day]': fathers-day
+  '[/gift-guides/korsa-end-of-season]': korsa end of season
+ sortOptionsMap:
+    0: ranking+asc
+    3: customer_rating+desc&customer_reviews+desc
+    4: best_seller+desc
+    5: price+asc
+    6: price+desc
+    7: rrs_sale+desc
+    8: newProduct+asc
+ bloomreachUrlMap: 
+  '[variants.colorGroup]': colorGroup
+  '[variants.Shoe_Size]': Shoe_Size
+  '[variants.widthGroup]': widthGroup
+  '[variants.width]': width
+  '[variants.Apparel_Size]': Apparel_Size
+  sale: rrs_sale
+  Exclusive: VIP%20Exclusive
+  '[variants.drop_ship]': drop_ship
+  price: reg_price
+  Scarpa: SCARPA
+ brandMap:
+  on-cloud: on
+  h20-audio: h20audio
+
+bloomreachproductsearchresults:
+ nonPromotionalProducts:
+  GIVEAHA: sdlli9xlpm
+  GIFTCARD: nvebbxkxba
+  RAC55: tr6eydtrei
+  RAC100: ch7hw5wr7e
+  RAC150: gey9p3mqw9
+ brandNameMap:
+  '[H20 Audio]': H20Audio
+ productLandingSeoURL: 
+  GIVEAHA: /content/aha-home-page,
+  RAC100: /vip/rewards-plus
+ vipPlus: RAC100
+ membershipPlusPrice: 0.00
+ promotionalProducts: GIVEAHA
+ colorCodeMap: 
+  black: 001-020
+  blue: 400-495
+  gray: 021-099
+  grey: 021-099
+  white: 100-197
+  green: 300-398
+  yellow: 700-793
+  orange: 800-880
+  red: 600-645
+  brown: 200-232
+  multi: 960-991
+  pink: 650-698
+  purple: 500-545
+  beige: 254-296
+
+bloomreach-breadcrum-searchresults:
+ titelOrderMap: 
+  '[gender_text]': 1
+  '[kids_gender]': 1
+  brand: 2
+  variantscolorGroup: 4
+  webSubPgc: 5
+  webPgc: 6
+  outlet: 7
+ urlMap:
+  '[/category/equipment]': equipment
+  '[/category/personalcare]': personalcare
+ canonicalMap: 
+  '[/trail/]': /trail-running/
+  '[/fitness/]': /fitness-equipment/
+  '[/activitytrackers]': /equipment/activitytrackers
+  '[/electronics]': /equipment/electronics
+  '[/jogging-strollers]': /equipment/jogging-strollers
+  '[/fitness-equipment]': /equipment/fitness-equipment
+ postfixTitle: -Road Runner Sports
+ coopBannersMap: 
+  '[/mens/shoes/running]': hoka-bondi-x
+  '[/womens/shoes/running]': hoka-bondi-x
+  '[/womens/shoes/trail-running]': brooks-cascadia-16
+  '[/mens/shoes/trail-running]': brooks-cascadia-16
+ fitFinderBannerList: /womens/shoes/running,/womens/shoes/walking,/womens/shoes/trail-running,/womens/shoes/cross-training,/mens/shoes/running,/mens/shoes/walking,/mens/shoes/cross-training,/mens/shoes/trail-running
+ coopBannerList: /mens/shoes/running,/womens/shoes/running,/womens/shoes/trail-running,/mens/shoes/trail-running
+ korsaBannerList: /womens/apparel/korsa,/mens/apparel/korsa,/womens/apparel,/mens/apparel,/womens/apparel/sportsbra,/womens/apparel/tops,/mens/apparel/tops,/womens/apparel/shorts-skorts,/mens/apparel/shorts,/womens/apparel/outlet,/mens/apparel/outlet
+
+bloomreachrefinement:
+ webPgcList: outerwear,gloves,cleats,baselayers
+ seoRefinmentList: Brand,variants.colorGroup,webSubPgc,shoe_type,sports
+ skipCategoryList: /category/shoes,/category/apparel,/category/shoes/running,/category/shoes/trail-running,/category/shoes/cross-training,/category/accessories/socks
+ skipClpUrl: /mens,/womens,/unisex,/kids
+ navigationMap: 
+  Gender: gender_text
+  '[Kids Gender]': kids_gender
+  Category: webPgc
+  Categories: webSubPgc
+  Subcategory: sub_category
+  '[Apparel Type]': apparel_type
+  Brand: brand
+  '[Shoe Size]': variants.Shoe_Size
+  '[Shoe Width]': variants.widthGroup
+  '[Shoe Type]': shoe_type
+  Size: variants.Apparel_Size
+  Color: variants.colorGroup
+  '[Shoe Cushion Levels]': shoe_cushion
+  Keywords: keywords
+  Sku: variants.sku
+  Sale: sale
+  '[New Arrivals]': newProduct
+  Price: price
+  new: new
+  Exclusive: exclusive
+  Outlet: outlet
+  '[Outlet Basement]': outlet_basement
+  Width: variants.width
+  '[Accessory Type]': accessory_type
+  '[Sock Thickness]': sock_thickness
+  '[Sock Length]': sock_length
+  '[Age Group]': kids_type
+  Sports: sports
+  '[Injury Recovery]': injury_recovery
+  '[Injury Placement]': injury_placement
+  '[Customer Rating]': customer_rating
+ genderTypeMap:
+  "[Men's]": mens
+  "[Women's]": womens
+  Kids: kids
+ kidsTypeMap:
+  Boys: kids/boys/
+  Girls: kids/girls/
+ seoFilterMap: 
+  webPgc: '%2CwebPgc%3A'
+  webSubPgc: '%2CwebSubPgc%3A'
+  '[apparel_type]': '%2Capparel_type%3A'
+  '[shoe_type]': '%2Cshoe_type%3A'
+  '[variants.widthGroup]': '%2Cvariants.widthGroup%3A'
+  '[shoe_cushion]': '%2Cshoe_cushion%3A'
+  '[variants.Apparel_Size]': '%2Cvariants.Apparel_Size%3A'
+  brand: '%2Cbrand%3A'
+  '[variants.Shoe_Size]': '%2Cvariants.Shoe_Size%3A'
+  '[variants.colorGroup]': '%2Cvariants.colorGroup%3A'
+  outlet: '%2Coutlet%3A'
+  newProduct: '%2CnewProduct%3A'
+  '[outlet_basement]': '%2Coutlet_basement%3A'
+  '[accessory_type]': '%2Caccessory_type%3A'
+  sale: '%2Csale%3A'
+  '[sock_thickness]': '%2Csock_thickness%3A'
+  '[sock_length]': '%2Csock_length%3A'
+  '[kids_type]': '%2Ckids_type%3A'
+  exclusive: '%2Cexclusive%3A'
+  sports: '%2Csports%3A'
+  '[kids_gender]': '%2Ckids_gender%3A'
+  '[gender_text]': '%2Cgender_text%3A'
+  price: '%2Cprice%3A'
+  '[injury_recovery]': '%2Cinjury_recovery%3A'
+  '[injury_placement]': '%2Cinjury_placement%3A'
+  '[customer_rating]': '%2Ccustomer_rating%3A'
+ refinementTitles: 
+  '[shoe_cushion]': 1S:Level 1 Stability|2S:Level 2 Stability|3S:Light & Fast Cushion Stability|4S:Mid Level Cushion Stability|5S:Max Cushion Stability|1N:Level 1 Neutral|2N:Level 2 Neutral|3N:Light & Fast Cushion Neutral|4N:Mid Level Cushion Neutral|5N:Max Cushion Neutral
+  webSubPgc: Training:Cross Training
+
+brandcategorytool:
+ excludeBrand: Korsa
+ brandImageUrlMap: 
+  '[brooks_womens_apparel]': /xanbi6q061ft/7u0EpWVdKMZBAbNntP5Anv/8f05f49f264faea5ec9f6da996832cc8/20210728_d_brand_brooks_womensApparel_lsty.png
+  '[brooks_womens_shoes]': /xanbi6q061ft/2xvb2zbfN0EkDSm9PmAHSH/43c2c3d02e1705855a6b44820aa9cf1c/20230920_bp_brooks_wShoes_lsty.png
+  '[brooks_mens_shoes]': /xanbi6q061ft/6DcjW3V6MOcprzpuFygl63/fab506b310d111bf51fe4dc8b2f221b6/20230920_bp_brooks_mShoes_lsty.png
+  '[brooks_mens_apparel]': /xanbi6q061ft/7IkqL9ZUPDtKoiBnnPoWXY/3ea9fe2d168c39567e43c3bb2d9d6d8d/20210728_d_brand_brooks_mensApparel_lsty.png
+  '[hokaoneone_womens_shoes]': /xanbi6q061ft/2XI2I1ed7pMTmbwwRAYUnA/7f10f3d5f1b6603199f7db1a9b2f58e0/20220609_hoka_bp_cat1.png
+  '[hokaoneone_mens_shoes]': /xanbi6q061ft/5i1cTdgtu58nLdr15pBpHW/89846c320d06192a33e6c5348bf46044/20220824_bp_hoka_mens_shoes_lsty.png
+  '[hoka_womens_shoes]': /xanbi6q061ft/2XI2I1ed7pMTmbwwRAYUnA/7f10f3d5f1b6603199f7db1a9b2f58e0/20220609_hoka_bp_cat1.png
+  '[hoka_mens_shoes]': /xanbi6q061ft/5i1cTdgtu58nLdr15pBpHW/89846c320d06192a33e6c5348bf46044/20220824_bp_hoka_mens_shoes_lsty.png
+  '[asics_womens_shoes]': /xanbi6q061ft/66jfjIQ4ls5MfGdUMchjNK/d76c04c5bbb9d0a7dea5085ee0a923ba/2023_bp_ASICS_ShopWomens.png
+  '[asics_mens_shoes]': /xanbi6q061ft/324FWTGDyFmLDE83k02Olp/0d64363fc38d53f7146231b2c25c8b8a/2023_bp_ASICS_ShopMens.png
+  '[asics_womens_apparel]': /xanbi6q061ft/2VmPpNrcj0BYmYDteTYSpY/9154fcfac2023968321e67effa71edb3/20210728_d_brand_asics_womensApparel_lsty.png
+  '[asics_mens_apparel]': /xanbi6q061ft/2PYTyCn0cGEPwjuwFMLWBt/4463fe6a6f0d8b0e114adddcc37c7744/20210728_d_brand_asics_mensApparel_lsty.png
+  '[nike_womens_shoes]': /xanbi6q061ft/33LHFPFKugJ0f5PelL95m0/3d5603fd7d0d3c5f74cd6a23e9d92d51/20230920_bp_NIKE_wShoes_lsty.png
+  '[nike_mens_shoes]': /xanbi6q061ft/3SfQINmUt4LT2WCj9qkYQ4/51f030bd92f66ca9b0d1894eca18f0c2/20230920_bp_NIKE_mShoes_lsty.png
+  '[nike_womens_apparel]': /xanbi6q061ft/6Hljz828mmQjp6yww0UQ3k/aaf2572654df9e38ac4824ef2eab0e5a/20210728_d_brand_nike_womensApparel_lsty.png
+  '[nike_mens_apparel]': /xanbi6q061ft/3rFdzMwc4tn4vdoyQQvVDC/d6785dc8cfbd5cc9c3421b4133126f47/20210728_d_brand_nike_mensApparel_lsty.png
+  '[newbalance_womens_shoes]': /xanbi6q061ft/7eHpH92t3Xi9H52YBrVWJ7/4cd8d9f15bde82a978a817db0d4f1eba/20231101_bp_newBalance_lstyShoesWomen.png
+  '[newbalance_mens_shoes]': /xanbi6q061ft/vgVtkyh4zXe1YNRNi3LnV/bf35520f73d00098d90b76063ea0ca38/20231101_bp_newBalance_lstyShoesMen.png
+  '[newbalance_womens_apparel]': /xanbi6q061ft/3z6fxCHNwP93Wg37Pgk5gC/ffd96321c49fc6f5fb7963a06a47aaae/20210728_d_brand_newbalance_womensApparel_lsty.png
+  '[newbalance_mens_apparel]': /xanbi6q061ft/79UVQv0x37SPbyWwE7r9XB/46d450edd2bc890de031cb479d975ac0/20210728_d_brand_newbalance_mensApparel_lsty.png
+  '[saucony_womens_shoes]': /xanbi6q061ft/2I5n2hkhGRO1Iv61WAbTJu/843024d7802d7ba0a7ba21748fff60c3/20230418_bp_saucony_wShoes_lsty.png
+  '[saucony_mens_shoes]': /xanbi6q061ft/54M7kFd0rOSZ2RpNSCgsnX/bc4f63ef31e0f8ef1036909e375dfd07/20230809_bp_saucony_mShoes_lsty.png
+  '[on_womens_shoes]': /xanbi6q061ft/aj2q8SLivLMTRmM8GiMiD/c59a599c5c9cce3639f356743d53a980/2023-bp-ON-womens.png
+  '[on_mens_shoes]': /xanbi6q061ft/7nfgOT0cl08noXTKnT9DAz/c2b6d6d9f30f189e42a7b748a32f0adc/2023-bp-ON-mens_v1.png
+  '[adidas_womens_shoes]': /xanbi6q061ft/2EwJ3PamTgMOBH2B17zAmg/538e71d76209ad8325e834a18dc0acca/20231108_bp_adidas_wShoes_lsty.png
+  '[adidas_mens_shoes]': /xanbi6q061ft/zYpw9C7CgL1PNfpRSkh1T/22b0bfdd6f7be2b941f198dbc57a51fd/20231108_bp_adidas_mShoes_lsty.png
+  '[altra_womens_shoes]': /xanbi6q061ft/6oPuqldjJAX7MmzdYlnLz1/131e550e0c936419f678a5dc4de7f1c0/20231101_bp_altra_lstyShoesWomen.png
+  '[altra_mens_shoes]': /xanbi6q061ft/5QdwxqkJrMioGDIbPKjHLq/1f9d356c0c571e5b3876e81f7e0c9be7/20231101_bp_altra_lstyShoesMen.png
+  '[mizuno_womens_shoes]': /xanbi6q061ft/7GMZgcrBu38C0B8XkdC32s/eb0080c2bf8622d64e15acc691ee2e58/20230222_bp_mizuno_wShoes_lsty.png
+  '[mizuno_mens_shoes]': /xanbi6q061ft/5CzeOjZSZrguZmwkCxz2q0/a7d384f90904d5d536283457cbac459e/20230222_bp_mizuno_mShoes_lsty.png
+  '[korsa_womens_apparel]': /xanbi6q061ft/7wxQdYjTKTbazNxkoSUWed/5aabc3bf127d8460ba1b53b1511c8e08/20210831_d_brand_korsa_womensApparel_lsty.png
+  '[korsa_mens_apparel]': /xanbi6q061ft/7nMBvYTeTFumHbO0r6CjTB/5e393c8096060acbbf1eb5463ba29202/20210831_d_brand_korsa_mensApparel_lsty.png
+  '[reebok_womens_shoes]': /xanbi6q061ft/1IGG0vh1jLs9K5vuz0Vh3T/cee1e16474acdaf09747faf15e805e2f/20230315_bp_reebok_wShoes_lsty.png
+  '[reebok_mens_shoes]': /xanbi6q061ft/5JZTV1QcTWHaShz3KcSKgr/e2c5c5ffe7f570a32c1c0081fd78a092/20230315_bp_reebok_mShoes_lsty.png
+ imageUrl: https://images.ctfassets.net
+ apparelText: APPAREL & ACCESSORIES
+ ignoreSubCatagory: 24.7,Motion_Control,Injury_Prevention_&_Recovery,Stability_Plus,Other_Sports
+ catMap:
+  '[Trail_Running]': Trail
+  Training: Cross_Training
+ shoeOrderMap: 
+  running: 1
+  '[trail_running]': 2
+  racing: 3
+  court: 4
+  hiking: 5
+  sandals: 6
+  '[cross_training]': 7
+  training: 8
+  casual: 9
+  neutral: 10
+  stability: 11
+  '[track_and_field]': 12
+  wrestling: 13
+  '[tennis_&_volleyball]': 14
+  kids: 15
+  '[cross_country]': 16
+  walking: 17
+ apparelOrderMap:
+  tops: 1
+  '[sport_bras_&_bra_tops]': 2
+  shorts: 3
+  '[shorts_&_skorts]': 4
+  '[tights_&_pants]': 5
+  jackets: 6
+  underwear: 7
+  accessories: 12
+ excludeCarousel: ASICS Brand Women's Apparel,ASICS Brand Men's Apparel
+
+bloomreachsearchrecommendation:
+ insole: 34259
+ socks: 40320
+ skipList: recommendation_method,isApparel,product_id
+ bloomreachUrlMap:
+  gender: gender_code
+ nonPromotionalProducts:
+  GIVEAHA: sdlli9xlpm
+  GIFTCARD: nvebbxkxba
+  RAC55: tr6eydtrei
+  RAC100: ch7hw5wr7e
+  RAC150: gey9p3mqw9
+ vipURLMap:
+  RAC55: /vip/rewards
+  RAC100: /vip/rewards-plus
+  RAC150: /vip/platinum
+ upsellProductsSize: 12
+ pgcSubcodeMap: 
+  '[Technical Tops]': Tops
+  '[Cross Training]': Training
+ webPgccodeMap:
+  Footwear: Shoes
+ qty: 2
