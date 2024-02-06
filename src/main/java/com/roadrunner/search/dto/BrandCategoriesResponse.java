@@ -3,7 +3,7 @@ package com.roadrunner.search.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
@@ -11,22 +11,22 @@ import lombok.Data;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class BrandCategoriesResponse {
 
-	@SerializedName("BrandName")
+	@JsonProperty("BrandName")
 	private String brandName;
 
-	@SerializedName("brandType")
+	@JsonProperty("brandType")
 	private String brandType;
 
-	@SerializedName("enableDynamicBrand")
+	@JsonProperty("enableDynamicBrand")
 	private boolean enableDynamicBrand;
 
-	@SerializedName("BrandCategories")
+	@JsonProperty("BrandCategories")
 	private List<BrandCategory> brandCategories;
 
-	@SerializedName("largeBrandCategories")
+	@JsonProperty("largeBrandCategories")
 	private List<LargeBrandCategories> largeBrandCategories = null;
 
-	@SerializedName("mediumBrandCategories")
+	@JsonProperty("mediumBrandCategories")
 	private MediumBrandCategories mediumBrandCategories = null;
 
 }

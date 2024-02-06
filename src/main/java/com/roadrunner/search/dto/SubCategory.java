@@ -1,29 +1,29 @@
 package com.roadrunner.search.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class SubCategory {
-	@SerializedName("name")
+	@JsonProperty("name")
 	private String name;
 
-	@SerializedName("title")
+	@JsonProperty("title")
 	private String title;
 
-	@SerializedName("productId")
+	@JsonProperty("productId")
 	private String productId;
 
-	@SerializedName("imageId")
+	@JsonProperty("imageId")
 	private String embedId;
 
-	@SerializedName("image")
+	@JsonProperty("image")
 	private String imageurl;
 
-	@SerializedName("url")
+	@JsonProperty("url")
 	private String categoryUrl;
 
 }

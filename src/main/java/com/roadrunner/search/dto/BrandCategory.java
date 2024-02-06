@@ -3,7 +3,7 @@ package com.roadrunner.search.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
@@ -11,19 +11,19 @@ import lombok.Data;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class BrandCategory {
 	
-	@SerializedName("title")
+	@JsonProperty("title")
 	private String title;
 
-	@SerializedName("link")
+	@JsonProperty("link")
 	private String url;
 
-	@SerializedName("image")
+	@JsonProperty("image")
 	private String imageurl;
 
-	@SerializedName("shopAllUrl")
+	@JsonProperty("shopAllUrl")
 	private String shopAllUrl;
 
-	@SerializedName("categories")
+	@JsonProperty("categories")
 	private List<Category> categories = null;
 
 }
