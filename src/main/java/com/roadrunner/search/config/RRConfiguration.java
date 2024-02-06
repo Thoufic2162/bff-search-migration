@@ -9,7 +9,6 @@ import lombok.Data;
 @Component
 @ConfigurationProperties(prefix = "rrconfig")
 public class RRConfiguration {
-	public boolean enableDynamicUrl;
 	public boolean enableRankingInGenderUrl;
 	public boolean enableBloomreachExcluded;
 	public boolean enableGenderWithFeedChange;
@@ -25,5 +24,4 @@ public class RRConfiguration {
 	public boolean enablePathwayRecommendation;
 	public String RRSDefaultPriceListId;
 	public String RRSSalePriceListId;
-
 }

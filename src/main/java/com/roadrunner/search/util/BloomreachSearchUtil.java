@@ -79,6 +79,11 @@ public class BloomreachSearchUtil {
 	@Autowired
 	private RRSCategoryMapRepository rrsCategoryMapRepository;
 
+	/**
+	 * This method is used to construct query parameters
+	 * 
+	 * @param request
+	 */
 	public void constructQueryParams(HttpServletRequest request) {
 		String queryString = request.getQueryString();
 		String query = URLCoderUtil.decode(request.getParameter(SearchConstants.QURI));
@@ -91,7 +96,7 @@ public class BloomreachSearchUtil {
 		if (null != query) {
 			query = query.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase();
 		}
-		if (rrConfiguration.isEnableDynamicUrl() && query != null && query.contains(SearchConstants.URL_DELIMETER2)
+		if (query != null && query.contains(SearchConstants.URL_DELIMETER2)
 				&& !query.contains(SearchConstants.SEARCH)) {
 			String[] params = query.split(SearchConstants.URL_DELIMETER2);
 			if (params[0] != null) {
@@ -105,14 +110,13 @@ public class BloomreachSearchUtil {
 		}
 		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String scriParam = queryParams.getProperty(BloomreachConstants.BR_SEO_CATEGORY_ITEM);
-		String cQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.COLOR));
-		String catQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.CATEGORY_Q));
-		String bQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.BRAND));
-		String rQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.R));
-		String shoeQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.SHOE_TYPE));
-		String sportsQuery = URLCoderUtil.decode(request.getParameter(SearchConstants.SPORTS_TYPE));
-		if (rrConfiguration.isEnableDynamicUrl()
-				&& StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.ISDECODE))) {
+		String cQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.COLOR));
+		String catQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.CATEGORY_Q));
+		String bQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.BRAND));
+		String rQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.R));
+		String shoeQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.SHOE_TYPE));
+		String sportsQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.SPORTS_TYPE));
+		if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.ISDECODE))) {
 			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.COLOR))) {
 				cQuery = (String) queryParams.getProperty(SearchConstants.COLOR);
 			}
@@ -230,8 +234,7 @@ public class BloomreachSearchUtil {
 			requestURI = SearchConstants.BASE_CONTEXT_PATH + query;
 			log.debug("BloomreachSearchUtil:: constructQueryParams() requestURI{} from qUri", requestURI);
 			String brRequestParams = BloomreachConstants.EMPTY_STRING;
-			if (rrConfiguration.isEnableDynamicUrl() && !query.contains(SearchConstants.BRAND_TYPE_AHEAD_URL)
-					&& !excludeDynamicurlList.contains(query)
+			if (!query.contains(SearchConstants.BRAND_TYPE_AHEAD_URL) && !excludeDynamicurlList.contains(query)
 					&& !query.contains(SearchConstants.GIFT_GUIDE_SEARCH_CONTEXT_PATH)) {
 				if (query != null) {
 					if (catalogElementsFinder.getBloomreachUrlQueryMap().containsKey(query)) {
@@ -312,7 +315,7 @@ public class BloomreachSearchUtil {
 									request.setAttribute(SearchConstants.TYPE_KEYWORD, SearchConstants.TRUE);
 									log.debug(
 											"BloomreachSearchUtil :: constructQueryParams :: catagory_qr :: {0}  and search type {1}",
-											queryUrl, request.getParameter(SearchConstants.TYPE_KEYWORD));
+											queryUrl, request.getAttribute(SearchConstants.TYPE_KEYWORD));
 								}
 								if (catalogElementsFinder.getBrands().contains(queryStringurl)) {
 									formBrQuery(queryStringurl, SearchConstants.BRAND, brQueryParam);
@@ -569,9 +572,7 @@ public class BloomreachSearchUtil {
 						}
 						request.setAttribute(BloomreachConstants.BR_QUERY_PARAM_DYNAMIC_URL_REFINMENT, selectedRef);
 						if (rQuery != null && !rQuery.isEmpty() && !brQueryParam.toString().isEmpty()) {
-							if (rrConfiguration.isEnableDynamicUrl()) {
-								rQuery = rQuery.replace(SearchConstants.URL_DELIMETER2, SearchConstants.STRING_26);
-							}
+							rQuery = rQuery.replace(SearchConstants.URL_DELIMETER2, SearchConstants.STRING_26);
 							brQueryParam.append(rQuery);
 						}
 
@@ -594,18 +595,21 @@ public class BloomreachSearchUtil {
 					.map(s -> s.split(BloomreachConstants.EQUAL))
 					.collect(Collectors.toMap(a -> a[0], a -> a.length > 1 ? a[1] : BloomreachConstants.EMPTY_STRING));
 			queryParmasMap.forEach((key, value) -> {
-				if (rrConfiguration.isEnableDynamicUrl()) {
-					value = value.replace(SearchConstants.PLUS, SearchConstants.SPACE);
-					value = value.replace(SearchConstants.OST_LOWER, SearchConstants.OST_UPPER);
-					request.setAttribute(key, value.replace(SearchConstants.STRING_26, SearchConstants.URL_DELIMETER2));
-				} else {
-					request.setAttribute(key, value);
-				}
+				value = value.replace(SearchConstants.PLUS, SearchConstants.SPACE);
+				value = value.replace(SearchConstants.OST_LOWER, SearchConstants.OST_UPPER);
+				request.setAttribute(key, value.replace(SearchConstants.STRING_26, SearchConstants.URL_DELIMETER2));
 			});
 			log.debug("BloomreachSearchUtil " + "constructQueryParams() END ::", brRequestParams);
 		}
 	}
 
+	/**
+	 * This method is used to form query param formBrQuery
+	 * 
+	 * @param queryStringurl
+	 * @param queryType
+	 * @param brQueryParam
+	 */
 	private void formBrQuery(String queryStringurl, String queryType, StringBuffer brQueryParam) {
 		log.debug("BloomreachSearchUtil::formBrQuery() START ::queryType::{}::brQueryParam::{}", queryType,
 				brQueryParam);
@@ -633,6 +637,10 @@ public class BloomreachSearchUtil {
 		log.debug("BloomreachSearchUtil::formBrQuery() END ::brQueryParam::{}", brQueryParam);
 	}
 
+	/**
+	 * @param countQuery
+	 * @param param
+	 */
 	private void getQueryCount(HashMap<String, Integer> countQuery, String param) {
 		if (countQuery.containsKey(param)) {
 			int count = countQuery.get(param);
@@ -642,14 +650,30 @@ public class BloomreachSearchUtil {
 		}
 	}
 
+	/**
+	 * @param index
+	 * @param list
+	 */
 	private void getUrlIndex(String index, List<Integer> list) {
 		int indexPosition = Integer.parseInt(index);
 		list.add(indexPosition);
 	}
 
+	/**
+	 * This method will form q param url same as bloomreach dashboard
+	 * formBloomrechDashBoardCategory
+	 * 
+	 * @param gender
+	 * @param categoryName
+	 * @param subCategoryName
+	 * @param brandName
+	 * @param request
+	 * @param outletName
+	 * @param query
+	 */
 	private void formBloomrechDashBoardCategory(String gender, String categoryName, String subCategoryName,
 			String brandName, HttpServletRequest request, String outletName, String query) {
-		if (null != request.getParameter(SearchConstants.TYPE_KEYWORD) || excludedCategoryList.contains(categoryName)) {
+		if (null != request.getAttribute(SearchConstants.TYPE_KEYWORD) || excludedCategoryList.contains(categoryName)) {
 			return;
 		}
 		if (null != catalogElementsFinder.getBloomreachDashBoardCategoryMap().get(query)) {
@@ -670,17 +694,30 @@ public class BloomreachSearchUtil {
 		String resultCategory = (gender.concat(SearchConstants.SPACE).concat(categoryName))
 				.replaceAll(SearchConstants.SPACE_REGEX, SearchConstants.SPACE).trim();
 		request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, resultCategory);
-		if (request.getParameter(SearchConstants.PAGE_TITLE_SOCKS) != null && StringUtils.isNotEmpty(subCategoryName)) {
+		if (request.getAttribute(SearchConstants.PAGE_TITLE_SOCKS) != null && StringUtils.isNotEmpty(subCategoryName)) {
 			request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, subCategoryName);
 		}
 	}
 
+	/**
+	 * This method is used to get seo data form seoContentRepository
+	 * 
+	 * @param url
+	 * @return The SEO content corresponding to the provided URL, or null if not
+	 *         found
+	 */
 	public SeoContent getSeoContent(String url) {
 		log.debug("BloomreachSearchUtil::getSeoContent() url:: {}", url);
 		SeoContent seoContent = seoContentRepository.findBySeoUrl(url);
 		return seoContent;
 	}
 
+	/**
+	 * This method is used to populate the request parameter populateRequestParam
+	 * 
+	 * @param params
+	 * @return
+	 */
 	public Map<String, String> populateRequestParam(Map<String, String> params) {
 		log.debug("BloomreachSearchUtil::populateRequestParam: START :: params={}", params);
 		StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
@@ -737,6 +774,12 @@ public class BloomreachSearchUtil {
 		return constructParam;
 	}
 
+	/**
+	 * This method is used to form the bloomreach url
+	 * 
+	 * @param params
+	 * @return
+	 */
 	public String formBloomreachParamUrl(Map<String, String> params) {
 		log.debug("BloomreachSearchUtil::formBloomreachParamUrl:: START...");
 		StringBuilder result = new StringBuilder();
@@ -760,6 +803,10 @@ public class BloomreachSearchUtil {
 		return result.toString();
 	}
 
+	/**
+	 * @param url
+	 * @return
+	 */
 	public String getPageURL(String url) {
 		log.debug("BloomreachSearchUtil::getPageURL() START ::url::{}", url);
 		String finalUrl = "";
@@ -782,6 +829,13 @@ public class BloomreachSearchUtil {
 		return pageUrl;
 	}
 
+	/**
+	 * This method is used to populate selected navigations selectedNavigation
+	 * 
+	 * @param param
+	 * @param queryParams
+	 * @return
+	 */
 	public Map<String, String> selectedNavigation(String param, Properties queryParams) {
 		log.debug("BloomreachSearchUtil :: selectedNavigation :: param: {}", param);
 		String urlQuery = queryParams.getProperty(SearchConstants.URL_QUERY);

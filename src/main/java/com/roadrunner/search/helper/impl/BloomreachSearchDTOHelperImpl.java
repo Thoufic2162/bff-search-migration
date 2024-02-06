@@ -394,8 +394,8 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 			bloomreachResults.setSearchPageBanner(getBannersList(qUri, customQueryBannersMap));
 		}
 		if (null != qUri && qUri.contains(SearchConstants.SEARCH_CONTEXT_PATH)
-				&& null != request.getParameter(BloomreachConstants.CLEAR_FILTER_URL)) {
-			bloomreachResults.setClearRefUrl(request.getParameter(BloomreachConstants.CLEAR_FILTER_URL));
+				&& null != request.getAttribute(BloomreachConstants.CLEAR_FILTER_URL)) {
+			bloomreachResults.setClearRefUrl((String) request.getAttribute(BloomreachConstants.CLEAR_FILTER_URL));
 		}
 		if (StringUtils.isNotEmpty(request.getParameter(SearchConstants.CANONICAL_URL))) {
 			String canonicalUrl = request.getParameter(SearchConstants.CANONICAL_URL);

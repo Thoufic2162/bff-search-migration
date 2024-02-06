@@ -38,7 +38,6 @@ bloomreachconfig:
   bestSellerField: map_price,sub_category,rrs_sale,outlet,pid,gender_text,brand,title,webPgc,webSubPgc,skuid,embed_id,apparel_size,Shoe_Size,width,sku_color,quantity_on_hand,widthGroup,umap_price,sku_sale_price,reg_price,vip_price,drop_ship,colorGroup,extended_drop_ship,customer_reviews,customer_rating
 
 rrconfig:
- enableDynamicUrl: true #Dynamic url for bloomreach
  enableRankingInGenderUrl: false #enable/disable asics and brooks products in first four position
  enableBloomreachExcluded: true  #enable/disable to view products based on the values from bloomreach Dashboard based on the rule
  enableGenderWithFeedChange: true #enable/disable gender with feed changes in full feed

@@ -10,6 +10,13 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpUtil {
 
+	/**
+	 * Retrieves request attributes and parameters
+	 * 
+	 * @param request The HttpServletRequest object containing the request
+	 *                attributes and parameters.
+	 * @return A Properties object containing the request attributes and parameters.
+	 */
 	public static Properties getRequestAttributesAndParameters(HttpServletRequest request) {
 		Properties requestParams = new Properties();
 		Enumeration<String> attributes = request.getAttributeNames();

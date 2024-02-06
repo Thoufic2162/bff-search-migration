@@ -63,6 +63,15 @@ public class BloomreachBreadcrumSearchResults {
 	@Autowired
 	private Gson gson;
 
+	/**
+	 * Retrieves breadcrumbs based on the search results, request parameters, and
+	 * Bloomreach search results.
+	 * 
+	 * @param searchResults           The search results DTO.
+	 * @param request                 The HTTP servlet request.
+	 * @param bloomreachSearchResults The Bloomreach search results DTO.
+	 */
+
 	public void getBreadCrumbs(BloomreachSearchResponseDTO searchResults, HttpServletRequest request,
 			BloomreachSearchResultsDTO bloomreachSearchResults) {
 		log.debug(
@@ -297,7 +306,7 @@ public class BloomreachBreadcrumSearchResults {
 				bloomreachSearchResults.setCustomUrl(customUrl);
 			} catch (Exception exception) {
 				log.error(
-						"BloomreachBreadcrumSearchResults constructBreadCrums() ServletException while getting the bloomreach Results",
+						"BloomreachBreadcrumSearchResults setCustomUrl() ServletException while getting the bloomreach Results",
 						exception);
 			}
 		}
@@ -395,7 +404,7 @@ public class BloomreachBreadcrumSearchResults {
 		String[] urlStrings = Optional.ofNullable(qUri).filter(s -> s != null && !s.trim().isEmpty())
 				.orElse(BloomreachConstants.EMPTY_STRING).split(SearchConstants.SLASH);
 
-		String activeCount = request.getParameter(SearchConstants.REFINMENT_ACTIVE_COUNT);
+		String activeCount = (String) request.getAttribute(SearchConstants.REFINMENT_ACTIVE_COUNT);
 		if (activeCount != null) {
 			refinementActiveCount = Integer.parseInt(activeCount);
 		}
@@ -407,7 +416,7 @@ public class BloomreachBreadcrumSearchResults {
 					.mapToObj(i -> urlStrings[i] + SearchConstants.SLASH).collect(Collectors.joining());
 		}
 		log.debug("BloomreachBreadcrumSearchResults :: clearRefUrl{}", url);
-		log.debug("BloomreachBreadcrumSearchResults :: getClearRefUrl() END ::");
+		log.debug("BloomreachBreadcrumSearchResults :: getClearRefUrl() END ");
 		if (url != null && url.endsWith(SearchConstants.SLASH)) {
 			StringBuffer removeIndex = new StringBuffer(url);
 			url = removeIndex.deleteCharAt(url.length() - 1).toString();
