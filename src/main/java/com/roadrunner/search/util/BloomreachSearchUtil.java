@@ -111,12 +111,12 @@ public class BloomreachSearchUtil {
 		}
 		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String scriParam = queryParams.getProperty(BloomreachConstants.BR_SEO_CATEGORY_ITEM);
-		String cQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.COLOR));
-		String catQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.CATEGORY_Q));
-		String bQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.BRAND));
-		String rQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.R));
-		String shoeQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.SHOE_TYPE));
-		String sportsQuery = URLCoderUtil.decode((String) request.getAttribute(SearchConstants.SPORTS_TYPE));
+		String cQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.COLOR));
+		String catQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.CATEGORY_Q));
+		String bQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.BRAND));
+		String rQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.R));
+		String shoeQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.SHOE_TYPE));
+		String sportsQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.SPORTS_TYPE));
 		if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.ISDECODE))) {
 			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.COLOR))) {
 				cQuery = (String) queryParams.getProperty(SearchConstants.COLOR);
