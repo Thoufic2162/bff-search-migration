@@ -1,0 +1,71 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /rest
+
+spring:
+  main:
+    allow-circular-references: true
+
+  datasource:
+    url: jdbc:oracle:thin:@54.227.195.142:1521:xe
+    username: UAT_CATALOGA
+    password: UAT_CATALOGA
+    driver-class-name:  oracle.jdbc.driver.OracleDriver 
+
+bloomreachconfig: 
+  searchApiUrl : https://staging-core.dxpapi.com/api/v1/core/?{0}
+  accountId: 6803
+  authKey: h6bwtw4kbnu75ldh
+  domainKey: roadrunnersports_discovery
+  fl: latest_version_pid,disableInProductSearch,embed_id,Apparel_Size,Shoe_Size,accessory_type,apparel_type,availability,bra_activity_level,bra_compression,bra_molded_cups,bra_seamless,bra_support_level,bra_type,bra_underwire,casual_style,classic,color,colorGroup,country_of_origin,creation_date,cup_size,customer_rating,default_color,display_name,drop_ship,exclusive,extended_drop_ship,features_benefits,fit_category,fit_size,flavorGroup,flavor_value,gender_code,gender_text,has_video,injury_placement,injury_recovery,inseam,keywords,kids_size,kids_type,long_description,map_price,map_sale_price,newProduct,outlet,outlet_basement,pgc_code,pid,price,price_range,quantity_on_hand,rac_price,racc_price,ranking,ref_color_code,reg_price,reg_price,sale,sale_price,sale_price,sale_price_range,sandal_type,shoe_cushion,shoe_height,shoe_type,sku_color,sku_ids,sku_price,sku_sale_price,sku_swatch_images,sku_thumb_images,sock_length,sock_thickness,sports,stock_level,sub_category,taxable,thumb_image,title,total_sales,training_type,umap_hide_vip,umap_price,url,vip_price,vip_price,webPgc,webSubPgc,width,widthGroup,workout_type,skuid,vip_exclusive,reviews,description,brand,customer_reviews,rrs_sale,injury_placement,injury_recovery,availability_date
+  requestType: search
+  searchType: keyword
+  catagorytype: category
+  refUrl: https://uat.roadrunnersports.com
+  pathWayUrl: https://pathways-staging.dxpapi.com/api/v2/widgets/item/{0}?{1}
+  recommendationId:
+   topPicksForYou: rj0d53l6
+   outfitYourRun: 6j83xqlz
+   youMayAlsoLike: 6j83xqlz
+   topPicksForYouOutlet: nj3w4e9r
+   outfitYourRunOutlet: kjy7gqjv
+   youMayAlsoLikeOutlet: kjy7gqjv
+   bestSeller: 4leqddl2
+   recentlyViewedProducts: rj0z0n96
+  fields: latest_version_pid,disableInProductSearch,embed_id,Apparel_Size,Shoe_Size,accessory_type,apparel_type,availability,bra_activity_level,bra_compression,bra_molded_cups,bra_seamless,bra_support_level,bra_type,bra_underwire,casual_style,classic,color,colorGroup,country_of_origin,creation_date,cup_size,customer_rating,default_color,display_name,drop_ship,exclusive,extended_drop_ship,features_benefits,fit_category,fit_size,flavorGroup,flavor_value,gender_code,gender_text,has_video,injury_placement,injury_recovery,inseam,keywords,kids_size,kids_type,long_description,map_price,map_sale_price,newProduct,outlet,outlet_basement,pgc_code,pid,price,price_range,quantity_on_hand,rac_price,racc_price,ranking,ref_color_code,reg_price,reg_price,sale,sale_price,sale_price,sale_price_range,sandal_type,shoe_cushion,shoe_height,shoe_type,sku_color,sku_ids,sku_price,sku_sale_price,sku_swatch_images,sku_thumb_images,sock_length,sock_thickness,sports,stock_level,sub_category,taxable,thumb_image,title,total_sales,training_type,umap_hide_vip,umap_price,url,vip_price,vip_price,webPgc,webSubPgc,width,widthGroup,workout_type,skuid,vip_exclusive,reviews,description,brand,customer_reviews,rrs_sale,injury_placement,injury_recovery
+  br_uid: uid=2603600622565:v=15.0:ts=1663002355413:hc=1
+  bestSellerField: map_price,sub_category,rrs_sale,outlet,pid,gender_text,brand,title,webPgc,webSubPgc,skuid,embed_id,apparel_size,Shoe_Size,width,sku_color,quantity_on_hand,widthGroup,umap_price,sku_sale_price,reg_price,vip_price,drop_ship,colorGroup,extended_drop_ship,customer_reviews,customer_rating
+
+rrconfig:
+ enableRankingInGenderUrl: false #enable/disable asics and brooks products in first four position
+ enableBloomreachExcluded: true  #enable/disable to view products based on the values from bloomreach Dashboard based on the rule
+ enableGenderWithFeedChange: true #enable/disable gender with feed changes in full feed
+ enableProductRanking: true #enable/disable product ranking
+ enableRunningShoesInWalkingCategory: true  #enable/running shoes in walking category plp and search
+ enableSockInTopPicks: true  #flag to display sock in top picks section
+ topPickSockProduct: 40323  #sock product id for top picks section in cart page
+ enableWidenImage: true #enable/disable widen images to the site
+ enableAltImagesInPlp: false
+ enableSearchToCategoryUrl: true #to convert search query to category url
+ enablePLPBanner: false  #enable/disable fitfinder banner in plp page
+ enableBloomreachSearch: true #enable/disable bloomreach
+ enablePathwayRecommendation: true #enable/disable pathway recommendation (bloomreach)
+ RRSDefaultPriceListId: plist3900002
+ RRSSalePriceListId: plist3900003
+ 
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+ 
