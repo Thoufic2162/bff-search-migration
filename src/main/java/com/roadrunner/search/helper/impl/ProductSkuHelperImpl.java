@@ -66,7 +66,6 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 			log.debug("ProductSkuHelperImpl :: createSkus() :: No variants");
 			return colorSkus;
 		}
-
 		Iterator<?> variantsIter = variants.iterator();
 		int productStock = 0;
 		InventoryDTO inventoryDTO = null;
@@ -219,28 +218,11 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 			for (String color : colors) {
 				String colorCodeData = colorCodeMap.get(color);
 				if (StringUtils.isNotEmpty(colorCodeData)) {
-					String split[] = colorCodeData.split(BloomreachConstants.HYPHEN);
-					int colorCodeBegin = Integer.parseInt(split[0]);
-					int colorCodeEnd = Integer.parseInt(split[1]);
-					colorCode = searchProductDTO.getColorsSkus().stream()
-							.filter(numeric -> NumberUtils.isParsable(numeric.getColorCode()))
-							.filter(colorSkus -> Integer.parseInt(colorSkus.getColorCode()) >= colorCodeBegin
-									&& Integer.parseInt(colorSkus.getColorCode()) <= colorCodeEnd)
-							.findFirst();
+					colorCode = fetchColorCode(searchProductDTO, colorCodeData);
 					colorData = colorCode;
 				}
 				if (null != result.getVariants() && !colorData.isPresent()) {
-					AtomicReference<String> defaultColorCode = new AtomicReference<>();
-					result.getVariants().stream().filter(selcolor -> null != selcolor.getColorGroup()
-							&& selcolor.getColorGroup().get(0).equalsIgnoreCase(color)).forEach(clrCode -> {
-								StringTokenizer tokenizer = new StringTokenizer(clrCode.getSkuid(),
-										BloomreachConstants.HYPHEN);
-								if (tokenizer.countTokens() > 1) {
-									String style = tokenizer.nextToken(); // style
-									String skuColorCode = tokenizer.nextToken();
-									defaultColorCode.set(skuColorCode);
-								}
-							});
+					AtomicReference<String> defaultColorCode = fetchDefaultColorCodeFromVariants(result, color);
 					if (null != defaultColorCode.get()) {
 						searchProductDTO.setColorCode(defaultColorCode.get());
 						isRearrangedColor = true;
@@ -260,10 +242,6 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 		return isRearrangedColor;
 	}
 
-	protected boolean isColorCode(String color, String flavor) {
-		return !StringUtils.isEmpty(color) || !StringUtils.isEmpty(flavor);
-	}
-
 	@Override
 	public String getSkuImage(String identifier) {
 		String imageUrlConstructed = "http://s7ondemand1.scene7.com/is/image/roadrunnersports/" + identifier
@@ -272,6 +250,52 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 			return imageUrlConstructed;
 		}
 		return null;
+	}
+
+	/**
+	 * This method fetches the default color code from the variants
+	 * 
+	 * @param result
+	 * @param color
+	 * @return
+	 */
+	private AtomicReference<String> fetchDefaultColorCodeFromVariants(BRDoc result, String color) {
+		AtomicReference<String> defaultColorCode = new AtomicReference<>();
+		result.getVariants().stream().filter(
+				selcolor -> null != selcolor.getColorGroup() && selcolor.getColorGroup().get(0).equalsIgnoreCase(color))
+				.forEach(clrCode -> {
+					StringTokenizer tokenizer = new StringTokenizer(clrCode.getSkuid(), BloomreachConstants.HYPHEN);
+					if (tokenizer.countTokens() > 1) {
+						String style = tokenizer.nextToken(); // style
+						String skuColorCode = tokenizer.nextToken();
+						defaultColorCode.set(skuColorCode);
+					}
+				});
+		return defaultColorCode;
+	}
+
+	/**
+	 * This method fetch color code
+	 * 
+	 * @param searchProductDTO
+	 * @param colorCodeData
+	 * @return
+	 */
+	private Optional<ColorSkusDTO> fetchColorCode(RecommendationProductDTO searchProductDTO, String colorCodeData) {
+		Optional<ColorSkusDTO> colorCode;
+		String split[] = colorCodeData.split(BloomreachConstants.HYPHEN);
+		int colorCodeBegin = Integer.parseInt(split[0]);
+		int colorCodeEnd = Integer.parseInt(split[1]);
+		colorCode = searchProductDTO.getColorsSkus().stream()
+				.filter(numeric -> NumberUtils.isParsable(numeric.getColorCode()))
+				.filter(colorSkus -> Integer.parseInt(colorSkus.getColorCode()) >= colorCodeBegin
+						&& Integer.parseInt(colorSkus.getColorCode()) <= colorCodeEnd)
+				.findFirst();
+		return colorCode;
+	}
+
+	protected boolean isColorCode(String color, String flavor) {
+		return !StringUtils.isEmpty(color) || !StringUtils.isEmpty(flavor);
 	}
 
 }

@@ -12,17 +12,17 @@ public class BRSearchBaseDTO {
 
 	private String state;
 
-	protected String name;
+	private String name;
 
-	protected String dimensionName;
+	private String dimensionName;
 
-	protected String url;
+	private String url;
 
 	private int sequence;
 
 	private String baseUrl;
 
-	protected Integer index;
+	private Integer index;
 
 	private Integer textIndex;
 

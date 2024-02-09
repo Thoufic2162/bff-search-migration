@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 @JsonInclude(value = Include.NON_NULL)
 public class CrossSellProductsDTO {
+	
 	private String title;
 
 	private List<RecommendationProductDTO> products;

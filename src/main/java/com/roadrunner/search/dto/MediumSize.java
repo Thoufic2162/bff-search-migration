@@ -4,5 +4,7 @@ import lombok.Data;
 
 @Data
 public class MediumSize {
+	
 	public int id;
+
 }

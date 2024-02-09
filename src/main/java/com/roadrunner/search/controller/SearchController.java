@@ -38,7 +38,7 @@ public class SearchController {
 	public BaseResponseDTO<RelatedProductResponseDTO> getRelatedProducts(
 			@RequestParam(name = "productId", required = false) String productId,
 			@RequestParam(name = "page", required = false) String page) {
-		log.info("SearchController::getRelatedProducts::START{} productId={} page={}", productId, page);
+		log.info("SearchController::getRelatedProducts::START productId={} page={}", productId, page);
 		BaseResponseDTO<RelatedProductResponseDTO> relatedProducts = searchService.getRelatedProducts(productId, page);
 		log.info("SearchController::getRelatedProducts::ENDED");
 		return relatedProducts;

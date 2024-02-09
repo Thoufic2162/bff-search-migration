@@ -105,6 +105,7 @@ public class CookieHelperImpl implements CookieHelper {
 		}
 	}
 
+	@Override
 	public void visitAsGuestCookie(boolean hoka, boolean ftv, boolean reset, HttpServletRequest request) {
 		HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getResponse();
@@ -163,6 +164,7 @@ public class CookieHelperImpl implements CookieHelper {
 		}
 	}
 
+	@Override
 	public void nonVipHokaCookie(boolean hoka, boolean ftv, boolean reset, HttpServletRequest request) {
 		HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getResponse();

@@ -33,6 +33,7 @@ import com.roadrunner.search.dto.CatalogElementsFinder;
 import com.roadrunner.search.dto.CategoryItemDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.helper.BloomreachSearchDTOHelper;
+import com.roadrunner.search.helper.ProductDataAccessHelper;
 import com.roadrunner.search.helper.SearchHelper;
 import com.roadrunner.search.tools.BloomreachBreadcrumSearchResults;
 import com.roadrunner.search.tools.BloomreachProductSearchResults;
@@ -101,6 +102,9 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 
 	@Autowired
 	private BrandCategoryTool brandCategoryTool;
+
+	@Autowired
+	private ProductDataAccessHelper productDataAccessHelper;
 
 	@Override
 	public BloomreachSearchResultsDTO getSearchResults(String qUri, HttpServletRequest request) {
@@ -243,7 +247,7 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 				boolean querySearch = !StringUtils.isEmpty(query);
 				if (querySearch) {
 					List<CategoryItemDTO> categoryItem = null;
-					categoryItem = bloomreachSearchUtil.getCategoryItem(query);
+					categoryItem = productDataAccessHelper.getCategoryItem(query);
 					if (!CollectionUtils.isEmpty(categoryItem)) {
 						List<String> refinements = categoryItem.stream().map(CategoryItemDTO::getRefinements).flatMap(
 								refinementsList -> Arrays.stream(refinementsList.split(SearchConstants.SEMICOLON)))
@@ -500,7 +504,7 @@ public class BloomreachSearchDTOHelperImpl implements BloomreachSearchDTOHelper 
 
 	private void populateSeoContentData(String qUri, BloomreachSearchResultsDTO bloomreachResults) {
 		String brandname = SearchConstants.EMPTY_STRING;
-		SeoContent seoRepo = bloomreachSearchUtil.getSeoContent(qUri);
+		SeoContent seoRepo = productDataAccessHelper.getSeoContent(qUri);
 		String qUriString = qUri.toString();
 		String separator = SearchConstants.SLASH;
 		int indexOfSeparator = qUriString.lastIndexOf(separator);

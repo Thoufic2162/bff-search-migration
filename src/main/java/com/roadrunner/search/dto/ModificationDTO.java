@@ -6,5 +6,6 @@ import lombok.Data;
 public class ModificationDTO {
 	
 	private String mode;
+	
 	private String value;
 }

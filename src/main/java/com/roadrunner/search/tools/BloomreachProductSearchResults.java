@@ -44,13 +44,6 @@ import lombok.extern.log4j.Log4j2;
 @Setter
 public class BloomreachProductSearchResults {
 
-	private Map<String, String> productLandingSeoURL = new HashMap<String, String>();
-	private Map<String, String> brandNameMap;
-	private String vipPlus;
-	private double vipPlusPrice;
-	private List<String> promotionalProducts;
-	private Map<String, String> nonPromotionalProducts;
-
 	@Autowired
 	private RRConfiguration rrConfiguration;
 
@@ -65,6 +58,13 @@ public class BloomreachProductSearchResults {
 
 	@Autowired
 	private CookieHelper cookieHelper;
+
+	private Map<String, String> productLandingSeoURL = new HashMap<String, String>();
+	private Map<String, String> brandNameMap;
+	private String vipPlus;
+	private double vipPlusPrice;
+	private List<String> promotionalProducts;
+	private Map<String, String> nonPromotionalProducts;
 
 	public void getProductResults(BloomreachSearchResponseDTO searchResult, HttpServletRequest request,
 			BloomreachSearchResultsDTO responseBean) {

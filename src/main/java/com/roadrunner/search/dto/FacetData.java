@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class FacetData {
+	
 	private String name;
 
 	private Integer count;

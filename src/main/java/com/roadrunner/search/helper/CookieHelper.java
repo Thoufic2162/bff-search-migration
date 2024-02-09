@@ -19,4 +19,8 @@ public interface CookieHelper {
 
 	void nonVipExceptHokaCookie(boolean isExceptHoka, HttpServletRequest request);
 
+	void visitAsGuestCookie(boolean hoka, boolean ftv, boolean reset, HttpServletRequest request);
+
+	void nonVipHokaCookie(boolean hoka, boolean ftv, boolean reset, HttpServletRequest request);
+
 }

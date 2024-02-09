@@ -34,10 +34,8 @@ import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.domain.SeoContent;
 import com.roadrunner.search.dto.CatalogElementsFinder;
-import com.roadrunner.search.dto.CategoryItemDTO;
+import com.roadrunner.search.helper.ProductDataAccessHelper;
 import com.roadrunner.search.helper.SearchHelper;
-import com.roadrunner.search.repo.RRSCategoryMapRepository;
-import com.roadrunner.search.repo.SeoContentRepository;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +58,7 @@ public class BloomreachSearchUtil {
 	private List<String> excludedSubCategoryOrderList;
 	private Map<String, String> sportsMap;
 	private Map<String, String> sortOptionsMap;
-	private Integer siteId;
+	private Map<String, String> searchSortOptionsMap;
 
 	@Autowired
 	private SearchHelper searchHelper;
@@ -72,13 +70,10 @@ public class BloomreachSearchUtil {
 	private RRConfiguration rrConfiguration;
 
 	@Autowired
-	private SeoContentRepository seoContentRepository;
-
-	@Autowired
 	private BloomreachConfiguration bloomreachConfiguration;
 
 	@Autowired
-	private RRSCategoryMapRepository rrsCategoryMapRepository;
+	private ProductDataAccessHelper productDataAccessHelper;
 
 	/**
 	 * This method is used to construct query parameters
@@ -97,18 +92,6 @@ public class BloomreachSearchUtil {
 		if (null != query) {
 			query = query.replace(SearchConstants.APOSTROPHE, SearchConstants.EMPTY_STRING).toLowerCase();
 		}
-		if (query != null && query.contains(SearchConstants.URL_DELIMETER2)
-				&& !query.contains(SearchConstants.SEARCH)) {
-			String[] params = query.split(SearchConstants.URL_DELIMETER2);
-			if (params[0] != null) {
-				request.setAttribute(SearchConstants.DECODEURI, params[0]);
-			}
-			Arrays.stream(params).filter(param -> param.contains(BloomreachConstants.EQUAL))
-					.map(param -> param.split(BloomreachConstants.EQUAL)).forEach(urlParam -> {
-						request.setAttribute(urlParam[0], urlParam[1]);
-						request.setAttribute(SearchConstants.ISDECODE, SearchConstants.TRUE);
-					});
-		}
 		Properties queryParams = HttpUtil.getRequestAttributesAndParameters(request);
 		String scriParam = queryParams.getProperty(BloomreachConstants.BR_SEO_CATEGORY_ITEM);
 		String cQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.COLOR));
@@ -117,31 +100,10 @@ public class BloomreachSearchUtil {
 		String rQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.R));
 		String shoeQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.SHOE_TYPE));
 		String sportsQuery = URLCoderUtil.decode((String) queryParams.getProperty(SearchConstants.SPORTS_TYPE));
-		if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.ISDECODE))) {
-			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.COLOR))) {
-				cQuery = (String) queryParams.getProperty(SearchConstants.COLOR);
-			}
-			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.CATEGORY_Q))) {
-				catQuery = (String) queryParams.getProperty(SearchConstants.CATEGORY_Q);
-			}
-			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.BRAND))) {
-				bQuery = (String) queryParams.getProperty(SearchConstants.BRAND);
-			}
-			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.SHOE_TYPE))) {
-				shoeQuery = (String) queryParams.getProperty(SearchConstants.SHOE_TYPE);
-			}
-			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.SPORTS_TYPE))) {
-				sportsQuery = (String) queryParams.getProperty(SearchConstants.SPORTS_TYPE);
-			}
-			if (StringUtils.isNotEmpty(queryParams.getProperty(SearchConstants.DECODEURI))) {
-				query = (String) queryParams.getProperty(SearchConstants.DECODEURI);
-			}
-			log.debug(
-					"BloomreachSearchUtil:: constructQueryParams() ::cQuery::{}::catQuery::{}::bQuery::{}::query::{} shoeQuery::{} sportsQuery::{}",
-					cQuery, catQuery, bQuery, query, shoeQuery, sportsQuery);
-		}
-
-		if (StringUtils.isNotBlank(queryString)) {
+		log.debug(
+				"BloomreachSearchUtil:: constructQueryParams() ::cQuery::{}::catQuery::{}::bQuery::{}::query::{} shoeQuery::{} sportsQuery::{}",
+				cQuery, catQuery, bQuery, query, shoeQuery, sportsQuery);
+		if (StringUtils.isNotEmpty(queryString)) {
 			String[] queryStringSplit = queryString.split(BloomreachConstants.EQUAL);
 			if (null != (queryStringSplit) && queryStringSplit.length > 1
 					&& SearchConstants.TYPE_AHEAD_SEARCH_QUERY_STRING.equalsIgnoreCase(queryStringSplit[0])) {
@@ -157,78 +119,7 @@ public class BloomreachSearchUtil {
 				query = query.replaceAll(SearchConstants.BRAND_TYPE_AHEAD_URL, SearchConstants.SEARCH_CONTEXT_PATH);
 				String arr[] = query.split(SearchConstants.SEARCH_CONTEXT_PATH);
 				if (arr != null && arr.length > 1) {
-					request.setAttribute(BloomreachConstants.QPARAMS.QUERY, arr[1]);
-					String uri = query;
-					String selColor = rQuery;
-					Optional<String> color = Arrays
-							.stream(uri
-									.replaceAll(SearchConstants.SEARCH_CONTEXT_PATH, BloomreachConstants.EMPTY_STRING)
-									.split(SearchConstants.SPACE))
-							.filter(isColor -> catalogElementsFinder.getColors().stream()
-									.anyMatch(clr -> (isColor.equalsIgnoreCase(clr))))
-							.findAny();
-					Optional<String> refineSelcolor = catalogElementsFinder
-							.getColors().stream().filter(
-									clr -> null != selColor
-											&& selColor
-													.replaceAll(
-															SearchConstants.VARIANTS_COLORGROUP
-																	.concat(SearchConstants.COLON),
-															SearchConstants.EMPTY_STRING)
-													.toLowerCase().equalsIgnoreCase(clr))
-							.findAny();
-					Optional<String> searchBrand = Arrays
-							.stream(uri
-									.replaceAll(SearchConstants.SEARCH_CONTEXT_PATH, BloomreachConstants.EMPTY_STRING)
-									.split(SearchConstants.SPACE))
-							.filter(isBrand -> catalogElementsFinder.getBrands().stream()
-									.anyMatch(brand -> isBrand.equalsIgnoreCase(brand)))
-							.findAny();
-					Optional<String> searchGender = searchGenders.stream().filter(gender -> uri.contains(gender))
-							.findAny();
-					Optional<String> searchApparelSize = Arrays
-							.stream(uri
-									.replaceAll(SearchConstants.SEARCH_CONTEXT_PATH, BloomreachConstants.EMPTY_STRING)
-									.split(SearchConstants.SPACE))
-							.filter(isapparelSize -> null != catalogElementsFinder.getApparelSizeMap()
-									.get(isapparelSize))
-							.findAny();
-
-					String searchShoeSize = null;
-					if (query.contains(SearchConstants.SIZE_LOWER_CASE)) {
-						String sizePattern = SearchConstants.SIZE_PATTERN;
-						Pattern regexPattern = Pattern.compile(sizePattern);
-						Matcher matcher = regexPattern.matcher(query);
-
-						if (matcher.find()) {
-							searchShoeSize = SearchConstants.SIZE_WITH_SPACE.concat(matcher.group(1));
-							request.setAttribute(BloomreachConstants.SHOE_SIZE_PARAM, searchShoeSize);
-						}
-					}
-					if (null != color && color.isPresent()) {
-						request.setAttribute(SearchConstants.SEARCH_COLOR, color.get());
-					}
-
-					if (null != refineSelcolor && refineSelcolor.isPresent()) {
-						request.setAttribute(SearchConstants.SEARCH_COLOR, refineSelcolor.get());
-					}
-
-					if (null != searchBrand && searchBrand.isPresent()) {
-						request.setAttribute(SearchConstants.SEARCH_BRAND, searchBrand.get());
-					}
-
-					if (null != searchApparelSize && searchApparelSize.isPresent()) {
-						request.setAttribute(SearchConstants.APPAREL_SIZE, searchApparelSize.get());
-					}
-
-					if (null != searchGender && searchGender.isPresent()) {
-						String genderName = !searchGender.get().equalsIgnoreCase(SearchConstants.KIDS)
-								? catalogElementsFinder.getGenderMap().get(searchGender.get())
-								: SearchConstants.KIDS;
-						request.setAttribute(SearchConstants.SEARCH_GENDER, genderName);
-					}
-					searchHelper.populateClearRefUrl(request, query, color, searchBrand, searchGender, searchShoeSize,
-							searchApparelSize);
+					setSearchParameters(request, query, rQuery, arr);
 					return;
 				}
 			}
@@ -279,27 +170,7 @@ public class BloomreachSearchUtil {
 						for (String queryStringurl : queryStringurls) {
 							if (queryStringurl != null && !queryStringurl.isEmpty()) {
 								if (catalogElementsFinder.getGender().contains(queryStringurl)) {
-									if (query.contains(SearchConstants.SITE_KIDS)) {
-										formBrQuery(queryStringurl, SearchConstants.KIDSGENDER, brQueryParam);
-										getUrlIndex(urlOrderMap.get(SearchConstants.KIDSGENDER), list);
-										request.setAttribute(BloomreachConstants.IS_GENDER, SearchConstants.SITE_KIDS);
-										gender = SearchConstants.SITE_KIDS.concat(SearchConstants.SPACE)
-												.concat(queryStringurl);
-									} else {
-										if (rrConfiguration.isEnableRankingInGenderUrl()
-												&& genderUrlList.contains(query)
-												&& null != catalogElementsFinder.getGenderMap().get(queryStringurl)) {
-											request.setAttribute(BloomreachConstants.IS_GENDER,
-													catalogElementsFinder.getGenderMap().get(queryStringurl));
-											gender = queryStringurl;
-										} else {
-											formBrQuery(queryStringurl, SearchConstants.GENDER_PARAM, brQueryParam);
-											formBrQuery(SearchConstants.GENDER_UNISEX, SearchConstants.GENDER_PARAM,
-													brQueryParam);
-											getUrlIndex(urlOrderMap.get(SearchConstants.GENDER_PARAM), list);
-											gender = queryStringurl;
-										}
-									}
+									gender = fetchAndSetGender(request, query, brQueryParam, list, queryStringurl);
 									formBloomrechDashBoardCategory(gender, categoryName, subCategoryName, brandName,
 											request, outletName, query);
 									getQueryCount(countQuery, SearchConstants.GENDER_PARAM);
@@ -328,16 +199,11 @@ public class BloomreachSearchUtil {
 									brandName = queryStringurl;
 									continue;
 								}
+
 								if (SearchConstants.PARAM_OUTLET.equals(queryStringurl)) {
 									formBrQuery(queryStringurl, SearchConstants.PARAM_OUTLET, brQueryParam);
 									getQueryCount(countQuery, SearchConstants.PARAM_OUTLET);
-									outletName = queryStringurl;
-									if (null != catalogElementsFinder.getBloomreachDashBoardCategoryMap().get(query)) {
-										request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR,
-												catalogElementsFinder.getBloomreachDashBoardCategoryMap().get(query));
-									} else {
-										request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, outletName);
-									}
+									outletName = FetchAndSetOutletCategory(request, query, queryStringurl);
 									getUrlIndex(urlOrderMap.get(SearchConstants.PARAM_OUTLET), list);
 									refinmentActiveCount.set(refinmentActiveCount.get() + 1);
 									continue;
@@ -382,30 +248,8 @@ public class BloomreachSearchUtil {
 									formBrQuery(queryStringurl, SearchConstants.SUBCATAGORY, brQueryParam);
 									getQueryCount(countQuery, SearchConstants.SUBCATAGORY);
 									getUrlIndex(urlOrderMap.get(SearchConstants.SUBCATAGORY), list);
-									if (!excludedSubCategoryOrderList.contains(queryStringurl) && catalogElementsFinder
-											.getBloomreachCategoryMap().containsKey(queryStringurl)
-											&& !excludedCategoryList.contains(categoryName)) {
-										String categoryQuery = gender.concat(SearchConstants.SPACE)
-												.concat(catalogElementsFinder.getBloomreachCategoryMap()
-														.get(queryStringurl))
-												.concat(SearchConstants.SPACE).concat(categoryName);
-										String resultUrl = rrConfiguration.isEnableGenderWithFeedChange()
-												&& !StringUtils.isEmpty(gender) ? categoryQuery.trim()
-														: catalogElementsFinder.getBloomreachCategoryMap()
-																.get(queryStringurl);
-										request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, resultUrl);
-										subCategoryName = catalogElementsFinder.getBloomreachCategoryMap()
-												.get(queryStringurl);
-									} else if (!excludedSubCategoryOrderList.contains(queryStringurl)
-											&& !excludedCategoryList.contains(categoryName)) {
-										String categoryQuery = gender.concat(SearchConstants.SPACE)
-												.concat(queryStringurl).concat(SearchConstants.SPACE)
-												.concat(categoryName);
-										String resultUrl = rrConfiguration.isEnableGenderWithFeedChange()
-												&& !StringUtils.isEmpty(gender) ? categoryQuery.trim() : queryStringurl;
-										request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, resultUrl);
-										subCategoryName = queryStringurl;
-									}
+									subCategoryName = fetchAndSetSubCategory(request, gender, categoryName,
+											subCategoryName, queryStringurl);
 									refinmentActiveCount.set(isTopNavSocks ? refinmentActiveCount.get()
 											: refinmentActiveCount.get() + 1);
 									formBloomrechDashBoardCategory(gender, categoryName, subCategoryName, brandName,
@@ -491,74 +335,10 @@ public class BloomreachSearchUtil {
 						}
 						request.setAttribute(SearchConstants.REFINMENT_ACTIVE_COUNT,
 								Integer.toString(refinmentActiveCount.get()));
-						boolean isCustomQuery = true;
-						if (customUrl) {
-							SeoContent seoRepo = getSeoContent(seourl);
-							if (seoRepo == null && query.equalsIgnoreCase(SearchConstants.CATEGORY_URL)) {
-								isCustomQuery = false;
-								request.setAttribute(SearchConstants.IS_CUSTOMQUERY, SearchConstants.FALSE);
-
-							}
-						}
-						boolean isOrderUrl = true;
-						if (list.size() > 1) {
-							for (int i = 1; i < list.size(); i++) {
-								if (list.get(i) > (list.get(i - 1))) {
-									continue;
-								} else {
-									isOrderUrl = false;
-									request.setAttribute(SearchConstants.IS_CUSTOMQUERY, SearchConstants.FALSE);
-									break;
-								}
-							}
-						}
-						boolean multipletCount = false;
-						if (countQuery != null && !countQuery.isEmpty()) {
-							multipletCount = countQuery.entrySet().stream().anyMatch(map -> map.getValue() > 1);
-							if (multipletCount) {
-								request.setAttribute(SearchConstants.QUERY_COUNT, SearchConstants.TRUE);
-							}
-						}
-
-						if (bQuery != null && !bQuery.isEmpty()) {
-							String[] brands = bQuery.split(SearchConstants.COMMA);
-							for (String brand : brands) {
-								formBrQuery(brand, SearchConstants.BRAND, brQueryParam);
-							}
-						}
-
-						if (cQuery != null && !cQuery.isEmpty()) {
-							String[] colors = cQuery.split(SearchConstants.COMMA);
-							request.setAttribute(SearchConstants.SELECTED_COLOR, cQuery);
-							for (String color : colors) {
-								formBrQuery(color, SearchConstants.COLOR, brQueryParam);
-							}
-						}
-
-						if (catQuery != null && !catQuery.isEmpty()) {
-							String[] categorys = catQuery.split(SearchConstants.COMMA);
-							for (String category : categorys) {
-								formBrQuery(category, SearchConstants.SUBCATAGORY, brQueryParam);
-							}
-						}
-
-						if (shoeQuery != null && !shoeQuery.isEmpty()) {
-							String[] shoetypes = shoeQuery.split(SearchConstants.COMMA);
-							for (String shoeType : shoetypes) {
-								formBrQuery(shoeType, SearchConstants.SHOE_TYPE, brQueryParam);
-							}
-						}
-
-						if (sportsQuery != null && !sportsQuery.isEmpty()) {
-							String[] sportsTypes = sportsQuery.split(SearchConstants.COMMA);
-							for (String element : sportsTypes) {
-								if (catalogElementsFinder.getSportsMap().entrySet().stream()
-										.anyMatch(sports -> sports.getValue().equalsIgnoreCase(element))) {
-									formBrQuery(sportsMap.get(element), SearchConstants.SPORTS_TYPE, brQueryParam);
-								}
-							}
-						}
-
+						setCustomQueryParam(request, query, seourl, customUrl, list);
+						setQueryCountParam(request, countQuery);
+						generateBrQueryFromParameter(request, cQuery, catQuery, bQuery, shoeQuery, sportsQuery,
+								brQueryParam);
 						String selectedRef = BloomreachConstants.EMPTY_STRING;
 						try {
 							if (brQueryParam.length() > 0) {
@@ -577,11 +357,7 @@ public class BloomreachSearchUtil {
 							brQueryParam.append(rQuery);
 						}
 
-						if (brQueryParam.toString().endsWith(SearchConstants.COMMA)) {
-							brRequestParams = brQueryParam.substring(0, brQueryParam.length() - 1);
-						} else {
-							brRequestParams = brQueryParam.toString();
-						}
+						brRequestParams = fetchBRRequestParam(brQueryParam);
 						log.debug("BloomreachSearchUtil constructQueryParams() dynamicUrl:: brRequestParams {}",
 								brRequestParams);
 						request.setAttribute(SearchConstants.REMOVE_CATAGORY, SearchConstants.TRUE);
@@ -602,6 +378,228 @@ public class BloomreachSearchUtil {
 			});
 			log.debug("BloomreachSearchUtil " + "constructQueryParams() END ::", brRequestParams);
 		}
+	}
+
+	private void setQueryCountParam(HttpServletRequest request, HashMap<String, Integer> countQuery) {
+		boolean multipletCount = false;
+		if (countQuery != null && !countQuery.isEmpty()) {
+			multipletCount = countQuery.entrySet().stream().anyMatch(map -> map.getValue() > 1);
+			if (multipletCount) {
+				request.setAttribute(SearchConstants.QUERY_COUNT, SearchConstants.TRUE);
+			}
+		}
+	}
+
+	/**
+	 * This method set the isCustomQuery attribute
+	 * 
+	 * @param request
+	 * @param query
+	 * @param seourl
+	 * @param customUrl
+	 * @param list
+	 */
+	private void setCustomQueryParam(HttpServletRequest request, String query, String seourl, boolean customUrl,
+			List<Integer> list) {
+		boolean isCustomQuery = true;
+		if (customUrl) {
+			SeoContent seoRepo = productDataAccessHelper.getSeoContent(seourl);
+			if (seoRepo == null && query.equalsIgnoreCase(SearchConstants.CATEGORY_URL)) {
+				isCustomQuery = false;
+				request.setAttribute(SearchConstants.IS_CUSTOMQUERY, SearchConstants.FALSE);
+			}
+		}
+		boolean isOrderUrl = true;
+		if (list.size() > 1) {
+			for (int i = 1; i < list.size(); i++) {
+				if (list.get(i) > (list.get(i - 1))) {
+					continue;
+				} else {
+					isOrderUrl = false;
+					request.setAttribute(SearchConstants.IS_CUSTOMQUERY, SearchConstants.FALSE);
+					break;
+				}
+			}
+		}
+	}
+
+	private String fetchBRRequestParam(StringBuffer brQueryParam) {
+		String brRequestParams;
+		if (brQueryParam.toString().endsWith(SearchConstants.COMMA)) {
+			brRequestParams = brQueryParam.substring(0, brQueryParam.length() - 1);
+		} else {
+			brRequestParams = brQueryParam.toString();
+		}
+		return brRequestParams;
+	}
+
+	private void generateBrQueryFromParameter(HttpServletRequest request, String cQuery, String catQuery, String bQuery,
+			String shoeQuery, String sportsQuery, StringBuffer brQueryParam) {
+		if (bQuery != null && !bQuery.isEmpty()) {
+			String[] brands = bQuery.split(SearchConstants.COMMA);
+			for (String brand : brands) {
+				formBrQuery(brand, SearchConstants.BRAND, brQueryParam);
+			}
+		}
+
+		if (cQuery != null && !cQuery.isEmpty()) {
+			String[] colors = cQuery.split(SearchConstants.COMMA);
+			request.setAttribute(SearchConstants.SELECTED_COLOR, cQuery);
+			for (String color : colors) {
+				formBrQuery(color, SearchConstants.COLOR, brQueryParam);
+			}
+		}
+
+		if (catQuery != null && !catQuery.isEmpty()) {
+			String[] categorys = catQuery.split(SearchConstants.COMMA);
+			for (String category : categorys) {
+				formBrQuery(category, SearchConstants.SUBCATAGORY, brQueryParam);
+			}
+		}
+
+		if (shoeQuery != null && !shoeQuery.isEmpty()) {
+			String[] shoetypes = shoeQuery.split(SearchConstants.COMMA);
+			for (String shoeType : shoetypes) {
+				formBrQuery(shoeType, SearchConstants.SHOE_TYPE, brQueryParam);
+			}
+		}
+
+		if (sportsQuery != null && !sportsQuery.isEmpty()) {
+			String[] sportsTypes = sportsQuery.split(SearchConstants.COMMA);
+			for (String element : sportsTypes) {
+				if (catalogElementsFinder.getSportsMap().entrySet().stream()
+						.anyMatch(sports -> sports.getValue().equalsIgnoreCase(element))) {
+					formBrQuery(sportsMap.get(element), SearchConstants.SPORTS_TYPE, brQueryParam);
+				}
+			}
+		}
+	}
+
+	private String FetchAndSetOutletCategory(HttpServletRequest request, String query, String queryStringurl) {
+		String outletName;
+		outletName = queryStringurl;
+		if (null != catalogElementsFinder.getBloomreachDashBoardCategoryMap().get(query)) {
+			request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR,
+					catalogElementsFinder.getBloomreachDashBoardCategoryMap().get(query));
+		} else {
+			request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, outletName);
+		}
+		return outletName;
+	}
+
+	private String fetchAndSetSubCategory(HttpServletRequest request, String gender, String categoryName,
+			String subCategoryName, String queryStringurl) {
+		if (!excludedSubCategoryOrderList.contains(queryStringurl)
+				&& catalogElementsFinder.getBloomreachCategoryMap().containsKey(queryStringurl)
+				&& !excludedCategoryList.contains(categoryName)) {
+			String categoryQuery = gender.concat(SearchConstants.SPACE)
+					.concat(catalogElementsFinder.getBloomreachCategoryMap().get(queryStringurl))
+					.concat(SearchConstants.SPACE).concat(categoryName);
+			String resultUrl = rrConfiguration.isEnableGenderWithFeedChange() && !StringUtils.isEmpty(gender)
+					? categoryQuery.trim()
+					: catalogElementsFinder.getBloomreachCategoryMap().get(queryStringurl);
+			request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, resultUrl);
+			subCategoryName = catalogElementsFinder.getBloomreachCategoryMap().get(queryStringurl);
+		} else if (!excludedSubCategoryOrderList.contains(queryStringurl)
+				&& !excludedCategoryList.contains(categoryName)) {
+			String categoryQuery = gender.concat(SearchConstants.SPACE).concat(queryStringurl)
+					.concat(SearchConstants.SPACE).concat(categoryName);
+			String resultUrl = rrConfiguration.isEnableGenderWithFeedChange() && !StringUtils.isEmpty(gender)
+					? categoryQuery.trim()
+					: queryStringurl;
+			request.setAttribute(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR, resultUrl);
+			subCategoryName = queryStringurl;
+		}
+		return subCategoryName;
+	}
+
+	private String fetchAndSetGender(HttpServletRequest request, String query, StringBuffer brQueryParam,
+			List<Integer> list, String queryStringurl) {
+		String gender;
+		if (query.contains(SearchConstants.SITE_KIDS)) {
+			formBrQuery(queryStringurl, SearchConstants.KIDSGENDER, brQueryParam);
+			getUrlIndex(urlOrderMap.get(SearchConstants.KIDSGENDER), list);
+			request.setAttribute(BloomreachConstants.IS_GENDER, SearchConstants.SITE_KIDS);
+			gender = SearchConstants.SITE_KIDS.concat(SearchConstants.SPACE).concat(queryStringurl);
+		} else {
+			if (rrConfiguration.isEnableRankingInGenderUrl() && genderUrlList.contains(query)
+					&& null != catalogElementsFinder.getGenderMap().get(queryStringurl)) {
+				request.setAttribute(BloomreachConstants.IS_GENDER,
+						catalogElementsFinder.getGenderMap().get(queryStringurl));
+				gender = queryStringurl;
+			} else {
+				formBrQuery(queryStringurl, SearchConstants.GENDER_PARAM, brQueryParam);
+				formBrQuery(SearchConstants.GENDER_UNISEX, SearchConstants.GENDER_PARAM, brQueryParam);
+				getUrlIndex(urlOrderMap.get(SearchConstants.GENDER_PARAM), list);
+				gender = queryStringurl;
+			}
+		}
+		return gender;
+	}
+
+	private void setSearchParameters(HttpServletRequest request, String query, String rQuery, String[] arr) {
+		request.setAttribute(BloomreachConstants.QPARAMS.QUERY, arr[1]);
+		String uri = query;
+		String selColor = rQuery;
+		Optional<String> color = Arrays
+				.stream(uri.replaceAll(SearchConstants.SEARCH_CONTEXT_PATH, BloomreachConstants.EMPTY_STRING)
+						.split(SearchConstants.SPACE))
+				.filter(isColor -> catalogElementsFinder.getColors().stream()
+						.anyMatch(clr -> (isColor.equalsIgnoreCase(clr))))
+				.findAny();
+		Optional<String> refineSelcolor = catalogElementsFinder.getColors().stream()
+				.filter(clr -> null != selColor
+						&& selColor.replaceAll(SearchConstants.VARIANTS_COLORGROUP.concat(SearchConstants.COLON),
+								SearchConstants.EMPTY_STRING).toLowerCase().equalsIgnoreCase(clr))
+				.findAny();
+		Optional<String> searchBrand = Arrays
+				.stream(uri.replaceAll(SearchConstants.SEARCH_CONTEXT_PATH, BloomreachConstants.EMPTY_STRING)
+						.split(SearchConstants.SPACE))
+				.filter(isBrand -> catalogElementsFinder.getBrands().stream()
+						.anyMatch(brand -> isBrand.equalsIgnoreCase(brand)))
+				.findAny();
+		Optional<String> searchGender = searchGenders.stream().filter(gender -> uri.contains(gender)).findAny();
+		Optional<String> searchApparelSize = Arrays
+				.stream(uri.replaceAll(SearchConstants.SEARCH_CONTEXT_PATH, BloomreachConstants.EMPTY_STRING)
+						.split(SearchConstants.SPACE))
+				.filter(isapparelSize -> null != catalogElementsFinder.getApparelSizeMap().get(isapparelSize))
+				.findAny();
+
+		String searchShoeSize = null;
+		if (query.contains(SearchConstants.SIZE_LOWER_CASE)) {
+			String sizePattern = SearchConstants.SIZE_PATTERN;
+			Pattern regexPattern = Pattern.compile(sizePattern);
+			Matcher matcher = regexPattern.matcher(query);
+
+			if (matcher.find()) {
+				searchShoeSize = SearchConstants.SIZE_WITH_SPACE.concat(matcher.group(1));
+				request.setAttribute(BloomreachConstants.SHOE_SIZE_PARAM, searchShoeSize);
+			}
+		}
+		if (null != color && color.isPresent()) {
+			request.setAttribute(SearchConstants.SEARCH_COLOR, color.get());
+		}
+
+		if (null != refineSelcolor && refineSelcolor.isPresent()) {
+			request.setAttribute(SearchConstants.SEARCH_COLOR, refineSelcolor.get());
+		}
+
+		if (null != searchBrand && searchBrand.isPresent()) {
+			request.setAttribute(SearchConstants.SEARCH_BRAND, searchBrand.get());
+		}
+
+		if (null != searchApparelSize && searchApparelSize.isPresent()) {
+			request.setAttribute(SearchConstants.APPAREL_SIZE, searchApparelSize.get());
+		}
+
+		if (null != searchGender && searchGender.isPresent()) {
+			String genderName = !searchGender.get().equalsIgnoreCase(SearchConstants.KIDS)
+					? catalogElementsFinder.getGenderMap().get(searchGender.get())
+					: SearchConstants.KIDS;
+			request.setAttribute(SearchConstants.SEARCH_GENDER, genderName);
+		}
+		searchHelper.populateClearRefUrl(request, query, color, searchBrand, searchGender, searchShoeSize,
+				searchApparelSize);
 	}
 
 	/**
@@ -701,78 +699,131 @@ public class BloomreachSearchUtil {
 	}
 
 	/**
-	 * This method is used to get seo data form seoContentRepository
-	 * 
-	 * @param url
-	 * @return The SEO content corresponding to the provided URL, or null if not
-	 *         found
-	 */
-	public SeoContent getSeoContent(String url) {
-		log.debug("BloomreachSearchUtil::getSeoContent() url:: {}", url);
-		SeoContent seoContent = seoContentRepository.findBySeoUrl(url);
-		return seoContent;
-	}
-
-	/**
 	 * This method is used to populate the request parameter populateRequestParam
 	 * 
+	 * @param queryParameters
 	 * @param params
+	 * @param isPopulateBRResponse
+	 * @param isRecommendation
 	 * @return
 	 */
-	public Map<String, String> populateRequestParam(Map<String, String> params) {
-		log.debug("BloomreachSearchUtil::populateRequestParam: START :: params={}", params);
-		StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
-				.getRequestURL();
-		String domain = null;
-		boolean isSort = false;
-		String smartZone = (String) params.get(BloomreachConstants.QPARAMS.SZ);
-		try {
-			URL url = new URL(host.toString());
-			domain = url.getProtocol().concat(BloomreachConstants.URL_SLASH).concat(url.getHost());
-		} catch (MalformedURLException exception) {
-			log.error("BloomreachSearchUtil::populateRequestParam::exception={}", exception);
-		}
-		String skip = (String) params.get(BloomreachConstants.QPARAMS.SKIP);
-		String uid = (String) params.get(BloomreachConstants.UID);
-		String searchQ = (String) params.get(BloomreachConstants.Q);
+	public Map<String, String> populateRequestParam(Properties queryParameters, Map<String, String> params,
+			boolean isPopulateBRResponse, boolean isRecommendation) {
+		log.debug("SearchHelperImpl.populateRequestParam: START :: queryParams={} params={} isPopulateBRResponse={}",
+				queryParameters, params, isPopulateBRResponse);
+		String domain = fetchDomain(isRecommendation);
+		Map<String, String> queryParams = (queryParameters != null) ? convertPropertiesToMap(queryParameters) : params;
 		String sort = null;
-		if (!StringUtils.isEmpty((String) params.get(BloomreachConstants.QPARAMS.S))) {
-			sort = (String) params.get(BloomreachConstants.QPARAMS.S);
+		boolean isSort = false;
+		String smartZone = null;
+		String skip = (queryParams != null) ? queryParams.get(BloomreachConstants.QPARAMS.SKIP) : null;
+		String uid = (queryParams != null) ? queryParams.get(BloomreachConstants.UID) : null;
+		String searchQuery = (queryParams != null) ? queryParams.get(BloomreachConstants.Q) : null;
+
+		if (isPopulateBRResponse && params != null)
+			smartZone = (String) params.get(BloomreachConstants.QPARAMS.SZ);
+
+		if (queryParams != null && !StringUtils.isEmpty(queryParams.get(BloomreachConstants.QPARAMS.S))) {
+			sort = queryParams.get(BloomreachConstants.QPARAMS.S);
 		}
-		if (null != smartZone && SearchConstants.TRUE.equalsIgnoreCase(smartZone)) {
+		if (queryParameters != null && rrConfiguration.isEnableProductRanking()
+				&& sort.equalsIgnoreCase(BloomreachConstants.START_COUNT)) {
+			isSort = true;
+		}
+		if (isPopulateBRResponse && null != smartZone && SearchConstants.TRUE.equalsIgnoreCase(smartZone)) {
 			isSort = true;
 		}
 		Map<String, String> constructParam = new HashMap<>();
-		constructParam.put(BloomreachConstants.ACCOUNT_ID, bloomreachConfiguration.getAccountId());
-		constructParam.put(BloomreachConstants.AUTH_KEY, bloomreachConfiguration.getAuthKey());
-		constructParam.put(BloomreachConstants.DOMAIN_KEY, bloomreachConfiguration.getDomainKey());
+		constructParam.put(BloomreachConstants.ACCOUNT_ID, getBloomreachConfiguration().getAccountId());
+		constructParam.put(BloomreachConstants.AUTH_KEY, getBloomreachConfiguration().getAuthKey());
+		constructParam.put(BloomreachConstants.DOMAIN_KEY, getBloomreachConfiguration().getDomainKey());
 		constructParam.put(BloomreachConstants.FL,
-				String.join(BloomreachConstants.COMMA, bloomreachConfiguration.getFl()));
+				String.join(BloomreachConstants.COMMA, getBloomreachConfiguration().getFl()));
 		constructParam.put(BloomreachConstants.URL, domain);
 		constructParam.put(BloomreachConstants.REF_URL, domain);
-		constructParam.put(BloomreachConstants.REQUEST_TYPE, bloomreachConfiguration.getRequestType());
+		setSearchType(queryParams, constructParam);
+		constructParam.put(BloomreachConstants.REQUEST_TYPE, getBloomreachConfiguration().getRequestType());
 		constructParam.put(BloomreachConstants.ROWS, BloomreachConstants.ROWS_COUNT);
-		if (params.get(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR) != null) {
-			constructParam.put(BloomreachConstants.SEARCH_TYPE, bloomreachConfiguration.getCatagorytype());
-		} else {
-			constructParam.put(BloomreachConstants.SEARCH_TYPE, bloomreachConfiguration.getSearchType());
-		}
-		if (!StringUtils.isEmpty(searchQ)) {
-			constructParam.put(BloomreachConstants.Q, searchQ);
-		}
-		if (!StringUtils.isEmpty(uid)) {
+		if (null != uid) {
 			constructParam.put(BloomreachConstants.UID_PARAM, uid);
 		}
-		if (!StringUtils.isEmpty(sort) && !isSort) {
+		setSort(queryParameters, isPopulateBRResponse, sort, isSort, constructParam);
+		constructParam.put(BloomreachConstants.START, skip != null ? skip : BloomreachConstants.START_COUNT);
+		if (isPopulateBRResponse && !StringUtils.isEmpty(searchQuery)) {
+			constructParam.put(BloomreachConstants.Q, searchQuery);
+		}
+		if (isRecommendation) {
+			constructParam.put(BloomreachConstants.ROWS, BloomreachConstants.ROWS_COUNT);
+			constructParam.put(BloomreachConstants.START, BloomreachConstants.START_COUNT);
+			constructParam.put(BloomreachConstants.SORT, BloomreachConstants.BEST_SELLER_SORT);
+		}
+		log.debug("SearchHelperImpl::populateRequestParam: END constructParam {}", constructParam);
+		return constructParam;
+	}
+
+	private void setSort(Properties queryParameters, boolean isPopulateBRResponse, String sort, boolean isSort,
+			Map<String, String> constructParam) {
+		if (null != queryParameters && null != sort && !isSort && null != getSortOptionsMap().get(sort)) {
+			constructParam.put(BloomreachConstants.SORT, searchSortOptionsMap.get(sort)
+					.replace(BloomreachConstants.URL_DELIMETER, BloomreachConstants.COMMA));
+		}
+		if (isPopulateBRResponse && !StringUtils.isEmpty(sort) && !isSort) {
 			constructParam.put(BloomreachConstants.SORT, sortOptionsMap.get(sort));
 		}
-		if (!StringUtils.isEmpty(skip)) {
-			constructParam.put(BloomreachConstants.START, skip);
+	}
+
+	/**
+	 * This method sets the search type (category search/keyword search)
+	 * 
+	 * @param queryParams
+	 * @param constructParam
+	 */
+	private void setSearchType(Map<String, String> queryParams, Map<String, String> constructParam) {
+		if (queryParams != null && queryParams.get(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR) != null
+				&& queryParams.get(SearchConstants.TYPE_KEYWORD) == null) {
+			constructParam.put(BloomreachConstants.SEARCH_TYPE, getBloomreachConfiguration().getCatagorytype());
 		} else {
-			constructParam.put(BloomreachConstants.START, BloomreachConstants.START_COUNT);
+			constructParam.put(BloomreachConstants.SEARCH_TYPE, getBloomreachConfiguration().getSearchType());
 		}
-		log.debug("BloomreachSearchUtil::populateRequestParam:: END...");
-		return constructParam;
+	}
+
+	/**
+	 * This method is used to fetch the domain url
+	 * 
+	 * @param isRecommendation
+	 * @return domain
+	 */
+	private String fetchDomain(boolean isRecommendation) {
+		String domain = null;
+		if ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes() != null) {
+			StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
+					.getRequestURL();
+			try {
+				URL url = new URL(host.toString());
+				domain = url.getProtocol() + BloomreachConstants.URL_SLASH + url.getHost();
+			} catch (MalformedURLException malformedURLException) {
+				log.error("SearchHelperImpl::populateRequestParam malformedURLException={}", malformedURLException);
+			}
+		} else {
+			if (isRecommendation)
+				domain = bloomreachConfiguration.getRefUrl();
+		}
+		return domain;
+	}
+
+	/**
+	 * This method is used to convert properties into map
+	 * 
+	 * @param properties
+	 * @return
+	 */
+	public static Map<String, String> convertPropertiesToMap(Properties properties) {
+		Map<String, String> map = new HashMap<>();
+		for (String key : properties.stringPropertyNames()) {
+			String value = properties.getProperty(key);
+			map.put(key, value);
+		}
+		return map;
 	}
 
 	/**
@@ -862,17 +913,6 @@ public class BloomreachSearchUtil {
 		}
 		log.debug("BloomreachSearchUtil :: selectedNavigation :: selectedNavigationMap: {}", selectedNavigationMap);
 		return selectedNavigationMap;
-	}
-
-	public List<CategoryItemDTO> getCategoryItem(String query) {
-		log.debug("BloomreachSearchUtil :: getCategoryItem :: query: {}", query);
-		List<CategoryItemDTO> itemList = null;
-		if (StringUtils.isEmpty(query)) {
-
-		}
-		itemList = rrsCategoryMapRepository.getCategoryItem(siteId, query);
-		log.debug("BloomreachSearchUtil :: getCategoryItem :: itemList: {}", itemList);
-		return itemList;
 	}
 
 }

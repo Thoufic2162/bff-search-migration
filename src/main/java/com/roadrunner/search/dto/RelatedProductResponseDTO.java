@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 @JsonInclude(value = Include.NON_NULL)
 public class RelatedProductResponseDTO {
+	
 	UpSellProductsDTO upsellProducts;
 
 	CrossSellProductsDTO crossSellProducts;
-
 }

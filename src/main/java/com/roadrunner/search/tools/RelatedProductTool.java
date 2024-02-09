@@ -19,13 +19,13 @@ import org.springframework.util.CollectionUtils;
 
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
+import com.roadrunner.search.constants.ErrorConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.domain.RRSProductWeb;
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.ColorSkusDTO;
 import com.roadrunner.search.dto.CrossSellProductsDTO;
-import com.roadrunner.search.dto.ErrorConstants;
 import com.roadrunner.search.dto.ErrorDetailDTO;
 import com.roadrunner.search.dto.ProductDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
@@ -33,8 +33,7 @@ import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.dto.UpSellProductsDTO;
 import com.roadrunner.search.dto.response.BaseResponseDTO;
 import com.roadrunner.search.helper.CookieHelper;
-import com.roadrunner.search.repo.RRSProductRepository;
-import com.roadrunner.search.repo.RRSProductWebRepository;
+import com.roadrunner.search.helper.ProductDataAccessHelper;
 import com.roadrunner.search.service.BloomreachSearchRecommendationService;
 import com.roadrunner.search.service.BloomreachSearchService;
 
@@ -53,12 +52,6 @@ public class RelatedProductTool {
 	private RRConfiguration rrConfiguration;
 
 	@Autowired
-	private RRSProductRepository rrsProductRepository;
-
-	@Autowired
-	private RRSProductWebRepository productWebRepository;
-
-	@Autowired
 	private BloomreachSearchRecommendationService bloomreachSearchRecommendationService;
 
 	@Autowired
@@ -69,6 +62,9 @@ public class RelatedProductTool {
 
 	@Autowired
 	private CookieHelper cookieHelper;
+
+	@Autowired
+	private ProductDataAccessHelper productDataAccessHelper;
 
 	private Map<String, String> pgcSubcodeMap;
 	private Map<String, String> webPgccodeMap;
@@ -83,7 +79,7 @@ public class RelatedProductTool {
 			if (StringUtils.isEmpty(productId)) {
 				log.error("RelatedProductTool::relatedProducts ::invalid request productId={}", productId);
 			}
-			ProductDTO products = rrsProductRepository.getProducts(productId);
+			ProductDTO products = productDataAccessHelper.getProducts(productId);
 			if (products == null && page == null) {
 				log.error("RelatedProductTool::relatedProducts::Cannot find the productId::product={}", productId);
 				response.setSuccess(Boolean.FALSE);
@@ -163,8 +159,8 @@ public class RelatedProductTool {
 			Map<String, String> refParams = new HashMap<String, String>();
 			upSellProductsDTO = new UpSellProductsDTO();
 			refParams.put(BloomreachConstants.RECOMMENDATION_METHOD, BloomreachConstants.BEST_SELLER);
-			upSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForUpSell(profile, refParams,
-					upSellProductsDTO);
+			upSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForUpSellAndCrossSell(profile,
+					refParams, upSellProductsDTO, null);
 			if (!CollectionUtils.isEmpty(upSellProducts)) {
 				upSellProducts = upSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
 			}
@@ -174,8 +170,8 @@ public class RelatedProductTool {
 			refParams.put(BloomreachConstants.RECOMMENDATION_METHOD, BloomreachConstants.RECENTLY_VIEWED_PRODUCTS);
 			refParams.put(BloomreachConstants.USER_ID, SearchConstants.EMPTY_STRING);// user id should be passes
 			CrossSellProductsDTO crossSell = new CrossSellProductsDTO();
-			crossSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForCrossSell(profile,
-					refParams, crossSellProductsDTO);
+			crossSellProducts = bloomreachSearchRecommendationService
+					.searchRecommendationsForUpSellAndCrossSell(profile, refParams, null, crossSellProductsDTO);
 			if (!CollectionUtils.isEmpty(crossSellProducts)) {
 				crossSellProducts = crossSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
 			}
@@ -239,8 +235,9 @@ public class RelatedProductTool {
 							refParams.put(BloomreachConstants.RECOMMENDATION_METHOD,
 									BloomreachConstants.YOU_MAY_ALSO_LIKE);
 						}
-						upSellProducts = bloomreachSearchRecommendationService.searchRecommendationsForUpSell(profile,
-								refParams, upSellProductsDTO);
+						upSellProducts = bloomreachSearchRecommendationService
+								.searchRecommendationsForUpSellAndCrossSell(profile, refParams, upSellProductsDTO,
+										null);
 					}
 					if (!CollectionUtils.isEmpty(upSellProducts)) {
 						upSellProducts = upSellProducts.stream().limit(sizeLimit).collect(Collectors.toList());
@@ -288,7 +285,7 @@ public class RelatedProductTool {
 								BloomreachConstants.OUTFIT_YOUR_RUN_OUTLET);
 					}
 					crossSellProductsList = bloomreachSearchRecommendationService
-							.searchRecommendationsForCrossSell(profile, refParams, crossSellProductsDTO);
+							.searchRecommendationsForUpSellAndCrossSell(profile, refParams, null, crossSellProductsDTO);
 					crossSellProductsDTO.setProducts(crossSellProductsList);
 					relatedProductResponse.setCrossSellProducts(crossSellProductsDTO);
 				} else {
@@ -305,7 +302,8 @@ public class RelatedProductTool {
 									BloomreachConstants.OUTFIT_YOUR_RUN_OUTLET);
 						}
 						crossSellProductsList = bloomreachSearchRecommendationService
-								.searchRecommendationsForCrossSell(profile, refParams, crossSellProductsDTO);
+								.searchRecommendationsForUpSellAndCrossSell(profile, refParams, null,
+										crossSellProductsDTO);
 						crossSellProductsDTO.setProducts(crossSellProductsList);
 						relatedProductResponse.setCrossSellProducts(crossSellProductsDTO);
 					} else {
@@ -313,7 +311,7 @@ public class RelatedProductTool {
 						List<String> recommendationIds = new ArrayList<String>();
 						if (rrConfiguration.isEnableBloomreachSearch()) {
 							recommendationIds = bloomreachSearchRecommendationService.searchRecommendation(refParams,
-									products, request);
+									products);
 						}
 						if (recommendationIds.contains(insole)) {
 							int index = recommendationIds.indexOf(insole);
@@ -375,7 +373,7 @@ public class RelatedProductTool {
 	}
 
 	private boolean isOutletProduct(String productId) {
-		RRSProductWeb products = productWebRepository.findByProductId(productId);
+		RRSProductWeb products = productDataAccessHelper.getProductData(productId);
 		if (products == null) {
 			log.debug("RelatedProductTool :: isOutletProduct :: null product arg products: {}", products);
 			return false;

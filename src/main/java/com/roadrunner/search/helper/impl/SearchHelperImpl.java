@@ -1,8 +1,6 @@
 package com.roadrunner.search.helper.impl;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -21,8 +19,6 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.gson.Gson;
 import com.roadrunner.search.config.BloomreachConfiguration;
@@ -33,6 +29,7 @@ import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.CatalogElementsFinder;
 import com.roadrunner.search.helper.SearchHelper;
 import com.roadrunner.search.service.BloomreachSearchService;
+import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.URLCoderUtil;
 
 import lombok.Getter;
@@ -60,9 +57,11 @@ public class SearchHelperImpl implements SearchHelper {
 	private RRConfiguration rrConfiguration;
 
 	@Autowired
+	private BloomreachSearchUtil bloomreachSearchUtil;
+
+	@Autowired
 	private Gson gson;
 
-	private Map<String, String> sortOptionsMap;
 	private Map<String, String> bloomreachUrlMap;
 
 	@Override
@@ -291,14 +290,7 @@ public class SearchHelperImpl implements SearchHelper {
 
 		String queryString = SearchConstants.EMPTY_STRING;
 		int querylength = urlParams.length;
-		for (String queryValues : urlParams) {
-			if (querylength != 1) {
-				queryValues = queryValues.concat(SearchConstants.PLUS);
-			}
-			queryString = queryString.concat(queryValues.toLowerCase());
-			--querylength;
-		}
-
+		queryString = constructQueryString(urlParams, queryString, querylength);
 		if (StringUtils.isNotEmpty(queryString) && catalogElementsFinder.getSearchQueryMap().containsKey(queryString)) {
 			url = catalogElementsFinder.getSearchQueryMap().get(queryString);
 		} else if (StringUtils.isNotEmpty(temp)) {
@@ -311,6 +303,17 @@ public class SearchHelperImpl implements SearchHelper {
 			url = reOrderUrl(sb, isGender, isCategory, isSubCategory);
 		}
 		return url;
+	}
+
+	private String constructQueryString(String[] urlParams, String queryString, int querylength) {
+		for (String queryValues : urlParams) {
+			if (querylength != 1) {
+				queryValues = queryValues.concat(SearchConstants.PLUS);
+			}
+			queryString = queryString.concat(queryValues.toLowerCase());
+			--querylength;
+		}
+		return queryString;
 	}
 
 	private String reOrderUrl(StringBuffer url, boolean isGender, boolean isCategory, boolean isSubCategory) {
@@ -463,12 +466,16 @@ public class SearchHelperImpl implements SearchHelper {
 							(String) queryParams.get(BloomreachConstants.APPAREL_SIZE), SearchConstants.EMPTY_STRING));
 				}
 				qParam = qParam.replaceAll(SearchConstants.SPACE, BloomreachConstants.PERCENTAGE_20);
+				Map<String, String> requestParam = bloomreachSearchUtil.populateRequestParam(queryParams, null, false,
+						false);
 				url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(),
-						getParamsString(populateRequestParam(queryParams), isSearch, queryParams)
-								+ BloomreachConstants.URL_DELIMETER + qParam.concat(outOfStockQuery));
+						getParamsString(requestParam, isSearch, queryParams) + BloomreachConstants.URL_DELIMETER
+								+ qParam.concat(outOfStockQuery));
 			} else {
+				Map<String, String> requestParam = bloomreachSearchUtil.populateRequestParam(queryParams, null, false,
+						false);
 				url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(),
-						getParamsString(populateRequestParam(queryParams), isSearch, queryParams)) + kidsGender;
+						getParamsString(requestParam, isSearch, queryParams)) + kidsGender;
 			}
 			responseJson = bloomreachSearchService.bloomreachSearchApiCall(url);
 			log.debug("SearchHelper.performSearch: bloomreachSearchUrl{}", url);
@@ -480,61 +487,6 @@ public class SearchHelperImpl implements SearchHelper {
 		}
 		log.debug("SearchHelperImpl::performSearch:: END");
 		return bloomreachSearchResponseDTO;
-	}
-
-	public Map<String, String> populateRequestParam(Properties queryParams) {
-		log.debug("SearchHelperImpl.populateRequestParam: START :: queryParams={}", queryParams);
-		StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
-				.getRequestURL();
-		String domain = null;
-		boolean isSort = false;
-		try {
-			URL url = new URL(host.toString());
-			domain = url.getProtocol() + BloomreachConstants.URL_SLASH + url.getHost();
-		} catch (MalformedURLException malformedURLException) {
-			log.error("SearchHelperImpl::populateRequestParam malformedURLException={}", malformedURLException);
-		}
-		String skip = queryParams.getProperty(BloomreachConstants.QPARAMS.SKIP);
-		String uid = queryParams.getProperty(BloomreachConstants.UID);
-		String sort = null;
-		if (!StringUtils.isEmpty(queryParams.getProperty(BloomreachConstants.QPARAMS.S))) {
-			sort = queryParams.getProperty(BloomreachConstants.QPARAMS.S);
-		}
-		if (rrConfiguration.isEnableProductRanking() && sort.equalsIgnoreCase(BloomreachConstants.START_COUNT)) {
-			isSort = true;
-		}
-		Map<String, String> constructParam = new HashMap<>();
-		constructParam.put(BloomreachConstants.ACCOUNT_ID, getBloomreachConfiguration().getAccountId());
-		constructParam.put(BloomreachConstants.AUTH_KEY, getBloomreachConfiguration().getAuthKey());
-		constructParam.put(BloomreachConstants.DOMAIN_KEY, getBloomreachConfiguration().getDomainKey());
-		constructParam.put(BloomreachConstants.FL,
-				String.join(BloomreachConstants.COMMA, getBloomreachConfiguration().getFl()));
-		constructParam.put(BloomreachConstants.URL, domain);
-		constructParam.put(BloomreachConstants.REF_URL, domain);
-		if (queryParams.get(BloomreachConstants.PRODUCT_FIELD.CATAGORY_QR) != null
-				&& queryParams.get(SearchConstants.TYPE_KEYWORD) == null) {
-			constructParam.put(BloomreachConstants.SEARCH_TYPE, getBloomreachConfiguration().getCatagorytype());
-		} else {
-			constructParam.put(BloomreachConstants.SEARCH_TYPE, getBloomreachConfiguration().getSearchType());
-		}
-		constructParam.put(BloomreachConstants.REQUEST_TYPE, getBloomreachConfiguration().getRequestType());
-		constructParam.put(BloomreachConstants.ROWS, BloomreachConstants.ROWS_COUNT);
-		if (null != uid) {
-			constructParam.put(BloomreachConstants.UID_PARAM, uid);
-		}
-		if (null != sort && !isSort && null != getSortOptionsMap().get(sort)) {
-
-			constructParam.put(BloomreachConstants.SORT, getSortOptionsMap().get(sort)
-					.replace(BloomreachConstants.URL_DELIMETER, BloomreachConstants.COMMA));
-		}
-		if (null != skip) {
-			constructParam.put(BloomreachConstants.START, skip);
-		} else {
-			constructParam.put(BloomreachConstants.START, BloomreachConstants.START_COUNT);
-		}
-		log.debug("SearchHelperImpl::populateRequestParam: END constructParam {}", constructParam);
-		return constructParam;
-
 	}
 
 	public String getParamsString(Map<String, String> queryParams, boolean isSearch, Properties pQueryParams)

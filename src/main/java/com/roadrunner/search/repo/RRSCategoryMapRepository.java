@@ -14,5 +14,5 @@ import com.roadrunner.search.dto.CategoryItemDTO;
 public interface RRSCategoryMapRepository extends JpaRepository<RRSCategoryMap, String> {
 	@Query("select new com.roadrunner.search.dto.CategoryItemDTO(c.categoryName,r.gbiRefinements) from RRSCategoryMap c ,"
 			+ "RRSRefinements r WHERE c.siteId = :siteId AND c.keyName LIKE lower(CONCAT('%',:keyName,'%')) AND c.cmCategoryMapId= r.cmCategoryMapId")
-	List<CategoryItemDTO> getCategoryItem(@Param("siteId") Integer siteId, @Param("keyName") String keyName);
+	List<CategoryItemDTO> getCategoryItem(@Param("siteId") long siteId, @Param("keyName") String keyName);
 }

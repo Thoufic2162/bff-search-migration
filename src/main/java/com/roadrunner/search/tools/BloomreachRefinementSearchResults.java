@@ -50,6 +50,15 @@ import lombok.extern.log4j.Log4j2;
 @Setter
 public class BloomreachRefinementSearchResults {
 
+	@Autowired
+	private BloomreachSearchUtil bloomreachSearchUtil;
+
+	@Autowired
+	private CatalogElementsFinder catalogElementsFinder;
+
+	@Autowired
+	private RRConfiguration rrConfiguration;
+
 	private Map<String, String> navigationMap = new HashMap<>();
 	private List<String> skipCategoryList;
 	private List<String> skipClpUrl;
@@ -59,18 +68,6 @@ public class BloomreachRefinementSearchResults {
 	private Map<String, String> kidsTypeMap;
 	private Map<String, String> seoFilterMap = new HashMap<>();
 	private Map<String, String> refinementTitles = new HashMap<String, String>();
-
-	private static final String USA_CODE = "USA";
-	private static final String EURO_CODE = "EURO";
-
-	@Autowired
-	private BloomreachSearchUtil bloomreachSearchUtil;
-
-	@Autowired
-	private CatalogElementsFinder catalogElementsFinder;
-
-	@Autowired
-	private RRConfiguration rrConfiguration;
 
 	public void getRefinementSearchResults(BloomreachSearchResponseDTO searchResults, HttpServletRequest request,
 			BloomreachSearchResultsDTO responseBean) {
@@ -312,280 +309,302 @@ public class BloomreachRefinementSearchResults {
 			if (StringUtils.isNotEmpty((String) pQueryParams.get(SearchConstants.DYNAMIC_URL_REFINMENT))
 					&& pQueryParams.get(SearchConstants.DYNAMIC_URL_REFINMENT).equals(SearchConstants.TRUE)
 					&& !refs.stream().anyMatch(ref -> ref.getState().equals(SearchConstants.ACTIVE))) {
-				refs.stream().forEach(ref -> {
-					String urlQuery = (String) pQueryParams.get(SearchConstants.URL_QUERY);
-					String brand = BloomreachConstants.EMPTY_STRING;
-					if (!urlQuery.isEmpty()) {
-						if (!urlQuery.endsWith(SearchConstants.SLASH)) {
-							urlQuery = urlQuery + SearchConstants.SLASH;
-						}
-						StringBuilder url = new StringBuilder(SearchConstants.EMPTY_STRING);
-						brand = ref.getName().replaceAll(BloomreachConstants.SINGLE_QUOTES, BloomreachConstants.HYPHEN);
-						url.append(urlQuery);
-						if (catalogElementsFinder.getWebPgcMap().containsKey(ref.getName().toLowerCase()
-								.replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING))) {
-							url.append(catalogElementsFinder.getWebPgcMap().get(ref.getName().toLowerCase()
-									.replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING)));
-						} else {
-							url.append(
-									brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING));
-						}
-						if (urlQuery.contains(BloomreachConstants.OUTLET_PARAM)
-								&& null == pResponseBean.getClearRefUrl()) {
-							pResponseBean.setClearRefUrl(outletClearUrl(url));
-						}
-						reorderUrl(url);
-						addQueryParam(pKey, pQueryParams, url);
-						String sort = BloomreachConstants.EMPTY_STRING;
-						if (null != pQueryParams.get(BloomreachConstants.QPARAMS.S)) {
-							sort = BloomreachConstants.URL_DELIMETER.concat(BloomreachConstants.QPARAMS.S)
-									.concat(BloomreachConstants.EQUAL)
-									.concat(pQueryParams.get(BloomreachConstants.QPARAMS.S).toString());
-						}
-						String rqueryUrl = url.toString();
-						rqueryUrl = rqueryUrl.replaceAll(SearchConstants.SPACE, SearchConstants.PLUS)
-								.replaceAll(BloomreachConstants.PERCENTAGE_26, SearchConstants.URL_DELIMETER2);
-						StringBuilder urlBuilder = new StringBuilder();
-						urlBuilder.append(rqueryUrl).append(sort);
-						url = urlBuilder;
-						ref.setUrl(url.toString());
-						if (!ref.getUrl().contains(SearchConstants.URL_DELIMETER2) && ref.getProducts() >= 3
-								&& !isFifthLevelUrl(ref.getUrl())) {
-							ref.setSeoUrl(true);
-						}
-
-					}
-				});
+				processInActiveRefinements(refs, pKey, pQueryParams, pResponseBean);
 			}
 
 			if (StringUtils.isNotEmpty((String) pQueryParams.get(SearchConstants.DYNAMIC_URL_REFINMENT))
 					&& pQueryParams.get(SearchConstants.DYNAMIC_URL_REFINMENT).equals(SearchConstants.TRUE)
 					&& refs.stream().anyMatch(ref -> ref.getState().equals(SearchConstants.ACTIVE))) {
-				List<String> activeBrandList = new ArrayList<String>();
-
-				refs.stream().filter(ref -> ref.getState().equals(SearchConstants.ACTIVE)).forEach(ref -> {
-					String brand = ref.getName();
-					if (catalogElementsFinder.getWebPgcMap().containsKey(
-							brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING))) {
-						activeBrandList.add(catalogElementsFinder.getWebPgcMap().get(
-								brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING)));
-					} else {
-						activeBrandList
-								.add(brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING));
-					}
-				});
-				refs.stream().forEach(ref -> {
-					String urlQuery = (String) pQueryParams.get(SearchConstants.URL_QUERY);
-					if (!urlQuery.isEmpty()) {
-						if (!urlQuery.endsWith(SearchConstants.SLASH)) {
-							urlQuery = urlQuery + SearchConstants.SLASH;
-						}
-						if (urlQuery.contains(SearchConstants.TRISUITS)) {
-							urlQuery = urlQuery.replace(SearchConstants.TRISUITS, SearchConstants.UNISUITS);
-						}
-						List<String> iActiveBrandList = new LinkedList<>(activeBrandList);
-						StringBuilder url = new StringBuilder(BloomreachConstants.EMPTY_STRING);
-						for (String activeBrand : activeBrandList) {
-							urlQuery = urlQuery.replace(activeBrand, SearchConstants.EMPTY_STRING)
-									.replace(SearchConstants.DOUBLE_SLASH, SearchConstants.SLASH);
-						}
-						String urlKey = ref.getName().toLowerCase().replace(SearchConstants.SPACE,
-								SearchConstants.HYPHEN_STRING);
-
-						if (catalogElementsFinder.getWebPgcMap().containsKey(urlKey)) {
-							urlKey = catalogElementsFinder.getWebPgcMap().get(urlKey);
-						}
-						String urlString = urlQuery.replace(urlKey, SearchConstants.EMPTY_STRING)
-								.replace(SearchConstants.DOUBLE_SLASH, SearchConstants.SLASH);
-						if (null != webPgcList) {
-							for (String webPgc : webPgcList) {
-								if (urlString.contains(webPgc)) {
-									urlString = urlQuery.replace(webPgc, SearchConstants.EMPTY_STRING)
-											.replace(SearchConstants.DOUBLE_SLASH, SearchConstants.SLASH);
-								}
-							}
-						}
-						url.append(urlString);
-						String brand = ref.getName().toLowerCase().replace(SearchConstants.SPACE,
-								SearchConstants.HYPHEN_STRING);
-						if (catalogElementsFinder.getWebPgcMap().containsKey(brand)) {
-							brand = catalogElementsFinder.getWebPgcMap().get(brand);
-						}
-						if (!iActiveBrandList.contains(brand)) {
-							iActiveBrandList.add(brand);
-						} else {
-							iActiveBrandList.remove(brand);
-						}
-						if (iActiveBrandList.size() == 1) {
-							url.append(iActiveBrandList.get(0));
-							url.append(SearchConstants.SLASH);
-						}
-						if (urlString.contains(BloomreachConstants.OUTLET_PARAM)
-								&& null == pResponseBean.getClearRefUrl()) {
-							pResponseBean.setClearRefUrl(outletClearUrl(url));
-						}
-						reorderUrl(url);
-						String sort = BloomreachConstants.EMPTY_STRING;
-						if (null != pQueryParams.get(BloomreachConstants.QPARAMS.S)) {
-							sort = BloomreachConstants.URL_DELIMETER.concat(BloomreachConstants.QPARAMS.S)
-									.concat(BloomreachConstants.EQUAL)
-									.concat(pQueryParams.get(BloomreachConstants.QPARAMS.S).toString());
-						}
-						if (!iActiveBrandList.isEmpty() && iActiveBrandList.size() != 1) {
-							if (url.toString().equals(SearchConstants.CATEGORY_U)
-									&& navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.BRAND)) {
-								url.append(SearchConstants.SLASH);
-								Optional<String> brandVal = iActiveBrandList.stream().findFirst();
-								if (brandVal.isPresent()) {
-									url.append(brandVal.get());
-									iActiveBrandList.remove(0);
-								}
-							}
-							url.append(SearchConstants.URL_DELIMETER2);
-							if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.BRAND)) {
-								url.append(SearchConstants.BRAND_PA);
-							} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.VARIANTS_COLORGROUP)) {
-								url.append(SearchConstants.COLOR_PA);
-							} else if (navigationMap.get(pKey)
-									.equalsIgnoreCase(SearchConstants.WEB_PGC_SUB_CODE_PARAM)) {
-								url.append(SearchConstants.CAT_PA);
-							} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.SHOE_TYPE)) {
-								url.append(SearchConstants.SHOE_PA);
-							} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.SPORTS_TYPE)) {
-								url.append(SearchConstants.SPORTS_EQUALS);
-							}
-							url.append(String.join(BloomreachConstants.COMMA, iActiveBrandList));
-						}
-						addQueryParam(pKey, pQueryParams, url);
-						String rqueryUrl = url.toString();
-						rqueryUrl = rqueryUrl.replaceAll(SearchConstants.SPACE, SearchConstants.PLUS)
-								.replaceAll(SearchConstants.STRING_26, SearchConstants.URL_DELIMETER2);
-
-						StringBuilder builder = new StringBuilder();
-						builder.append(rqueryUrl).append(sort);
-						url = builder;
-						ref.setUrl(url.toString());
-						String urlStr = url.toString();
-						if (iActiveBrandList.contains(SearchConstants.UNISUITS) && (activeBrandList.size() > 0)) {
-							String replaceString = urlStr.replace(SearchConstants.UNISUITS_SLASH,
-									SearchConstants.EMPTY_STRING);
-							ref.setUrl(replaceString);
-						}
-					}
-				});
+				processActiveRefinements(refs, pKey, pQueryParams, pResponseBean);
 			}
 		}
 		if (navigationMap.get(pKey).equalsIgnoreCase(BloomreachConstants.PRODUCT_FIELD.BRAND)) {
-			String qUri = null;
-			if (pRequest.getParameter(SearchConstants.QURI) != null) {
-				qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
-			}
-			refs.stream().forEach(ref -> {
-				if (ref.getBaseUrl() != null && !ref.getBaseUrl().isEmpty()) {
-					ref.setUrl(ref.getBaseUrl());
-				}
-			});
-			refs.sort((BloomreachSearchRefinementsDTO o1, BloomreachSearchRefinementsDTO o2) -> o1.getName()
-					.compareToIgnoreCase(o2.getName()));
-			if (qUri != null && qUri.contains(SearchConstants.APPARELURL)) {
-				for (BloomreachSearchRefinementsDTO s : refs) {
-					if (s.getName().equalsIgnoreCase(SearchConstants.KORSA)) {
-						int index = refs.indexOf(s);
-						refs.remove(index);
-						refs.add(0, s);
-						break;
-					}
-				}
-			}
-			if (qUri != null && qUri.contains(SearchConstants.ACCESSORIESURL)) {
-				for (BloomreachSearchRefinementsDTO s : refs) {
-					if (s.getName().equalsIgnoreCase(SearchConstants.RGEAR)) {
-						int index = refs.indexOf(s);
-						refs.remove(index);
-						refs.add(0, s);
-						break;
-					}
-				}
-			}
-			if (qUri != null && qUri.contains(SearchConstants.CATEGORY_SOCKS_TOPNAV_URL)) {
-				for (BloomreachSearchRefinementsDTO s : refs) {
-					if (s.getName().equalsIgnoreCase(SearchConstants.RGEAR)) {
-						int index = refs.indexOf(s);
-						refs.remove(index);
-						refs.add(0, s);
-						break;
-					}
-				}
-			}
-			return refs;
+			return modifyAndSortRefinements(refs, pRequest);
 		}
 		if ((null != pQuery && !pQuery.contains(SearchConstants.KIDS))
 				|| (null != rParam && !rParam.contains(SearchConstants.KIDS))) {
 			if (navigationMap.get(pKey).equalsIgnoreCase(BloomreachConstants.SKU_FIELD.VARIANTS_SHOE_SIZE)) {
-				List<BloomreachSearchRefinementsDTO> sizeSortedRefSizes = new ArrayList<BloomreachSearchRefinementsDTO>();
-				for (BloomreachSearchRefinementsDTO refBean : refs) {
-					if (null != refBean.getName()) {
-						double size = StringUtil.getDoubleFromString(refBean.getName().trim());
-						if (NumberUtils.isParsable(refBean.getName())) {
-							if (size <= 0.0 || size > 20.0) {
-								refBean.setSizeCode(EURO_CODE);
-							} else {
-								refBean.setSizeCode(USA_CODE);
-							}
-							sizeSortedRefSizes.add(refBean);
-						}
-					}
-				}
-				Collections.sort(sizeSortedRefSizes,
-						Comparator.comparingDouble(sorting -> Double.parseDouble(sorting.getName())));
-				return sizeSortedRefSizes;
-
+				return sortShoeSizeRefinement(refs);
 			}
 		}
 
 		if (navigationMap.get(pKey).equalsIgnoreCase(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)) {
-			String qUri = null;
-			if (pRequest.getParameter(SearchConstants.QURI) != null) {
-				qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
-			}
-			if (qUri != null && qUri.contains(SearchConstants.CATEGORY_URL)
-					&& !qUri.contains(SearchConstants.TYPE_AHEAD_SEARCH_QUERY)) {
-				for (BloomreachSearchRefinementsDTO item : refs) {
-					StringBuffer newUrl = new StringBuffer(qUri);
-					if (item.getName() != null && (item.getName()
-							.replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING).toLowerCase()
-							.equalsIgnoreCase(SearchConstants.MENS)
-							|| item.getName().replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING)
-									.toLowerCase().equalsIgnoreCase(SearchConstants.WOMENS)
-							|| item.getName().replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING)
-									.toLowerCase().equalsIgnoreCase(SearchConstants.KIDS))) {
-						item.setUrl(newUrl.insert(10, genderTypeMap.get(item.getName())).toString());
-					}
-				}
-			}
+			constructAndSetRefinementUrls(refs, pRequest);
 
 		}
 		if (navigationMap.get(pKey).equalsIgnoreCase(BloomreachConstants.PRODUCT_FIELD.KIDS_GENDER)) {
-			String qUri = null;
-			if (pRequest.getParameter(SearchConstants.QURI) != null) {
-				qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
-			}
-			if (qUri != null && qUri.contains(SearchConstants.CATEGORY_URL)
-					&& !qUri.contains(SearchConstants.TYPE_AHEAD_SEARCH_QUERY)) {
-				for (BloomreachSearchRefinementsDTO item : refs) {
-					StringBuffer newUrl = new StringBuffer(qUri);
-					if (item.getName() != null && (item.getName()
-							.replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING).toLowerCase()
-							.equalsIgnoreCase(SearchConstants.BOYS)
-							|| item.getName().replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING)
-									.toLowerCase().equalsIgnoreCase(SearchConstants.GIRLS))) {
-						item.setUrl(newUrl.insert(10, kidsTypeMap.get(item.getName())).toString());
-					}
-				}
-			}
-
+			updateKidsGenderRefinementUrls(refs, pRequest);
 		}
 		log.debug("BloomreachRefinementSearchResults :: getRefinementDetails() :: ListOf RefSizes {}: ", refs);
+		return refs;
+	}
+
+	private void processActiveRefinements(List<BloomreachSearchRefinementsDTO> refs, String pKey,
+			Properties pQueryParams, BloomreachSearchResultsDTO pResponseBean) {
+		List<String> activeBrandList = new ArrayList<String>();
+		refs.stream().filter(ref -> ref.getState().equals(SearchConstants.ACTIVE)).forEach(ref -> {
+			String brand = ref.getName();
+			if (catalogElementsFinder.getWebPgcMap()
+					.containsKey(brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING))) {
+				activeBrandList.add(catalogElementsFinder.getWebPgcMap()
+						.get(brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING)));
+			} else {
+				activeBrandList.add(brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING));
+			}
+		});
+		refs.stream().forEach(ref -> {
+			String urlQuery = (String) pQueryParams.get(SearchConstants.URL_QUERY);
+			if (!urlQuery.isEmpty()) {
+				if (!urlQuery.endsWith(SearchConstants.SLASH)) {
+					urlQuery = urlQuery + SearchConstants.SLASH;
+				}
+				if (urlQuery.contains(SearchConstants.TRISUITS)) {
+					urlQuery = urlQuery.replace(SearchConstants.TRISUITS, SearchConstants.UNISUITS);
+				}
+				List<String> iActiveBrandList = new LinkedList<>(activeBrandList);
+				StringBuilder url = new StringBuilder(BloomreachConstants.EMPTY_STRING);
+				for (String activeBrand : activeBrandList) {
+					urlQuery = urlQuery.replace(activeBrand, SearchConstants.EMPTY_STRING)
+							.replace(SearchConstants.DOUBLE_SLASH, SearchConstants.SLASH);
+				}
+				String urlKey = ref.getName().toLowerCase().replace(SearchConstants.SPACE,
+						SearchConstants.HYPHEN_STRING);
+
+				if (catalogElementsFinder.getWebPgcMap().containsKey(urlKey)) {
+					urlKey = catalogElementsFinder.getWebPgcMap().get(urlKey);
+				}
+				String urlString = urlQuery.replace(urlKey, SearchConstants.EMPTY_STRING)
+						.replace(SearchConstants.DOUBLE_SLASH, SearchConstants.SLASH);
+				if (null != webPgcList) {
+					for (String webPgc : webPgcList) {
+						if (urlString.contains(webPgc)) {
+							urlString = urlQuery.replace(webPgc, SearchConstants.EMPTY_STRING)
+									.replace(SearchConstants.DOUBLE_SLASH, SearchConstants.SLASH);
+						}
+					}
+				}
+				url.append(urlString);
+				String brand = ref.getName().toLowerCase().replace(SearchConstants.SPACE,
+						SearchConstants.HYPHEN_STRING);
+				if (catalogElementsFinder.getWebPgcMap().containsKey(brand)) {
+					brand = catalogElementsFinder.getWebPgcMap().get(brand);
+				}
+				if (!iActiveBrandList.contains(brand)) {
+					iActiveBrandList.add(brand);
+				} else {
+					iActiveBrandList.remove(brand);
+				}
+				if (iActiveBrandList.size() == 1) {
+					url.append(iActiveBrandList.get(0));
+					url.append(SearchConstants.SLASH);
+				}
+				if (urlString.contains(BloomreachConstants.OUTLET_PARAM) && null == pResponseBean.getClearRefUrl()) {
+					pResponseBean.setClearRefUrl(outletClearUrl(url));
+				}
+				reorderUrl(url);
+				String sort = BloomreachConstants.EMPTY_STRING;
+				if (null != pQueryParams.get(BloomreachConstants.QPARAMS.S)) {
+					sort = BloomreachConstants.URL_DELIMETER.concat(BloomreachConstants.QPARAMS.S)
+							.concat(BloomreachConstants.EQUAL)
+							.concat(pQueryParams.get(BloomreachConstants.QPARAMS.S).toString());
+				}
+				if (!iActiveBrandList.isEmpty() && iActiveBrandList.size() != 1) {
+					constructUrl(pKey, iActiveBrandList, url);
+				}
+				addQueryParam(pKey, pQueryParams, url);
+				String rqueryUrl = url.toString();
+				rqueryUrl = rqueryUrl.replaceAll(SearchConstants.SPACE, SearchConstants.PLUS)
+						.replaceAll(SearchConstants.STRING_26, SearchConstants.URL_DELIMETER2);
+
+				StringBuilder builder = new StringBuilder();
+				builder.append(rqueryUrl).append(sort);
+				url = builder;
+				ref.setUrl(url.toString());
+				String urlStr = url.toString();
+				if (iActiveBrandList.contains(SearchConstants.UNISUITS) && (activeBrandList.size() > 0)) {
+					String replaceString = urlStr.replace(SearchConstants.UNISUITS_SLASH, SearchConstants.EMPTY_STRING);
+					ref.setUrl(replaceString);
+				}
+			}
+		});
+	}
+
+	private void processInActiveRefinements(List<BloomreachSearchRefinementsDTO> refs, String pKey,
+			Properties pQueryParams, BloomreachSearchResultsDTO pResponseBean) {
+		refs.stream().forEach(ref -> {
+			String urlQuery = (String) pQueryParams.get(SearchConstants.URL_QUERY);
+			String brand = BloomreachConstants.EMPTY_STRING;
+			if (!urlQuery.isEmpty()) {
+				if (!urlQuery.endsWith(SearchConstants.SLASH)) {
+					urlQuery = urlQuery + SearchConstants.SLASH;
+				}
+				StringBuilder url = new StringBuilder(SearchConstants.EMPTY_STRING);
+				brand = ref.getName().replaceAll(BloomreachConstants.SINGLE_QUOTES, BloomreachConstants.HYPHEN);
+				url.append(urlQuery);
+				if (catalogElementsFinder.getWebPgcMap().containsKey(
+						ref.getName().toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING))) {
+					url.append(catalogElementsFinder.getWebPgcMap().get(
+							ref.getName().toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING)));
+				} else {
+					url.append(brand.toLowerCase().replace(SearchConstants.SPACE, SearchConstants.HYPHEN_STRING));
+				}
+				if (urlQuery.contains(BloomreachConstants.OUTLET_PARAM) && null == pResponseBean.getClearRefUrl()) {
+					pResponseBean.setClearRefUrl(outletClearUrl(url));
+				}
+				reorderUrl(url);
+				addQueryParam(pKey, pQueryParams, url);
+				String sort = BloomreachConstants.EMPTY_STRING;
+				if (null != pQueryParams.get(BloomreachConstants.QPARAMS.S)) {
+					sort = BloomreachConstants.URL_DELIMETER.concat(BloomreachConstants.QPARAMS.S)
+							.concat(BloomreachConstants.EQUAL)
+							.concat(pQueryParams.get(BloomreachConstants.QPARAMS.S).toString());
+				}
+				String rqueryUrl = url.toString();
+				rqueryUrl = rqueryUrl.replaceAll(SearchConstants.SPACE, SearchConstants.PLUS)
+						.replaceAll(BloomreachConstants.PERCENTAGE_26, SearchConstants.URL_DELIMETER2);
+				StringBuilder urlBuilder = new StringBuilder();
+				urlBuilder.append(rqueryUrl).append(sort);
+				url = urlBuilder;
+				ref.setUrl(url.toString());
+				if (!ref.getUrl().contains(SearchConstants.URL_DELIMETER2) && ref.getProducts() >= 3
+						&& !isFifthLevelUrl(ref.getUrl())) {
+					ref.setSeoUrl(true);
+				}
+			}
+		});
+	}
+
+	private void constructUrl(String pKey, List<String> iActiveBrandList, StringBuilder url) {
+		if (url.toString().equals(SearchConstants.CATEGORY_U)
+				&& navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.BRAND)) {
+			url.append(SearchConstants.SLASH);
+			Optional<String> brandVal = iActiveBrandList.stream().findFirst();
+			if (brandVal.isPresent()) {
+				url.append(brandVal.get());
+				iActiveBrandList.remove(0);
+			}
+		}
+		url.append(SearchConstants.URL_DELIMETER2);
+		if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.BRAND)) {
+			url.append(SearchConstants.BRAND_PA);
+		} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.VARIANTS_COLORGROUP)) {
+			url.append(SearchConstants.COLOR_PA);
+		} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.WEB_PGC_SUB_CODE_PARAM)) {
+			url.append(SearchConstants.CAT_PA);
+		} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.SHOE_TYPE)) {
+			url.append(SearchConstants.SHOE_PA);
+		} else if (navigationMap.get(pKey).equalsIgnoreCase(SearchConstants.SPORTS_TYPE)) {
+			url.append(SearchConstants.SPORTS_EQUALS);
+		}
+		url.append(String.join(BloomreachConstants.COMMA, iActiveBrandList));
+	}
+
+	private void updateKidsGenderRefinementUrls(List<BloomreachSearchRefinementsDTO> refs,
+			HttpServletRequest pRequest) {
+		String qUri = null;
+		if (pRequest.getParameter(SearchConstants.QURI) != null) {
+			qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
+		}
+		if (qUri != null && qUri.contains(SearchConstants.CATEGORY_URL)
+				&& !qUri.contains(SearchConstants.TYPE_AHEAD_SEARCH_QUERY)) {
+			for (BloomreachSearchRefinementsDTO item : refs) {
+				StringBuffer newUrl = new StringBuffer(qUri);
+				if (item.getName() != null && (item.getName()
+						.replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING).toLowerCase()
+						.equalsIgnoreCase(SearchConstants.BOYS)
+						|| item.getName().replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING)
+								.toLowerCase().equalsIgnoreCase(SearchConstants.GIRLS))) {
+					item.setUrl(newUrl.insert(10, kidsTypeMap.get(item.getName())).toString());
+				}
+			}
+		}
+	}
+
+	private void constructAndSetRefinementUrls(List<BloomreachSearchRefinementsDTO> refs, HttpServletRequest pRequest) {
+		String qUri = null;
+		if (pRequest.getParameter(SearchConstants.QURI) != null) {
+			qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
+		}
+		if (qUri != null && qUri.contains(SearchConstants.CATEGORY_URL)
+				&& !qUri.contains(SearchConstants.TYPE_AHEAD_SEARCH_QUERY)) {
+			for (BloomreachSearchRefinementsDTO item : refs) {
+				StringBuffer newUrl = new StringBuffer(qUri);
+				if (item.getName() != null && (item.getName()
+						.replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING).toLowerCase()
+						.equalsIgnoreCase(SearchConstants.MENS)
+						|| item.getName().replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING)
+								.toLowerCase().equalsIgnoreCase(SearchConstants.WOMENS)
+						|| item.getName().replaceAll(SearchConstants.APOSTROPHE, BloomreachConstants.EMPTY_STRING)
+								.toLowerCase().equalsIgnoreCase(SearchConstants.KIDS))) {
+					item.setUrl(newUrl.insert(10, genderTypeMap.get(item.getName())).toString());
+				}
+			}
+		}
+	}
+
+	private List<BloomreachSearchRefinementsDTO> sortShoeSizeRefinement(List<BloomreachSearchRefinementsDTO> refs) {
+		List<BloomreachSearchRefinementsDTO> sizeSortedRefSizes = new ArrayList<BloomreachSearchRefinementsDTO>();
+		for (BloomreachSearchRefinementsDTO refBean : refs) {
+			if (null != refBean.getName()) {
+				double size = StringUtil.getDoubleFromString(refBean.getName().trim());
+				if (NumberUtils.isParsable(refBean.getName())) {
+					if (size <= 0.0 || size > 20.0) {
+						refBean.setSizeCode(SearchConstants.EURO_CODE);
+					} else {
+						refBean.setSizeCode(SearchConstants.USA_CODE);
+					}
+					sizeSortedRefSizes.add(refBean);
+				}
+			}
+		}
+		Collections.sort(sizeSortedRefSizes,
+				Comparator.comparingDouble(sorting -> Double.parseDouble(sorting.getName())));
+		return sizeSortedRefSizes;
+	}
+
+	private List<BloomreachSearchRefinementsDTO> modifyAndSortRefinements(List<BloomreachSearchRefinementsDTO> refs,
+			HttpServletRequest pRequest) {
+		String qUri = null;
+		if (pRequest.getParameter(SearchConstants.QURI) != null) {
+			qUri = URLCoderUtil.decode(pRequest.getParameter(SearchConstants.QURI));
+		}
+		refs.stream().forEach(ref -> {
+			if (ref.getBaseUrl() != null && !ref.getBaseUrl().isEmpty()) {
+				ref.setUrl(ref.getBaseUrl());
+			}
+		});
+		refs.sort((BloomreachSearchRefinementsDTO o1, BloomreachSearchRefinementsDTO o2) -> o1.getName()
+				.compareToIgnoreCase(o2.getName()));
+		if (qUri != null && qUri.contains(SearchConstants.APPARELURL)) {
+			for (BloomreachSearchRefinementsDTO s : refs) {
+				if (s.getName().equalsIgnoreCase(SearchConstants.KORSA)) {
+					int index = refs.indexOf(s);
+					refs.remove(index);
+					refs.add(0, s);
+					break;
+				}
+			}
+		}
+		if (qUri != null && qUri.contains(SearchConstants.ACCESSORIESURL)) {
+			for (BloomreachSearchRefinementsDTO s : refs) {
+				if (s.getName().equalsIgnoreCase(SearchConstants.RGEAR)) {
+					int index = refs.indexOf(s);
+					refs.remove(index);
+					refs.add(0, s);
+					break;
+				}
+			}
+		}
+		if (qUri != null && qUri.contains(SearchConstants.CATEGORY_SOCKS_TOPNAV_URL)) {
+			for (BloomreachSearchRefinementsDTO s : refs) {
+				if (s.getName().equalsIgnoreCase(SearchConstants.RGEAR)) {
+					int index = refs.indexOf(s);
+					refs.remove(index);
+					refs.add(0, s);
+					break;
+				}
+			}
+		}
 		return refs;
 	}
 
@@ -727,7 +746,7 @@ public class BloomreachRefinementSearchResults {
 	}
 
 	private void addQueryParam(String key, Properties queryParams, StringBuilder url) {
-		log.debug("BloomreachRefinementSearchResults::addQueryParam START :: key::{}::queryParams::{1}::url::{2}", key,
+		log.debug("BloomreachRefinementSearchResults::addQueryParam START :: key::{}::queryParams::{}::url::{}", key,
 				queryParams, url);
 		if (navigationMap.get(key).equalsIgnoreCase(SearchConstants.BRAND)) {
 			if (StringUtils.isNotEmpty((String) queryParams.get(SearchConstants.COLOR))) {
@@ -1072,7 +1091,7 @@ public class BloomreachRefinementSearchResults {
 							.setUrl(SearchConstants.SEARCH_CONTEXT_PATH.concat(searchRefinementQuery).concat(rParam));
 				}
 				refs.add(refinementBean);
-				log.debug("BloomreachRefinementSearchResults :: buildRefinementDetails() END refinementBean {0}",
+				log.debug("BloomreachRefinementSearchResults :: buildRefinementDetails() END refinementBean {}",
 						refinementBean);
 			}
 

@@ -31,6 +31,7 @@ import com.roadrunner.search.dto.BRSearchBaseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResponseDTO;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
 import com.roadrunner.search.dto.CatalogElementsFinder;
+import com.roadrunner.search.helper.ProductDataAccessHelper;
 import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.HttpUtil;
 import com.roadrunner.search.util.URLCoderUtil;
@@ -46,15 +47,6 @@ import lombok.extern.log4j.Log4j2;
 @Setter
 public class BloomreachBreadcrumSearchResults {
 
-	private Map<String, String> titelOrderMap;
-	private Map<String, String> urlMap;
-	private Map<String, String> canonicalMap;
-	private String postfixTitle;
-	private Map<String, String> coopBannersMap;
-	private List<String> fitFinderBannerList;
-	private List<String> coopBannerList;
-	private List<String> korsaBannerList;
-
 	@Autowired
 	private CatalogElementsFinder catalogElementsFinder;
 
@@ -63,6 +55,18 @@ public class BloomreachBreadcrumSearchResults {
 
 	@Autowired
 	private Gson gson;
+
+	@Autowired
+	private ProductDataAccessHelper productDataAccessHelper;
+
+	private Map<String, String> titelOrderMap;
+	private Map<String, String> urlMap;
+	private Map<String, String> canonicalMap;
+	private String postfixTitle;
+	private Map<String, String> coopBannersMap;
+	private List<String> fitFinderBannerList;
+	private List<String> coopBannerList;
+	private List<String> korsaBannerList;
 
 	/**
 	 * Retrieves breadcrumbs based on the search results, request parameters, and
@@ -107,7 +111,7 @@ public class BloomreachBreadcrumSearchResults {
 		log.debug(
 				"BloomreachBreadcrumSearchResults :: populateBreadCrums() START :: bloomreachSearchResults {} qUri {}",
 				bloomreachSearchResults, qUri);
-		SeoContent seoRepo = bloomreachSearchUtil.getSeoContent(qUri);
+		SeoContent seoRepo = productDataAccessHelper.getSeoContent(qUri);
 		if (seoRepo == null) {
 			return;
 		} else {
@@ -135,7 +139,7 @@ public class BloomreachBreadcrumSearchResults {
 		List<BRSearchBaseDTO> toRemove = new ArrayList<BRSearchBaseDTO>();
 		List<String> titleString = new ArrayList<String>();
 		if (!CollectionUtils.isEmpty(bloomreachSearchResults.getBreadcrums())) {
-			SeoContent seoRepo = bloomreachSearchUtil.getSeoContent(qUri);
+			SeoContent seoRepo = productDataAccessHelper.getSeoContent(qUri);
 			if (StringUtils.isNotEmpty((String) queryParams.get(SearchConstants.DYNAMIC_URL_REFINMENT))
 					&& queryParams.get(SearchConstants.DYNAMIC_URL_REFINMENT).equals(SearchConstants.TRUE)) {
 				if (seoRepo != null && seoRepo.getBreadCrums() != null) {

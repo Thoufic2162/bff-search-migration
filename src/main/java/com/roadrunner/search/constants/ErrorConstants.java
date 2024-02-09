@@ -1,4 +1,4 @@
-package com.roadrunner.search.dto;
+package com.roadrunner.search.constants;
 
 public class ErrorConstants {
 

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class LargeBrandImage {
+	
 	public int width;
 	
 	public int height;

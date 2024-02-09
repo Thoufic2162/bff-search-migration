@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryItemDTO {
+
 	private String categoryName;
+
 	private String refinements;
 }

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.roadrunner.search.constants.ErrorConstants;
 import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.dto.BloomreachSearchResultsDTO;
-import com.roadrunner.search.dto.ErrorConstants;
 import com.roadrunner.search.dto.ErrorDetailDTO;
 import com.roadrunner.search.dto.RelatedProductResponseDTO;
 import com.roadrunner.search.dto.response.BaseResponseDTO;

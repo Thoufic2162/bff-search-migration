@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class PriceDTO {
+	
 	private String label;
 
 	private String amount;

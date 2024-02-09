@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.roadrunner.search.constants.SearchConstants;
 
 import lombok.Data;
@@ -41,7 +42,8 @@ public class BloomreachSearchResultsDTO {
 	private String description;
 
 	private List<String> banners;
-
+	
+	@JsonProperty("isRetailUser")
 	private boolean isRetailUser;
 
 	private String pageUrl;
@@ -74,6 +76,7 @@ public class BloomreachSearchResultsDTO {
 
 	private String brandName;
 
+	@JsonProperty("isBrandSearch")
 	private boolean isBrandSearch;
 
 	private boolean enabledisplayFTVmodal;
@@ -84,5 +87,6 @@ public class BloomreachSearchResultsDTO {
 
 	private String searchRedirectURL;
 
+	@JsonProperty("isApparel")
 	private boolean isApparel;
 }

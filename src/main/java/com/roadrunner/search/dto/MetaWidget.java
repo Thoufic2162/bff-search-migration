@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class MetaWidget {
+	
 	private String id;
 
 	private String name;

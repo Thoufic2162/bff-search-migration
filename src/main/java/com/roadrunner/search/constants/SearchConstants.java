@@ -52,8 +52,6 @@ public class SearchConstants {
 	public static final String SPACE_REGEX = "\\s{2,}";
 	public static final String STAR = "*";
 	public static final String SEARCH = "/search";
-	public static final String ISDECODE = "isDecode";
-	public static final String DECODEURI = "DecodeUri";
 	public static final String URL_DELIMETER2 = "&";
 	public static final String GIFT_GUIDE_SEARCH_CONTEXT_PATH = "/gift-guides/";
 	public static final String URL_QUERY = "urlQuery";
@@ -210,4 +208,9 @@ public class SearchConstants {
 	public static final String ONE_BY_OPTIC_NERVE = "ONE by Optic Nerve";
 	public static final String OPTICNERVE = "Optic Nerve";
 	public static final String SEMICOLON = ";";
+	public static final String NON_WORD_REGEX = "[\\W]|_";
+	public static final String WHITESPACE_REGEX = "\\s+";
+	public static final String USA_CODE = "USA";
+	public static final String EURO_CODE = "EURO";
+
 }

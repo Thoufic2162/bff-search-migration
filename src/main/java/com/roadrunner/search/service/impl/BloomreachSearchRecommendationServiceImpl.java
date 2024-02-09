@@ -13,8 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +41,12 @@ import com.roadrunner.search.dto.ProductDTO;
 import com.roadrunner.search.dto.RecommendationProductDTO;
 import com.roadrunner.search.dto.SeoRecommendationBean;
 import com.roadrunner.search.dto.UpSellProductsDTO;
+import com.roadrunner.search.helper.ProductDataAccessHelper;
 import com.roadrunner.search.helper.ProductSkuHelper;
-import com.roadrunner.search.repo.DCSPriceRepository;
-import com.roadrunner.search.repo.DCSProductSkusRepository;
-import com.roadrunner.search.repo.RRSProductRatingRepository;
-import com.roadrunner.search.repo.RRSProductRepository;
-import com.roadrunner.search.repo.RRSProductWebRepository;
-import com.roadrunner.search.repo.RRSSkuRepository;
-import com.roadrunner.search.repo.SeoCategoryRepository;
 import com.roadrunner.search.service.BloomreachSearchRecommendationService;
 import com.roadrunner.search.service.BloomreachSearchService;
 import com.roadrunner.search.tools.BloomreachProductSearchResults;
+import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.StringUtil;
 
 import lombok.Getter;
@@ -83,28 +76,13 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 	private BloomreachProductSearchResults bloomreachProductSearchResults;
 
 	@Autowired
-	private RRSProductRepository rrsProductRepository;
-
-	@Autowired
-	private RRSSkuRepository rrsSkuRepository;
-
-	@Autowired
-	private DCSPriceRepository dcsPriceRepository;
-
-	@Autowired
-	private DCSProductSkusRepository dcsProductSkusRepository;
-
-	@Autowired
-	private RRSProductRatingRepository rrsProductRatingRepository;
-
-	@Autowired
-	private RRSProductWebRepository productWebRepository;
-
-	@Autowired
 	private ProductSkuHelper productSkuHelper;
 
 	@Autowired
-	private SeoCategoryRepository seoCategoryRepository;
+	private ProductDataAccessHelper productDataAccessHelper;
+
+	@Autowired
+	private BloomreachSearchUtil bloomreachSearchUtil;
 
 	private Map<String, String> bloomreachUrlMap;
 	private List<String> skipList;
@@ -112,7 +90,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 	private Map<String, String> vipURLMap;
 	private int upsellProductsSize;
 	private int qty;
-
 	private Map<String, SeoRecommendationBean> seoRecommendationsMap = new HashMap<String, SeoRecommendationBean>(); // webPgc:webSubPgc=bean
 
 	@Override
@@ -123,7 +100,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
 		BloomreachSearchResultsDTO upSellProducts = new BloomreachSearchResultsDTO();
 		List<RecommendationProductDTO> upsellProductResults = new ArrayList<>();
-		bloomreachSearchResponse = doSearch(refParams, null);
+		bloomreachSearchResponse = doSearch(refParams);
 		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, upSellProducts);
 		upsellProductResults = upSellProducts.getResults();
 		if (null != profile) {
@@ -135,56 +112,43 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 	}
 
 	@Override
-	public List<RecommendationProductDTO> searchRecommendationsForUpSell(Object profile, Map<String, String> refParams,
-			UpSellProductsDTO pUpSellProductsDTO) {
+	public List<RecommendationProductDTO> searchRecommendationsForUpSellAndCrossSell(Object profile,
+			Map<String, String> refParams, UpSellProductsDTO upSellProductsDTO,
+			CrossSellProductsDTO crossSellProductsDTO) {
 		if (CollectionUtils.isEmpty(refParams)) {
 			log.debug(
-					"BloomreachSearchRecommendationServiceImplImpl:: searchRecommendationsForUpSell: input params are empty");
+					"BloomreachSearchRecommendationServiceImplImpl:: searchRecommendationsForUpSellAndCrossSell: input params are empty");
 		}
 		profile = new Object();// need to set up the profile data
 		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
-		BloomreachSearchResultsDTO upSellProducts = new BloomreachSearchResultsDTO();
-		List<RecommendationProductDTO> upsellProductResults = new ArrayList<>();
+		BloomreachSearchResultsDTO recommendedProducts = new BloomreachSearchResultsDTO();
+		List<RecommendationProductDTO> recommendedProductList = new ArrayList<>();
 		String methodName = refParams.get(BloomreachConstants.RECOMMENDATION_METHOD);
-		bloomreachSearchResponse = doSearch(refParams, null);
-		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, upSellProducts);
-		upsellProductResults = upSellProducts.getResults();
-		pUpSellProductsDTO.setMetadata(bloomreachSearchResponse.getMetadata());
+		bloomreachSearchResponse = doSearch(refParams);
+		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, recommendedProducts);
+		recommendedProductList = recommendedProducts.getResults();
+		if (upSellProductsDTO != null) {
+			upSellProductsDTO.setMetadata(bloomreachSearchResponse.getMetadata());
+		}
 		if (null != profile && null != methodName && !methodName.contains(BloomreachConstants.OUTFIT_YOUR_RUN)
 				&& !methodName.contains(BloomreachConstants.BEST_SELLER)) {
-			upsellProductResults = populateVIPProducts(profile, upSellProducts.getResults());
-			log.debug("BloomreachSearchRecommendationServiceImpl::searchRecommendationsForUpSell::  upSellProducts {}",
-					upSellProducts);
-		}
-		return upsellProductResults;
-	}
-
-	@Override
-	public List<RecommendationProductDTO> searchRecommendationsForCrossSell(Object profile,
-			Map<String, String> refParams, CrossSellProductsDTO crossSellProductsDTO) {
-		if (CollectionUtils.isEmpty(refParams)) {
+			recommendedProductList = populateVIPProducts(profile, recommendedProducts.getResults());
 			log.debug(
-					"BloomreachSearchRecommendationServiceImpl :: searchRecommendationsForCrossSell: input params are empty");
+					"BloomreachSearchRecommendationServiceImpl::searchRecommendationsForUpSellAndCrossSell::  recommendedProducts {}",
+					recommendedProducts);
 		}
-		profile = new Object();// need to set up the profile data
-		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
-		BloomreachSearchResultsDTO crossSellProducts = new BloomreachSearchResultsDTO();
-		List<RecommendationProductDTO> crossSellProductResults = new ArrayList<>();
-		bloomreachSearchResponse = doSearch(refParams, null);
-		bloomreachProductSearchResults.getProductResults(bloomreachSearchResponse, null, crossSellProducts);
-		crossSellProductResults = crossSellProducts.getResults();
-		if (null != profile && null != crossSellProductResults && !crossSellProductResults.isEmpty()) {
+		if (crossSellProductsDTO != null && null != profile && null != recommendedProductList
+				&& !recommendedProductList.isEmpty()) {
 			crossSellProductsDTO.setMetadata(bloomreachSearchResponse.getMetadata());
 			log.debug(
-					"BloomreachSearchRecommendationServiceImpl::searchRecommendationsForCrossSell::  crossSellProducts {}",
-					crossSellProducts);
+					"BloomreachSearchRecommendationServiceImpl::searchRecommendationsForUpSellAndCrossSell::  recommendedProductList {}",
+					recommendedProductList);
 		}
-		return crossSellProductResults;
+		return recommendedProductList;
 	}
 
 	@Override
-	public List<String> searchRecommendation(Map<String, String> refParams, ProductDTO products,
-			HttpServletRequest request) {
+	public List<String> searchRecommendation(Map<String, String> refParams, ProductDTO products) {
 		List<String> searchRes = new LinkedList<String>();
 		if (refParams == null) {
 			log.warn("BloomreachSearchRecommendationServiceImpl.searchRecommendation: input param is empty");
@@ -279,15 +243,12 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return searchRes;
 	}
 
-	private BloomreachSearchResponseDTO doSearch(Map<String, String> refParams, HttpServletRequest request) {
+	private BloomreachSearchResponseDTO doSearch(Map<String, String> refParams) {
 		BloomreachSearchResponseDTO bloomreachSearchResponseDTO = new BloomreachSearchResponseDTO();
 		String url;
 		String apparel = refParams.get(SearchConstants.IS_APPAREL);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		if (request != null) {
-			request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		}
 		log.debug("BloomreachSearchRecommendationServiceImpl::doSearch START...{}", stopWatch.getTime());
 		boolean isApparel = false;
 		if (null != apparel && apparel.equalsIgnoreCase(SearchConstants.TRUE)) {
@@ -303,8 +264,9 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		}
 		try {
 			if (!rrConfiguration.isEnablePathwayRecommendation() || isApparel || isOutlet) {
+				Map<String, String> requestParam = bloomreachSearchUtil.populateRequestParam(null, null, false, true);
 				url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(),
-						getParamsString(populateRequestParam(request), refParams));
+						getParamsString(requestParam, refParams));
 			} else {
 				url = MessageFormat.format(bloomreachConfiguration.getPathWayUrl(),
 						bloomreachConfiguration.getRecommendationId()
@@ -322,38 +284,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		stopWatch.stop();
 		log.debug("BloomreachSearchRecommendationServiceImpl::doSearch END...{}", stopWatch.getTime());
 		return bloomreachSearchResponseDTO;
-	}
-
-	public Map<String, String> populateRequestParam(HttpServletRequest request) {
-		String domain = null;
-		if (null != request) {
-			StringBuffer host = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()
-					.getRequestURL();
-			try {
-				URL url = new URL(host.toString());
-				domain = url.getProtocol() + BloomreachConstants.URL_SLASH + url.getHost();
-			} catch (MalformedURLException malformedURLException) {
-				log.error("BloomreachSearchRecommendationServiceImpl::populateRequestParam::malformedURLException={}",
-						malformedURLException);
-			}
-		} else {
-			domain = bloomreachConfiguration.getRefUrl();
-		}
-
-		Map<String, String> constructParam = new HashMap<>();
-		constructParam.put(BloomreachConstants.ACCOUNT_ID, bloomreachConfiguration.getAccountId());
-		constructParam.put(BloomreachConstants.AUTH_KEY, bloomreachConfiguration.getAuthKey());
-		constructParam.put(BloomreachConstants.DOMAIN_KEY, bloomreachConfiguration.getDomainKey());
-		constructParam.put(BloomreachConstants.FL,
-				String.join(BloomreachConstants.COMMA, bloomreachConfiguration.getFl()));
-		constructParam.put(BloomreachConstants.URL, domain);
-		constructParam.put(BloomreachConstants.REF_URL, domain);
-		constructParam.put(BloomreachConstants.SEARCH_TYPE, bloomreachConfiguration.getSearchType());
-		constructParam.put(BloomreachConstants.REQUEST_TYPE, bloomreachConfiguration.getRequestType());
-		constructParam.put(BloomreachConstants.ROWS, BloomreachConstants.ROWS_COUNT);
-		constructParam.put(BloomreachConstants.START, BloomreachConstants.START_COUNT);
-		constructParam.put(BloomreachConstants.SORT, BloomreachConstants.BEST_SELLER_SORT);
-		return constructParam;
 	}
 
 	public String getParamsString(Map<String, String> pRefParams, Map<String, String> refParams) throws IOException {
@@ -552,8 +482,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 				return recommendationProductList;
 			}
 		}
-		ProductDTO products = null;
-		products = rrsProductRepository.getProducts(vipId);
+		ProductDTO products = productDataAccessHelper.getProducts(vipId);
 		if (products != null) {
 			String listPriceId = rrConfiguration.getRRSDefaultPriceListId();
 			String salePriceId = rrConfiguration.getRRSSalePriceListId();
@@ -568,23 +497,19 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			if (rrConfiguration.isEnableWidenImage() && nonPromotionalProducts.containsKey(sku)) {
 				productBean.setImageId(nonPromotionalProducts.get(sku));
 			}
-			String imageUrlConstructed = productSkuHelper.getSkuImage(sku);
-			productBean.setImageUrl(imageUrlConstructed);
-			if (products.getCartOnlyClubPrice() != null) {
-				boolean umapProduct = products.getCartOnlyClubPrice() == 1 ? true : false;
-				productBean.setCartOnlyClubPrice(umapProduct);
-			}
+			setImage(productBean, sku);
+			setCartOnlyClubPrice(products, productBean);
 			double salePrice = 0.0, listPrice = 0.0;
 			Double umap_price = 0.0;
 			double umapPrice = 0.0;
-			List<DCSProductChildSkus> childSkus = dcsProductSkusRepository.findByProductId(vipId);
-			RRSSku rrsSKu = rrsSkuRepository.findBySkuId(vipId);
+			List<DCSProductChildSkus> childSkus = productDataAccessHelper.getChildSkus(vipId);
+			RRSSku rrsSku = productDataAccessHelper.getProductSkus(vipId);
 			if ((childSkus != null) && !childSkus.isEmpty()) {
 				for (DCSProductChildSkus childSKU : childSkus) {
 					salePrice = getDoubleSkuPrice(products, childSKU, salePriceId);
 					listPrice = getDoubleSkuPrice(products, childSKU, listPriceId);
 					productBean.setLowestListPrice(listPrice);
-					umap_price = rrsSKu.getUmapPrice();
+					umap_price = rrsSku.getUmapPrice();
 					umapPrice = umap_price != null ? (double) umapPrice : 0.0;
 				}
 			}
@@ -592,35 +517,13 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			productBean.setLowestListPrice(lowestListPrice);
 			productBean.setLowestSalePrice(salePrice);
 			productBean.setHighestSalePrice(salePrice);
-			boolean videoIcon = false;
-			if (products.getVideoEmbeddedCode() != null && (products.getVideoEmbeddedCode().toString().length() > 1)) {
-				videoIcon = true;
-			}
-			productBean.setDisplayVideo(videoIcon);
+			setDisplayVideo(products, productBean);
 			String ratingId = SearchConstants.RRS + SearchConstants.MINUS + sku;
-			RRSProductRating rrsRatings = rrsProductRatingRepository.findByRatingId(ratingId);
-			if (rrsRatings != null) {
-				float rating = (float) rrsRatings.getRating();
-				int reviews = (int) rrsRatings.getReviews();
-				productBean.setRating(rating);
-				productBean.setReviews(reviews);
-			}
-			boolean umapHideVIP = false;
-			if (products.getUmapHideVip() != null && products.getUmapHideVip() == 1) {
-				umapHideVIP = true;
-			}
-			productBean.setUmapHideVIP(umapHideVIP);
-			RRSProductWeb rrsProductWeb = productWebRepository.findByProductId(products.getProductId());
+			setProductRatings(productBean, ratingId);
+			setUmapHideVIP(products, productBean);
 			String listPrices = String.valueOf(format.format(lowestListPrice));
 			addPrice(priceDTOList, SearchConstants.PRICE_MSRP, listPrices, SearchConstants.STRING_ZERO);
-			boolean exclusive = false;
-			if (rrsProductWeb != null) {
-				Integer vipExclusive = rrsProductWeb.getVipExclusive();
-				if (vipExclusive != null && vipExclusive == 1) {
-					exclusive = true;
-				}
-			}
-			productBean.setExclusive(exclusive);
+			setExclusivce(productBean, products.getProductId());
 			if (!CollectionUtils.isEmpty(recommendationProductList)) {
 				recommendationProductList.add(0, productBean);
 				if (recommendationProductList.size() > upsellProductsSize) {
@@ -631,10 +534,60 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return recommendationProductList;
 	}
 
+	private void setImage(RecommendationProductDTO productBean, String sku) {
+		String imageUrlConstructed = productSkuHelper.getSkuImage(sku);
+		productBean.setImageUrl(imageUrlConstructed);
+	}
+
+	private void setCartOnlyClubPrice(ProductDTO products, RecommendationProductDTO productBean) {
+		if (products.getCartOnlyClubPrice() != null) {
+			boolean umapProduct = products.getCartOnlyClubPrice() == 1 ? true : false;
+			productBean.setCartOnlyClubPrice(umapProduct);
+		}
+	}
+
+	private void setDisplayVideo(ProductDTO products, RecommendationProductDTO productBean) {
+		boolean videoIcon = false;
+		if (products.getVideoEmbeddedCode() != null && (products.getVideoEmbeddedCode().toString().length() > 1)) {
+			videoIcon = true;
+		}
+		productBean.setDisplayVideo(videoIcon);
+	}
+
+	private void setUmapHideVIP(ProductDTO products, RecommendationProductDTO productBean) {
+		boolean umapHideVIP = false;
+		if (products.getUmapHideVip() != null && products.getUmapHideVip() == 1) {
+			umapHideVIP = true;
+		}
+		productBean.setUmapHideVIP(umapHideVIP);
+	}
+
+	private void setExclusivce(RecommendationProductDTO productBean, String productId) {
+		boolean exclusive = false;
+		RRSProductWeb rrsProductWeb = productDataAccessHelper.getProductData(productId);
+		if (rrsProductWeb != null) {
+			Integer vipExclusive = rrsProductWeb.getVipExclusive();
+			if (vipExclusive != null && vipExclusive == 1) {
+				exclusive = true;
+			}
+		}
+		productBean.setExclusive(exclusive);
+	}
+
+	private void setProductRatings(RecommendationProductDTO productBean, String ratingId) {
+		RRSProductRating rrsRatings = productDataAccessHelper.getProductRating(ratingId);
+		if (rrsRatings != null) {
+			float rating = (float) rrsRatings.getRating();
+			int reviews = (int) rrsRatings.getReviews();
+			productBean.setRating(rating);
+			productBean.setReviews(reviews);
+		}
+	}
+
 	public Double getDoubleSkuPrice(ProductDTO product, DCSProductChildSkus sku, String priceList) {
 		log.debug("BloomreachSearchRecommendationServiceImpl :: getDoubleSkuPrice() :: START");
 		Double price = 0.0;
-		DCSPrice dcsPrice = dcsPriceRepository.findBypriceList(priceList, product.getProductId(), sku.getSkuId());
+		DCSPrice dcsPrice = productDataAccessHelper.getProductPrice(product, sku, priceList);
 		if (dcsPrice != null) {
 			price = (Double) dcsPrice.getListPrice();
 			log.debug("BloomreachSearchRecommendationServiceImpl :: getDoubleSkuPrice()==> price :: {} ", price);
@@ -689,7 +642,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 
 	private void featchSeoRecommendationData() {
 		seoRecommendationsMap = new HashMap<String, SeoRecommendationBean>();
-		List<SeoCategory> seoCategory = seoCategoryRepository.getSeoCategory();
+		List<SeoCategory> seoCategory = productDataAccessHelper.getSeoCategory();
 		SeoRecommendationBean bean = new SeoRecommendationBean();
 		String webPgcCode = null;
 		String webPgcSubCode = null;
@@ -771,7 +724,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			log.debug("BloomreachSearchRecommendationService :: crossSellRecommendations: input params are empty");
 		}
 		BloomreachSearchResponseDTO bloomreachSearchResponse = new BloomreachSearchResponseDTO();
-		bloomreachSearchResponse = doSearch(refParams, null);
+		bloomreachSearchResponse = doSearch(refParams);
 		return bloomreachSearchResponse;
 	}
 

@@ -46,5 +46,4 @@ public class CatalogElementsFinder {
 	private Map<String, String> bloomreachCategoryMap;
 	private Map<String, String> sportsMap;
 	private Map<String, String> webPgcMap;
-
 }

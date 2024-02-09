@@ -44,20 +44,12 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 			if (searchProductDTO.isCartOnlyClubPrice() && searchProductDTO.getLowestListPrice() > 0) {
 				if (searchProductDTO.getLowestUmapPrice() > 0
 						&& searchProductDTO.getLowestUmapPrice() != searchProductDTO.getLowestListPrice()) {
-					double lowestUmapPrice = searchProductDTO.getLowestUmapPrice();
-					String lowestUmapPriceS = String.valueOf(format.format(lowestUmapPrice));
-					double highestUmapPrice = searchProductDTO.getHighestUmapPrice();
-					String highestUmapPriceS = String.valueOf(format.format(highestUmapPrice));
-					addPrice(priceDTOList, priceMsg, lowestUmapPriceS, highestUmapPriceS);
+					setUMAPPrice(searchProductDTO, priceDTOList, format, priceMsg);
 				}
 				if (!searchProductDTO.isUmapHideVIP() && searchProductDTO.getLowestVIPPrice() > 0
 						&& searchProductDTO.getLowestUmapPrice() > 0
 						&& searchProductDTO.getLowestUmapPrice() != searchProductDTO.getLowestListPrice()) {
-					double lowestVIPPrice = searchProductDTO.getLowestVIPPrice();
-					String lowestVIPPriceS = String.valueOf(format.format(lowestVIPPrice));
-					double highestVIPPrice = searchProductDTO.getHighestVIPPrice();
-					String highestVIPPriceS = String.valueOf(format.format(highestVIPPrice));
-					addPrice(priceDTOList, vipPriceMsg, lowestVIPPriceS, highestVIPPriceS);
+					setVIPPrice(searchProductDTO, priceDTOList, format, vipPriceMsg);
 				}
 				if (searchProductDTO.getLowestUmapPrice() > 0
 						&& searchProductDTO.getLowestUmapPrice() != searchProductDTO.getLowestListPrice()
@@ -67,31 +59,17 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 				} else if (!searchProductDTO.isUmapHideVIP()) {
 					searchProductDTO.setDisplayVipMessage(true);
 				}
-
 			} else {
 				if (searchProductDTO.getSpecialPricing() == SearchConstants.TRUE
 						&& searchProductDTO.getLowestListPrice() > 0) {
-					double lowestSalePrice = searchProductDTO.getLowestSalePrice();
-					String lowestSalePriceS = String.valueOf(format.format(lowestSalePrice));
-					double highestSalePrice = searchProductDTO.getHighestSalePrice();
-					String highestSalePriceS = String.valueOf(format.format(highestSalePrice));
-
-					addPrice(priceDTOList, SearchConstants.DAILY_SALE, lowestSalePriceS, highestSalePriceS);
+					setSalePrice(searchProductDTO, priceDTOList, format, SearchConstants.DAILY_SALE);
 				} else {
 					if (searchProductDTO.getLowestSalePrice() > 0) {
-						double lowestSalePrice = searchProductDTO.getLowestSalePrice();
-						String lowestSalePriceS = String.valueOf(format.format(lowestSalePrice));
-						double highestSalePrice = searchProductDTO.getHighestSalePrice();
-						String highestSalePriceS = String.valueOf(format.format(highestSalePrice));
-						addPrice(priceDTOList, priceMsg, lowestSalePriceS, highestSalePriceS);
+						setSalePrice(searchProductDTO, priceDTOList, format, priceMsg);
 					}
 				}
 				if (!searchProductDTO.isUmapHideVIP() && searchProductDTO.getLowestVIPPrice() > 0) {
-					double lowestVIPPrice = searchProductDTO.getLowestVIPPrice();
-					String lowestVIPPriceS = String.valueOf(format.format(lowestVIPPrice));
-					double highestVIPPrice = searchProductDTO.getHighestVIPPrice();
-					String highestVIPPriceS = String.valueOf(format.format(highestVIPPrice));
-					addPrice(priceDTOList, vipPriceMsg, lowestVIPPriceS, highestVIPPriceS);
+					setVIPPrice(searchProductDTO, priceDTOList, format, vipPriceMsg);
 				}
 			}
 		}
@@ -101,6 +79,33 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 			searchProductDTO.setSaleMessage(saleMessage);
 		}
 		log.debug("ProductPriceHelperImpl :: setProdutPrices() :: END :: searchProductDTO {}", searchProductDTO);
+	}
+
+	private void setUMAPPrice(RecommendationProductDTO searchProductDTO, List<PriceDTO> priceDTOList,
+			DecimalFormat format, String priceMsg) {
+		double lowestUmapPrice = searchProductDTO.getLowestUmapPrice();
+		String lowestUmapPrices = String.valueOf(format.format(lowestUmapPrice));
+		double highestUmapPrice = searchProductDTO.getHighestUmapPrice();
+		String highestUmapPrices = String.valueOf(format.format(highestUmapPrice));
+		addPrice(priceDTOList, priceMsg, lowestUmapPrices, highestUmapPrices);
+	}
+
+	private void setSalePrice(RecommendationProductDTO searchProductDTO, List<PriceDTO> priceDTOList,
+			DecimalFormat format, String priceMsg) {
+		double lowestSalePrice = searchProductDTO.getLowestSalePrice();
+		String lowestSalePrices = String.valueOf(format.format(lowestSalePrice));
+		double highestSalePrice = searchProductDTO.getHighestSalePrice();
+		String highestSalePrices = String.valueOf(format.format(highestSalePrice));
+		addPrice(priceDTOList, priceMsg, lowestSalePrices, highestSalePrices);
+	}
+
+	private void setVIPPrice(RecommendationProductDTO searchProductDTO, List<PriceDTO> priceDTOList,
+			DecimalFormat format, String vipPriceMsg) {
+		double lowestVIPPrice = searchProductDTO.getLowestVIPPrice();
+		String lowestVIPPrices = String.valueOf(format.format(lowestVIPPrice));
+		double highestVIPPrice = searchProductDTO.getHighestVIPPrice();
+		String highestVIPPrices = String.valueOf(format.format(highestVIPPrice));
+		addPrice(priceDTOList, vipPriceMsg, lowestVIPPrices, highestVIPPrices);
 	}
 
 	private void addPrice(List<PriceDTO> priceDTOList, String propertyName, String lowPriceValue,

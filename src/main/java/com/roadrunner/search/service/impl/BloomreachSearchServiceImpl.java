@@ -58,7 +58,7 @@ public class BloomreachSearchServiceImpl implements BloomreachSearchService {
 	public String bloomreachSearchApiCall(String reqURL) {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		log.debug("BloomreachServiceImpl::bloomreachServiceCall:: START...{} BRReqURL{}", stopWatch.getTime(), reqURL);
+		log.debug("BloomreachServiceImpl::bloomreachServiceCall:: START...{} reqURL{}", stopWatch.getTime(), reqURL);
 		String responseJson = null;
 		try {
 			HttpHeaders headers = new HttpHeaders();
@@ -133,16 +133,16 @@ public class BloomreachSearchServiceImpl implements BloomreachSearchService {
 			bloomreachSearchResponseDTO = new BloomreachSearchResponseDTO();
 			Map<String, String> paramMap = new HashMap<>();
 			paramMap.put(BloomreachConstants.Q, productId);
-			Map<String, String> populateRequestParam = bloomreachSearchUtil.populateRequestParam(paramMap);
+			Map<String, String> populateRequestParam = bloomreachSearchUtil.populateRequestParam(null, paramMap, true,
+					false);
 			String paramString = bloomreachSearchUtil.formBloomreachParamUrl(populateRequestParam);
-			String url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(), paramString);
 			if (!CollectionUtils.isEmpty(productIds)) {
 				productIds = productIds.stream().map(id -> BloomreachConstants.QUOTES + id + BloomreachConstants.QUOTES)
 						.collect(Collectors.toList());
 				paramString = paramString.concat(BloomreachConstants.QUOTES_WITH_FQ_).concat(
 						BloomreachConstants.PID_STRING + String.join(BloomreachConstants.OR_STRING, productIds));
-
 			}
+			String url = MessageFormat.format(bloomreachConfiguration.getSearchApiUrl(), paramString);
 			log.debug("BloomreachServiceImpl::populateBloomreachResponse..url={}", url);
 			String responseJson = bloomreachSearchApiCall(url);
 			if (null != responseJson) {

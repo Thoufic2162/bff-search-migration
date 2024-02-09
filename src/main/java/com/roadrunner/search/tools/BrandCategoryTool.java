@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.roadrunner.search.config.RRConfiguration;
 import com.roadrunner.search.constants.BloomreachConstants;
 import com.roadrunner.search.constants.SearchConstants;
@@ -37,7 +38,7 @@ import com.roadrunner.search.dto.MediumBrandFields;
 import com.roadrunner.search.dto.MediumBrandFile;
 import com.roadrunner.search.dto.MediumBrandImage;
 import com.roadrunner.search.dto.MediumSize;
-import com.roadrunner.search.repo.BrandCategoryDataRepository;
+import com.roadrunner.search.helper.ProductDataAccessHelper;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -51,10 +52,10 @@ import lombok.extern.log4j.Log4j2;
 public class BrandCategoryTool {
 
 	@Autowired
-	private Gson gson;
+	private ObjectMapper objectMapper;
 
 	@Autowired
-	private BrandCategoryDataRepository brandCategoryDataRepository;
+	private ProductDataAccessHelper productDataAccessHelper;
 
 	@Autowired
 	private RRConfiguration rrConfiguration;
@@ -91,7 +92,12 @@ public class BrandCategoryTool {
 				log.error("BrandCategoryTool::getBrandData:: sqlException{}", sqlException);
 			}
 			String apiData = new String(bdata);
-			brandCategoryResponse = gson.fromJson(apiData, BrandCategoriesResponse.class);
+			try {
+				brandCategoryResponse = objectMapper.readValue(apiData, BrandCategoriesResponse.class);
+			} catch (JsonProcessingException jsonProcessingException) {
+				log.error("BrandCategoryTool::getBrandData::::Exception jsonProcessingException={}",
+						jsonProcessingException);
+			}
 			mapBrandCategoryValue(brandCategoryResponse);
 		}
 		log.debug("BrandCategoryTool::getBrandData::::Exception while getting data from DB for Brand::{} ", query);
@@ -101,7 +107,7 @@ public class BrandCategoryTool {
 	public BrandCategoryData getBrandApiFromDB(String brandName) {
 		log.debug("BrandCategoryTool:::getBrandApiFromDB:::Searching for Brand:{}", brandName);
 		if (null != brandName && !StringUtils.isEmpty(brandName)) {
-			BrandCategoryData brandRepoItem = brandCategoryDataRepository.findByBrandName(brandName);
+			BrandCategoryData brandRepoItem = productDataAccessHelper.getBrandCategoryData(brandName);
 			if (brandRepoItem != null) {
 				BrandCategoryData brandCategoryData = new BrandCategoryData();
 				brandCategoryData.setBrandName((String) brandRepoItem.getBrandName());

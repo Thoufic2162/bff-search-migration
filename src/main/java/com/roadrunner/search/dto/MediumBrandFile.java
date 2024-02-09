@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class MediumBrandFile {
+	
 	public String url;
 
 	public String imageId;
