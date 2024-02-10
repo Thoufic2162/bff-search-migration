@@ -726,33 +726,6 @@ bloomreachrefinement:
  kidsTypeMap:
   Boys: kids/boys/
   Girls: kids/girls/
- seoFilterMap: 
-  webPgc: '%2CwebPgc%3A'
-  webSubPgc: '%2CwebSubPgc%3A'
-  '[apparel_type]': '%2Capparel_type%3A'
-  '[shoe_type]': '%2Cshoe_type%3A'
-  '[variants.widthGroup]': '%2Cvariants.widthGroup%3A'
-  '[shoe_cushion]': '%2Cshoe_cushion%3A'
-  '[variants.Apparel_Size]': '%2Cvariants.Apparel_Size%3A'
-  brand: '%2Cbrand%3A'
-  '[variants.Shoe_Size]': '%2Cvariants.Shoe_Size%3A'
-  '[variants.colorGroup]': '%2Cvariants.colorGroup%3A'
-  outlet: '%2Coutlet%3A'
-  newProduct: '%2CnewProduct%3A'
-  '[outlet_basement]': '%2Coutlet_basement%3A'
-  '[accessory_type]': '%2Caccessory_type%3A'
-  sale: '%2Csale%3A'
-  '[sock_thickness]': '%2Csock_thickness%3A'
-  '[sock_length]': '%2Csock_length%3A'
-  '[kids_type]': '%2Ckids_type%3A'
-  exclusive: '%2Cexclusive%3A'
-  sports: '%2Csports%3A'
-  '[kids_gender]': '%2Ckids_gender%3A'
-  '[gender_text]': '%2Cgender_text%3A'
-  price: '%2Cprice%3A'
-  '[injury_recovery]': '%2Cinjury_recovery%3A'
-  '[injury_placement]': '%2Cinjury_placement%3A'
-  '[customer_rating]': '%2Ccustomer_rating%3A'
  refinementTitles: 
   '[shoe_cushion]': 1S:Level 1 Stability|2S:Level 2 Stability|3S:Light & Fast Cushion Stability|4S:Mid Level Cushion Stability|5S:Max Cushion Stability|1N:Level 1 Neutral|2N:Level 2 Neutral|3N:Light & Fast Cushion Neutral|4N:Mid Level Cushion Neutral|5N:Max Cushion Neutral
   webSubPgc: Training:Cross Training

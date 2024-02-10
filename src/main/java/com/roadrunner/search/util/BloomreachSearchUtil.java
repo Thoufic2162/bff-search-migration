@@ -25,6 +25,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -435,14 +436,14 @@ public class BloomreachSearchUtil {
 
 	private void generateBrQueryFromParameter(HttpServletRequest request, String cQuery, String catQuery, String bQuery,
 			String shoeQuery, String sportsQuery, StringBuffer brQueryParam) {
-		if (bQuery != null && !bQuery.isEmpty()) {
+		if (!StringUtils.isEmpty(bQuery)) {
 			String[] brands = bQuery.split(SearchConstants.COMMA);
 			for (String brand : brands) {
 				formBrQuery(brand, SearchConstants.BRAND, brQueryParam);
 			}
 		}
 
-		if (cQuery != null && !cQuery.isEmpty()) {
+		if (!StringUtils.isEmpty(cQuery)) {
 			String[] colors = cQuery.split(SearchConstants.COMMA);
 			request.setAttribute(SearchConstants.SELECTED_COLOR, cQuery);
 			for (String color : colors) {
@@ -450,21 +451,21 @@ public class BloomreachSearchUtil {
 			}
 		}
 
-		if (catQuery != null && !catQuery.isEmpty()) {
+		if (!StringUtils.isEmpty(catQuery)) {
 			String[] categorys = catQuery.split(SearchConstants.COMMA);
 			for (String category : categorys) {
 				formBrQuery(category, SearchConstants.SUBCATAGORY, brQueryParam);
 			}
 		}
 
-		if (shoeQuery != null && !shoeQuery.isEmpty()) {
+		if (!StringUtils.isEmpty(shoeQuery)) {
 			String[] shoetypes = shoeQuery.split(SearchConstants.COMMA);
 			for (String shoeType : shoetypes) {
 				formBrQuery(shoeType, SearchConstants.SHOE_TYPE, brQueryParam);
 			}
 		}
 
-		if (sportsQuery != null && !sportsQuery.isEmpty()) {
+		if (!StringUtils.isEmpty(sportsQuery)) {
 			String[] sportsTypes = sportsQuery.split(SearchConstants.COMMA);
 			for (String element : sportsTypes) {
 				if (catalogElementsFinder.getSportsMap().entrySet().stream()
@@ -913,6 +914,35 @@ public class BloomreachSearchUtil {
 		}
 		log.debug("BloomreachSearchUtil :: selectedNavigation :: selectedNavigationMap: {}", selectedNavigationMap);
 		return selectedNavigationMap;
+	}
+
+	/**
+	 * This method will fetch embed id
+	 * 
+	 * @param productId
+	 * @param colorCode
+	 * @return
+	 */
+	public String constructWidenImage(String productId, String colorCode) {
+		log.debug("BloomreachSearchUtil :: constructWidenImage(): productId= {} colorCode={}START", productId,
+				colorCode);
+		if (null == productId) {
+			return null;
+		}
+		String styleSKu = StringUtils.isNotBlank(colorCode) ? productId + SearchConstants.HYPHEN_STRING + colorCode
+				: productId;
+		if (!CollectionUtils.isEmpty(rrConfiguration.getNonPromotionalProducts())
+				&& rrConfiguration.getNonPromotionalProducts().contains(styleSKu)) {
+			styleSKu = SearchConstants.PERCENTAGE.concat(styleSKu).concat(SearchConstants.PERCENTAGE);
+		}
+		log.debug("BloomreachSearchUtil.constructWidenImage() ::: product_id {}, colorcode{}", productId, colorCode);
+		String embedId = null;
+		if (rrConfiguration.isEnableWidenImage()) {
+			embedId = productDataAccessHelper.fetchEmbedId(styleSKu);
+			log.debug("BloomreachSearchUtil :: constructWidenImage(): Embed id {} END", embedId);
+			return embedId;
+		}
+		return null;
 	}
 
 }

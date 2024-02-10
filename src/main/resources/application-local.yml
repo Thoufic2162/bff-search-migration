@@ -53,6 +53,8 @@ rrconfig:
  enablePathwayRecommendation: true #enable/disable pathway recommendation (bloomreach)
  RRSDefaultPriceListId: plist3900002
  RRSSalePriceListId: plist3900003
+ nonPromotionalProducts: RAC55,RAC100,RAC150
+ 
  
 
 

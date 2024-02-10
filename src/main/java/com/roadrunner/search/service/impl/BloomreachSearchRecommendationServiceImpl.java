@@ -243,6 +243,12 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return searchRes;
 	}
 
+	/**
+	 * This method perform search for recommendation
+	 * 
+	 * @param refParams
+	 * @return
+	 */
 	private BloomreachSearchResponseDTO doSearch(Map<String, String> refParams) {
 		BloomreachSearchResponseDTO bloomreachSearchResponseDTO = new BloomreachSearchResponseDTO();
 		String url;
@@ -286,6 +292,14 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return bloomreachSearchResponseDTO;
 	}
 
+	/**
+	 * This method gets param string
+	 * 
+	 * @param pRefParams
+	 * @param refParams
+	 * @return
+	 * @throws IOException
+	 */
 	public String getParamsString(Map<String, String> pRefParams, Map<String, String> refParams) throws IOException {
 		String resultString = null;
 		if (null != pRefParams) {
@@ -328,6 +342,12 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return resultString;
 	}
 
+	/**
+	 * This populates the request param for bloomreach pathway recommendation
+	 * 
+	 * @param pRefParams
+	 * @return
+	 */
 	public String populatePathwaysRequestParam(Map<String, String> pRefParams) {
 		log.debug(
 				"BloomreachSearchRecommendationServiceImpl :: populatePathwaysRequestParam :: START :: pRefParams: {}",
@@ -380,46 +400,11 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		}
 		if (null != recommendationMethod && (recommendationMethod.contains(BloomreachConstants.OUTFIT_YOUR_RUN)
 				|| recommendationMethod.contains(BloomreachConstants.TOP_PICKS_FOR_YOU))) {
-			String gender = BloomreachConstants.QUOTES + pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
-					+ BloomreachConstants.QUOTES;
-			String cat_id = pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
-					.replaceAll(BloomreachConstants.SINGLE_QUOTES, BloomreachConstants.EMPTY_STRING)
-					.concat(SearchConstants.SPACE).concat(BloomreachConstants.APPAREL);
-			constructParam.put(BloomreachConstants.CAT_ID, cat_id);
-			if (null != pRefParams.get(BloomreachConstants.IS_GIFTCARD)
-					&& pRefParams.get(BloomreachConstants.IS_GIFTCARD).equalsIgnoreCase(SearchConstants.TRUE)) {
-				constructParam.put(
-						BloomreachConstants.BRAND_PARAMETER.concat(BloomreachConstants.BRAND_KORSA)
-								.concat(BloomreachConstants.AND).concat(BloomreachConstants.RRS),
-						BloomreachConstants.FILTER_FACET);
-				constructParam.put(BloomreachConstants.GENDER_TEXT.concat(gender).concat(BloomreachConstants.AND)
-						.concat(BloomreachConstants.UNISEX_PARAM), BloomreachConstants.FILTER_FACET);
-				constructParam.put(BloomreachConstants.SORT, BloomreachConstants.BEST_SELLER_SORT);
-			} else {
-				constructParam.put(BloomreachConstants.BRAND_PARAMETER.concat(BloomreachConstants.BRAND_KORSA),
-						BloomreachConstants.FILTER_FACET);
-				constructParam.put(BloomreachConstants.GENDER_TEXT.concat(gender), BloomreachConstants.FILTER_FACET);
-			}
+			populateTopPicksParam(pRefParams, constructParam);
 
 		} else if (null != recommendationMethod
 				&& (recommendationMethod.contains(BloomreachConstants.YOU_MAY_ALSO_LIKE))) {
-			String gender = BloomreachConstants.QUOTES + pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
-					+ BloomreachConstants.QUOTES;
-			String cat_id = pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
-					.replaceAll(BloomreachConstants.SINGLE_QUOTES, BloomreachConstants.EMPTY_STRING)
-					.concat(SearchConstants.SPACE).concat(pRefParams.get(BloomreachConstants.PRODUCT_FIELD.WEB_PGC));
-			constructParam.put(BloomreachConstants.CAT_ID, cat_id.trim());
-			constructParam.put(BloomreachConstants.WEBSUBPGC + BloomreachConstants.QUOTES
-					+ pRefParams.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC) + BloomreachConstants.QUOTES,
-					BloomreachConstants.FILTER_FACET);
-			if (null != pRefParams.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC) && !pRefParams
-					.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC).equalsIgnoreCase(SearchConstants.SOCKS)) {
-				constructParam.put(
-						BloomreachConstants.BRAND_PARAMETER + BloomreachConstants.QUOTES
-								+ pRefParams.get(BloomreachConstants.PRODUCT_FIELD.BRAND) + BloomreachConstants.QUOTES,
-						BloomreachConstants.FILTER_FACET);
-			}
-			constructParam.put(BloomreachConstants.GENDER_TEXT + gender, BloomreachConstants.FILTER_FACET);
+			populateYouMayAlsoLikeParam(pRefParams, constructParam);
 		}
 		StringBuilder result = new StringBuilder();
 		StringBuilder fieldFilter = new StringBuilder();
@@ -428,7 +413,6 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			try {
 				if (!value.equalsIgnoreCase(BloomreachConstants.FILTER_FACET)) {
 					result.append(URLEncoder.encode(entry.getKey(), BloomreachConstants.UTF_8));
-
 					result.append(BloomreachConstants.EQUAL);
 					if (!entry.getKey().equals(BloomreachConstants.UID_PARAM)
 							&& !entry.getKey().equals(BloomreachConstants.SORT)) {
@@ -453,6 +437,62 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		log.debug("BloomreachSearchRecommendationServiceImpl :: populatePathwaysRequestParam :: END :: result: {}",
 				result);
 		return result.toString();
+	}
+
+	/**
+	 * This method populates request param for youMayAlsoLike recommendation
+	 * 
+	 * @param pRefParams
+	 * @param constructParam
+	 */
+	private void populateYouMayAlsoLikeParam(Map<String, String> pRefParams, Map<String, String> constructParam) {
+		String gender = BloomreachConstants.QUOTES + pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
+				+ BloomreachConstants.QUOTES;
+		String cat_id = pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
+				.replaceAll(BloomreachConstants.SINGLE_QUOTES, BloomreachConstants.EMPTY_STRING)
+				.concat(SearchConstants.SPACE).concat(pRefParams.get(BloomreachConstants.PRODUCT_FIELD.WEB_PGC));
+		constructParam.put(BloomreachConstants.CAT_ID, cat_id.trim());
+		constructParam.put(
+				BloomreachConstants.WEBSUBPGC + BloomreachConstants.QUOTES
+						+ pRefParams.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC) + BloomreachConstants.QUOTES,
+				BloomreachConstants.FILTER_FACET);
+		if (null != pRefParams.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC) && !pRefParams
+				.get(BloomreachConstants.PRODUCT_FIELD.WEB_SUB_PGC).equalsIgnoreCase(SearchConstants.SOCKS)) {
+			constructParam.put(
+					BloomreachConstants.BRAND_PARAMETER + BloomreachConstants.QUOTES
+							+ pRefParams.get(BloomreachConstants.PRODUCT_FIELD.BRAND) + BloomreachConstants.QUOTES,
+					BloomreachConstants.FILTER_FACET);
+		}
+		constructParam.put(BloomreachConstants.GENDER_TEXT + gender, BloomreachConstants.FILTER_FACET);
+	}
+
+	/**
+	 * This method populates request param for TopPicks recommendation
+	 * 
+	 * @param pRefParams
+	 * @param constructParam
+	 */
+	private void populateTopPicksParam(Map<String, String> pRefParams, Map<String, String> constructParam) {
+		String gender = BloomreachConstants.QUOTES + pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
+				+ BloomreachConstants.QUOTES;
+		String cat_id = pRefParams.get(BloomreachConstants.PRODUCT_FIELD.GENDER_TEXT)
+				.replaceAll(BloomreachConstants.SINGLE_QUOTES, BloomreachConstants.EMPTY_STRING)
+				.concat(SearchConstants.SPACE).concat(BloomreachConstants.APPAREL);
+		constructParam.put(BloomreachConstants.CAT_ID, cat_id);
+		if (null != pRefParams.get(BloomreachConstants.IS_GIFTCARD)
+				&& pRefParams.get(BloomreachConstants.IS_GIFTCARD).equalsIgnoreCase(SearchConstants.TRUE)) {
+			constructParam.put(
+					BloomreachConstants.BRAND_PARAMETER.concat(BloomreachConstants.BRAND_KORSA)
+							.concat(BloomreachConstants.AND).concat(BloomreachConstants.RRS),
+					BloomreachConstants.FILTER_FACET);
+			constructParam.put(BloomreachConstants.GENDER_TEXT.concat(gender).concat(BloomreachConstants.AND)
+					.concat(BloomreachConstants.UNISEX_PARAM), BloomreachConstants.FILTER_FACET);
+			constructParam.put(BloomreachConstants.SORT, BloomreachConstants.BEST_SELLER_SORT);
+		} else {
+			constructParam.put(BloomreachConstants.BRAND_PARAMETER.concat(BloomreachConstants.BRAND_KORSA),
+					BloomreachConstants.FILTER_FACET);
+			constructParam.put(BloomreachConstants.GENDER_TEXT.concat(gender), BloomreachConstants.FILTER_FACET);
+		}
 	}
 
 	public List<RecommendationProductDTO> populateVIPProducts(Object profile,
@@ -506,8 +546,8 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			RRSSku rrsSku = productDataAccessHelper.getProductSkus(vipId);
 			if ((childSkus != null) && !childSkus.isEmpty()) {
 				for (DCSProductChildSkus childSKU : childSkus) {
-					salePrice = getDoubleSkuPrice(products, childSKU, salePriceId);
-					listPrice = getDoubleSkuPrice(products, childSKU, listPriceId);
+					salePrice = getDoubleFromSkuPrice(products, childSKU, salePriceId);
+					listPrice = getDoubleFromSkuPrice(products, childSKU, listPriceId);
 					productBean.setLowestListPrice(listPrice);
 					umap_price = rrsSku.getUmapPrice();
 					umapPrice = umap_price != null ? (double) umapPrice : 0.0;
@@ -523,7 +563,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 			setUmapHideVIP(products, productBean);
 			String listPrices = String.valueOf(format.format(lowestListPrice));
 			addPrice(priceDTOList, SearchConstants.PRICE_MSRP, listPrices, SearchConstants.STRING_ZERO);
-			setExclusivce(productBean, products.getProductId());
+			setExclusive(productBean, products.getProductId());
 			if (!CollectionUtils.isEmpty(recommendationProductList)) {
 				recommendationProductList.add(0, productBean);
 				if (recommendationProductList.size() > upsellProductsSize) {
@@ -534,6 +574,12 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		return recommendationProductList;
 	}
 
+	/**
+	 * This method sets the image url
+	 * 
+	 * @param productBean
+	 * @param sku
+	 */
 	private void setImage(RecommendationProductDTO productBean, String sku) {
 		String imageUrlConstructed = productSkuHelper.getSkuImage(sku);
 		productBean.setImageUrl(imageUrlConstructed);
@@ -562,7 +608,7 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		productBean.setUmapHideVIP(umapHideVIP);
 	}
 
-	private void setExclusivce(RecommendationProductDTO productBean, String productId) {
+	private void setExclusive(RecommendationProductDTO productBean, String productId) {
 		boolean exclusive = false;
 		RRSProductWeb rrsProductWeb = productDataAccessHelper.getProductData(productId);
 		if (rrsProductWeb != null) {
@@ -574,6 +620,12 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		productBean.setExclusive(exclusive);
 	}
 
+	/**
+	 * This method sets the ratings and reviews for the product
+	 * 
+	 * @param productBean
+	 * @param ratingId
+	 */
 	private void setProductRatings(RecommendationProductDTO productBean, String ratingId) {
 		RRSProductRating rrsRatings = productDataAccessHelper.getProductRating(ratingId);
 		if (rrsRatings != null) {
@@ -584,7 +636,13 @@ public class BloomreachSearchRecommendationServiceImpl implements BloomreachSear
 		}
 	}
 
-	public Double getDoubleSkuPrice(ProductDTO product, DCSProductChildSkus sku, String priceList) {
+	/**
+	 * @param product
+	 * @param sku
+	 * @param priceList
+	 * @return
+	 */
+	public Double getDoubleFromSkuPrice(ProductDTO product, DCSProductChildSkus sku, String priceList) {
 		log.debug("BloomreachSearchRecommendationServiceImpl :: getDoubleSkuPrice() :: START");
 		Double price = 0.0;
 		DCSPrice dcsPrice = productDataAccessHelper.getProductPrice(product, sku, priceList);

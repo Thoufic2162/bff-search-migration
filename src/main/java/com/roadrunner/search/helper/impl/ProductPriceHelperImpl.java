@@ -81,6 +81,14 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 		log.debug("ProductPriceHelperImpl :: setProdutPrices() :: END :: searchProductDTO {}", searchProductDTO);
 	}
 
+	/**
+	 * This method sets UMAP price
+	 * 
+	 * @param searchProductDTO
+	 * @param priceDTOList
+	 * @param format
+	 * @param priceMsg
+	 */
 	private void setUMAPPrice(RecommendationProductDTO searchProductDTO, List<PriceDTO> priceDTOList,
 			DecimalFormat format, String priceMsg) {
 		double lowestUmapPrice = searchProductDTO.getLowestUmapPrice();
@@ -90,6 +98,14 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 		addPrice(priceDTOList, priceMsg, lowestUmapPrices, highestUmapPrices);
 	}
 
+	/**
+	 * This method sets sale price
+	 * 
+	 * @param searchProductDTO
+	 * @param priceDTOList
+	 * @param format
+	 * @param priceMsg
+	 */
 	private void setSalePrice(RecommendationProductDTO searchProductDTO, List<PriceDTO> priceDTOList,
 			DecimalFormat format, String priceMsg) {
 		double lowestSalePrice = searchProductDTO.getLowestSalePrice();
@@ -99,6 +115,14 @@ public class ProductPriceHelperImpl implements ProductPriceHelper {
 		addPrice(priceDTOList, priceMsg, lowestSalePrices, highestSalePrices);
 	}
 
+	/**
+	 * This method sets VIP price
+	 * 
+	 * @param searchProductDTO
+	 * @param priceDTOList
+	 * @param format
+	 * @param vipPriceMsg
+	 */
 	private void setVIPPrice(RecommendationProductDTO searchProductDTO, List<PriceDTO> priceDTOList,
 			DecimalFormat format, String vipPriceMsg) {
 		double lowestVIPPrice = searchProductDTO.getLowestVIPPrice();

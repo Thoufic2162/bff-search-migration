@@ -30,6 +30,7 @@ import com.roadrunner.search.helper.CookieHelper;
 import com.roadrunner.search.helper.ProductPriceHelper;
 import com.roadrunner.search.helper.ProductSkuHelper;
 import com.roadrunner.search.service.BloomreachSearchService;
+import com.roadrunner.search.util.BloomreachSearchUtil;
 import com.roadrunner.search.util.StringUtil;
 import com.roadrunner.search.util.URLCoderUtil;
 
@@ -59,6 +60,9 @@ public class BloomreachProductSearchResults {
 	@Autowired
 	private CookieHelper cookieHelper;
 
+	@Autowired
+	private BloomreachSearchUtil bloomreachSearchUtil;
+
 	private Map<String, String> productLandingSeoURL = new HashMap<String, String>();
 	private Map<String, String> brandNameMap;
 	private String vipPlus;
@@ -66,6 +70,14 @@ public class BloomreachProductSearchResults {
 	private List<String> promotionalProducts;
 	private Map<String, String> nonPromotionalProducts;
 
+	/**
+	 * Retrieves and populates search product results from the given Bloomreach
+	 * search response into the provided response bean.
+	 * 
+	 * @param searchResult
+	 * @param request
+	 * @param responseBean
+	 */
 	public void getProductResults(BloomreachSearchResponseDTO searchResult, HttpServletRequest request,
 			BloomreachSearchResultsDTO responseBean) {
 		log.debug(
@@ -136,73 +148,12 @@ public class BloomreachProductSearchResults {
 					if (rrConfiguration.isEnableWidenImage() && nonPromotionalProducts.containsKey(sku)) {
 						searchProductDTO.setImageId(nonPromotionalProducts.get(sku));
 					}
+					name = fetchProductName(name);
 					searchProductDTO.setName(name);
 					String seoURl = getProductSeoUrl(sku, true, null, null, name);
 					searchProductDTO.setUrl(seoURl);
-					for (Map.Entry<String, String> entry : brandNameMap.entrySet()) {
-						if (name.contains(entry.getKey())) {
-							name = name.replaceAll(entry.getKey(), entry.getValue());
-						}
-					}
-					double lowestListPrice = result.getRegPrice();
-					if (sku.equals(vipPlus)) {
-						searchProductDTO.setLowestListPrice(vipPlusPrice);
-					} else {
-						searchProductDTO.setLowestListPrice(lowestListPrice);
-					}
-					double lowestUmapPrice = getProductLowestUmapPrice(result);
-					searchProductDTO.setLowestUmapPrice(lowestUmapPrice);
-
-					double highestUmapPrice = getProductHighestUmapPrice(result);
-					searchProductDTO.setHighestUmapPrice(highestUmapPrice);
-
-					double lowestSalePrice = getProductLowestPrice(result, BloomreachConstants.SKU_FIELD.SALE_PRICE);
-					searchProductDTO.setLowestSalePrice(lowestSalePrice);
-
-					double highestSalePrice = getProductHighestPrice(result, BloomreachConstants.SKU_FIELD.SALE_PRICE,
-							lowestListPrice);
-					searchProductDTO.setHighestSalePrice(highestSalePrice);
-
-					double lowestVIPPrice = getProductLowestPrice(result, BloomreachConstants.SKU_FIELD.VIP_PRICE);
-					if (sku.equals(vipPlus)) {
-						searchProductDTO.setLowestVIPPrice(vipPlusPrice);
-					} else {
-						searchProductDTO.setLowestVIPPrice(lowestVIPPrice);
-					}
-
-					double highestVIPPrice = getProductHighestPrice(result, BloomreachConstants.SKU_FIELD.VIP_PRICE,
-							lowestListPrice);
-					if (sku.equals(vipPlus)) {
-						searchProductDTO.setHighestVIPPrice(vipPlusPrice);
-					} else {
-						searchProductDTO.setHighestVIPPrice(highestVIPPrice);
-					}
-					if (!StringUtils.isEmpty(result.getUmapHideVip())
-							&& SearchConstants.ONE_STRING.equals(result.getUmapHideVip())) {
-						searchProductDTO.setUmapHideVIP(true);
-					} else {
-						searchProductDTO.setUmapHideVIP(false);
-					}
-					// Setting Price for each product
-					if (!promotionalProducts.contains(sku)) {
-						productPriceHelper.setProdutPrices(searchProductDTO);
-					}
-					Map<String, Map<String, ColorSkusDTO>> skus = new HashMap<>();
-					Map<String, ColorSkusDTO> skusDetais = productSkuHelper.createSkus(result, searchProductDTO);
-					if (skusDetais.values().size() > 1) {
-						searchProductDTO.setHasSkus(SearchConstants.TRUE);
-						skus.put(sku, skusDetais);
-					}
-					boolean isRearrangedDefaultColor = productSkuHelper.rearrangeDefaultColor(request, searchProductDTO,
-							result);
-					if (null != result.getDefaultColor() && !isRearrangedDefaultColor) {
-						searchProductDTO.setColorCode(result.getDefaultColor());
-					} else if (!CollectionUtils.isEmpty(searchProductDTO.getColorsSkus())
-							&& !isRearrangedDefaultColor) {
-						String fstColorCode = searchProductDTO.getColorsSkus().stream().findFirst().get()
-								.getColorCode();
-						searchProductDTO.setColorCode(fstColorCode);
-					}
+					populatePriceDetail(result, searchProductDTO, sku);
+					populateSkuDetail(request, result, searchProductDTO, sku);
 					if (searchProductDTO.isDisplayVipMessage() && !CollectionUtils.isEmpty(searchProductDTO.getPrice())
 							&& searchProductDTO.getPrice().stream()
 									.anyMatch(price -> price.getType().equals(SearchConstants.VIP))) {
@@ -298,6 +249,97 @@ public class BloomreachProductSearchResults {
 		responseBean.setResults(searchProductList);
 	}
 
+	/**
+	 * This method will populate the skus
+	 * 
+	 * @param request
+	 * @param result
+	 * @param searchProductDTO
+	 * @param sku
+	 */
+	private void populateSkuDetail(HttpServletRequest request, BRDoc result, RecommendationProductDTO searchProductDTO,
+			String sku) {
+		Map<String, Map<String, ColorSkusDTO>> skus = new HashMap<>();
+		Map<String, ColorSkusDTO> skusDetails = productSkuHelper.createSkus(result, searchProductDTO);
+		if (skusDetails.values().size() > 1) {
+			searchProductDTO.setHasSkus(SearchConstants.TRUE);
+			skus.put(sku, skusDetails);
+		}
+		boolean isRearrangedDefaultColor = productSkuHelper.rearrangeDefaultColor(request, searchProductDTO, result);
+		if (null != result.getDefaultColor() && !isRearrangedDefaultColor) {
+			searchProductDTO.setColorCode(result.getDefaultColor());
+		} else if (!CollectionUtils.isEmpty(searchProductDTO.getColorsSkus()) && !isRearrangedDefaultColor) {
+			String fstColorCode = searchProductDTO.getColorsSkus().stream().findFirst().get().getColorCode();
+			searchProductDTO.setColorCode(fstColorCode);
+		}
+		if (CollectionUtils.isEmpty(searchProductDTO.getColorsSkus()) && null != searchProductDTO.getColorCode()) {
+			searchProductDTO.setImageId(bloomreachSearchUtil.constructWidenImage(
+					SearchConstants.PERCENTAGE.concat(sku).concat(SearchConstants.PERCENTAGE), null));
+		}
+	}
+
+	/**
+	 * This method sets the price for the product
+	 * 
+	 * @param result
+	 * @param searchProductDTO
+	 * @param sku
+	 */
+	private void populatePriceDetail(BRDoc result, RecommendationProductDTO searchProductDTO, String sku) {
+		double lowestListPrice = result.getRegPrice();
+		if (sku.equals(vipPlus)) {
+			searchProductDTO.setLowestListPrice(vipPlusPrice);
+		} else {
+			searchProductDTO.setLowestListPrice(lowestListPrice);
+		}
+		double lowestUmapPrice = getProductLowestUmapPrice(result);
+		searchProductDTO.setLowestUmapPrice(lowestUmapPrice);
+
+		double highestUmapPrice = getProductHighestUmapPrice(result);
+		searchProductDTO.setHighestUmapPrice(highestUmapPrice);
+
+		double lowestSalePrice = getProductLowestPrice(result, BloomreachConstants.SKU_FIELD.SALE_PRICE);
+		searchProductDTO.setLowestSalePrice(lowestSalePrice);
+
+		double highestSalePrice = getProductHighestPrice(result, BloomreachConstants.SKU_FIELD.SALE_PRICE,
+				lowestListPrice);
+		searchProductDTO.setHighestSalePrice(highestSalePrice);
+
+		double lowestVIPPrice = getProductLowestPrice(result, BloomreachConstants.SKU_FIELD.VIP_PRICE);
+		if (sku.equals(vipPlus)) {
+			searchProductDTO.setLowestVIPPrice(vipPlusPrice);
+		} else {
+			searchProductDTO.setLowestVIPPrice(lowestVIPPrice);
+		}
+
+		double highestVIPPrice = getProductHighestPrice(result, BloomreachConstants.SKU_FIELD.VIP_PRICE,
+				lowestListPrice);
+		if (sku.equals(vipPlus)) {
+			searchProductDTO.setHighestVIPPrice(vipPlusPrice);
+		} else {
+			searchProductDTO.setHighestVIPPrice(highestVIPPrice);
+		}
+		if (!StringUtils.isEmpty(result.getUmapHideVip())
+				&& SearchConstants.ONE_STRING.equals(result.getUmapHideVip())) {
+			searchProductDTO.setUmapHideVIP(true);
+		} else {
+			searchProductDTO.setUmapHideVIP(false);
+		}
+		// Setting Price for each product
+		if (!promotionalProducts.contains(sku)) {
+			productPriceHelper.setProdutPrices(searchProductDTO);
+		}
+	}
+
+	private String fetchProductName(String name) {
+		for (Map.Entry<String, String> entry : brandNameMap.entrySet()) {
+			if (name.contains(entry.getKey())) {
+				name = name.replaceAll(entry.getKey(), entry.getValue());
+			}
+		}
+		return name;
+	}
+
 	public String getProductSeoUrl(String productId, boolean constructUrl, String gender, String brand, String name) {
 		String seoUrl = BloomreachConstants.EMPTY_STRING;
 		if (productLandingSeoURL.containsKey(productId)) {
@@ -340,7 +382,6 @@ public class BloomreachProductSearchResults {
 			if (null != entries.getUmapPrice()) {
 				umapPrice = entries.getUmapPrice().get(0);
 			}
-
 			if (!CollectionUtils.isEmpty(entries.getRegPrice()) && entries.getRegPrice().size() > 0
 					&& null != entries.getSkuSalePrice() && entries.getSkuSalePrice() < entries.getRegPrice().get(0)) {
 				salePrice = entries.getSkuSalePrice();

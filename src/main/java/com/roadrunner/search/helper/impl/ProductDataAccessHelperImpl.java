@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.roadrunner.search.constants.SearchConstants;
 import com.roadrunner.search.domain.BrandCategoryData;
 import com.roadrunner.search.domain.DCSPrice;
 import com.roadrunner.search.domain.DCSProductChildSkus;
@@ -26,6 +27,7 @@ import com.roadrunner.search.repo.RRSProductRatingRepository;
 import com.roadrunner.search.repo.RRSProductRepository;
 import com.roadrunner.search.repo.RRSProductWebRepository;
 import com.roadrunner.search.repo.RRSSkuRepository;
+import com.roadrunner.search.repo.RRSWidenAssetsRepository;
 import com.roadrunner.search.repo.SeoCategoryRepository;
 import com.roadrunner.search.repo.SeoContentRepository;
 
@@ -34,6 +36,9 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 public class ProductDataAccessHelperImpl implements ProductDataAccessHelper {
+
+	@Autowired
+	private RRSWidenAssetsRepository rrsWidenAssetsRepository;
 
 	@Autowired
 	private RRSCategoryMapRepository rrsCategoryMapRepository;
@@ -127,4 +132,14 @@ public class ProductDataAccessHelperImpl implements ProductDataAccessHelper {
 		return brandCategoryDataRepository.findByBrandName(brandName);
 	}
 
+	@Override
+	public String fetchEmbedId(String styleSKu) {
+		String embedId = null;
+		if (styleSKu.contains(SearchConstants.PERCENTAGE)) {
+			embedId = rrsWidenAssetsRepository.findEmbedIdByStyleSkuLike(styleSKu);
+		} else {
+			embedId = rrsWidenAssetsRepository.findEmbedIdByStyleSku(styleSKu);
+		}
+		return embedId;
+	}
 }

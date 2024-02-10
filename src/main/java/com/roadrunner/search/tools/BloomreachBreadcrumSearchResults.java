@@ -20,6 +20,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -57,6 +59,9 @@ public class BloomreachBreadcrumSearchResults {
 	private Gson gson;
 
 	@Autowired
+	private ObjectMapper objectMapper;
+
+	@Autowired
 	private ProductDataAccessHelper productDataAccessHelper;
 
 	private Map<String, String> titelOrderMap;
@@ -72,9 +77,9 @@ public class BloomreachBreadcrumSearchResults {
 	 * Retrieves breadcrumbs based on the search results, request parameters, and
 	 * Bloomreach search results.
 	 * 
-	 * @param searchResults           The search results DTO.
-	 * @param request                 The HTTP servlet request.
-	 * @param bloomreachSearchResults The Bloomreach search results DTO.
+	 * @param searchResults
+	 * @param request
+	 * @param bloomreachSearchResults
 	 */
 
 	public void getBreadCrumbs(BloomreachSearchResponseDTO searchResults, HttpServletRequest request,
@@ -130,6 +135,14 @@ public class BloomreachBreadcrumSearchResults {
 				bloomreachSearchResults);
 	}
 
+	/**
+	 * This method will construct breadcrums
+	 * 
+	 * @param queryParams
+	 * @param bloomreachSearchResults
+	 * @param qUri
+	 * @param request
+	 */
 	private void constructBreadCrums(Properties queryParams, BloomreachSearchResultsDTO bloomreachSearchResults,
 			String qUri, HttpServletRequest request) {
 		log.debug("BloomreachBreadcrumSearchResults :: constructBreadCrums() START :: queryParams={}, qUri={}",
@@ -220,17 +233,7 @@ public class BloomreachBreadcrumSearchResults {
 					bloomreachSearchResults.setTitle(title + postfixTitle);
 				}
 				if (seoRepo != null && seoRepo.getBannerContent() != null) {
-					String bannerContent = (String) seoRepo.getBannerContent();
-					List<String> breadcrums = null;
-					breadcrums = getBreadcrumList(bannerContent, breadcrums);
-					if (null != breadcrums && !breadcrums.contains(SearchConstants.GIFT_CARD_BANNER)) {
-						if (breadcrums.size() > 1) {
-							breadcrums.add(1, SearchConstants.GIFT_CARD_BANNER);
-						} else {
-							breadcrums.add(SearchConstants.GIFT_CARD_BANNER);
-						}
-					}
-					bloomreachSearchResults.setBanners(breadcrums);
+					setBanners(bloomreachSearchResults, seoRepo);
 				} else {
 					bloomreachSearchResults.setBanners(getBannersList(qUri, resultQuery));
 				}
@@ -238,15 +241,7 @@ public class BloomreachBreadcrumSearchResults {
 					bloomreachSearchResults.setSeoFooterText((String) seoRepo.getFooterContent());
 				}
 				if (seoRepo != null && seoRepo.getCanonicalUrl() != null) {
-					String canonicalUrl = (String) seoRepo.getCanonicalUrl();
-					if (null != canonicalUrl) {
-						for (String entryKey : canonicalMap.keySet()) {
-							if (canonicalUrl.contains(entryKey) && !canonicalUrl.contains(SearchConstants.EQUIPMENT)) {
-								canonicalUrl = canonicalUrl.replace(entryKey, canonicalMap.get(entryKey));
-							}
-						}
-					}
-					bloomreachSearchResults.setCanonicalUrl(canonicalUrl.toLowerCase());
+					setCanonicalUrlFromSeo(bloomreachSearchResults, seoRepo);
 				} else {
 					if (null != qUri) {
 						String finalurl = SearchConstants.EMPTY_STRING;
@@ -302,12 +297,39 @@ public class BloomreachBreadcrumSearchResults {
 
 	}
 
+	private void setBanners(BloomreachSearchResultsDTO bloomreachSearchResults, SeoContent seoRepo) {
+		String bannerContent = (String) seoRepo.getBannerContent();
+		List<String> breadcrums = null;
+		breadcrums = getBreadcrumList(bannerContent, breadcrums);
+		if (null != breadcrums && !breadcrums.contains(SearchConstants.GIFT_CARD_BANNER)) {
+			if (breadcrums.size() > 1) {
+				breadcrums.add(1, SearchConstants.GIFT_CARD_BANNER);
+			} else {
+				breadcrums.add(SearchConstants.GIFT_CARD_BANNER);
+			}
+		}
+		bloomreachSearchResults.setBanners(breadcrums);
+	}
+
+	private void setCanonicalUrlFromSeo(BloomreachSearchResultsDTO bloomreachSearchResults, SeoContent seoRepo) {
+		String canonicalUrl = (String) seoRepo.getCanonicalUrl();
+		if (null != canonicalUrl) {
+			for (String entryKey : canonicalMap.keySet()) {
+				if (canonicalUrl.contains(entryKey) && !canonicalUrl.contains(SearchConstants.EQUIPMENT)) {
+					canonicalUrl = canonicalUrl.replace(entryKey, canonicalMap.get(entryKey));
+				}
+			}
+		}
+		bloomreachSearchResults.setCanonicalUrl(canonicalUrl.toLowerCase());
+	}
+
 	private void setCustomUrl(BloomreachSearchResultsDTO bloomreachSearchResults, SeoContent seoRepo) {
 		if (seoRepo != null && seoRepo.getCustomUrl() != null) {
 			String customString = (String) seoRepo.getCustomUrl();
 			try {
-				List<BRSearchBaseDTO> customUrl = gson.fromJson(customString, new TypeToken<List<BRSearchBaseDTO>>() {
-				}.getType());
+				List<BRSearchBaseDTO> customUrl = objectMapper.readValue(customString,
+						new TypeReference<List<BRSearchBaseDTO>>() {
+						});
 				bloomreachSearchResults.setCustomUrl(customUrl);
 			} catch (Exception exception) {
 				log.error(
@@ -352,7 +374,6 @@ public class BloomreachBreadcrumSearchResults {
 
 	private List<String> getBreadcrumList(String bannerContent, List<String> breadcrums) {
 		try {
-
 			if (gson.fromJson(bannerContent, JsonElement.class).isJsonArray()) {
 				JsonArray jsonArray = gson.fromJson(bannerContent, JsonArray.class);
 				String bannerContentString = jsonArray.toString();
@@ -369,8 +390,9 @@ public class BloomreachBreadcrumSearchResults {
 
 	private void setBreadCrumFromSeo(BloomreachSearchResultsDTO bloomreachSearchResults, String breadcrumString) {
 		try {
-			List<BRSearchBaseDTO> breadcrums = gson.fromJson(breadcrumString, new TypeToken<List<BRSearchBaseDTO>>() {
-			}.getType());
+			List<BRSearchBaseDTO> breadcrums = objectMapper.readValue(breadcrumString,
+					new TypeReference<List<BRSearchBaseDTO>>() {
+					});
 			bloomreachSearchResults.setBreadcrums(breadcrums);
 		} catch (Exception exception) {
 			log.error(
@@ -401,14 +423,11 @@ public class BloomreachBreadcrumSearchResults {
 	private String getClearRefUrl(String qUri, HttpServletRequest request) {
 		log.debug("BloomreachBreadcrumSearchResults :: getClearRefUrl() START :: qUri={}", qUri);
 		int refinementActiveCount = 0;
-
 		if (qUri != null && qUri.contains(SearchConstants.SEARCH_CONTEXT_PATH)) {
 			return null;
 		}
-
 		String[] urlStrings = Optional.ofNullable(qUri).filter(s -> s != null && !s.trim().isEmpty())
 				.orElse(BloomreachConstants.EMPTY_STRING).split(SearchConstants.SLASH);
-
 		String activeCount = (String) request.getAttribute(SearchConstants.REFINMENT_ACTIVE_COUNT);
 		if (activeCount != null) {
 			refinementActiveCount = Integer.parseInt(activeCount);
@@ -491,5 +510,4 @@ public class BloomreachBreadcrumSearchResults {
 		log.debug("BloomreachBreadcrumSearchResults:: getBannersList:: END:: banners::{}", banners);
 		return banners;
 	}
-
 }

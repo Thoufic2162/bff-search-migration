@@ -66,7 +66,6 @@ public class BloomreachRefinementSearchResults {
 	private List<String> webPgcList;
 	private Map<String, String> genderTypeMap;
 	private Map<String, String> kidsTypeMap;
-	private Map<String, String> seoFilterMap = new HashMap<>();
 	private Map<String, String> refinementTitles = new HashMap<String, String>();
 
 	public void getRefinementSearchResults(BloomreachSearchResponseDTO searchResults, HttpServletRequest request,
@@ -1055,8 +1054,10 @@ public class BloomreachRefinementSearchResults {
 				}
 				if (refinementBean.getState().equals(BloomreachConstants.ACTIVE) && urlKidsType == null) {
 					StringBuffer sb = new StringBuffer(url);
-					if (null != seoFilterMap.get(navigationMap.get(pString))) {
-						int len = seoFilterMap.get(navigationMap.get(pString)).length();
+					String seoFilterData = URLCoderUtil
+							.encode(SearchConstants.COMMA + navigationMap.get(pString) + SearchConstants.COLON);
+					if (null != seoFilterData) {
+						int len = seoFilterData.length();
 						if (len > 0 && url.length() > 0 && url.length() - len >= 0) {
 							sb.delete(url.length() - len, url.length());
 						}

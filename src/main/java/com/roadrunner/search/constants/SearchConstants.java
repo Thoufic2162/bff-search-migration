@@ -212,5 +212,5 @@ public class SearchConstants {
 	public static final String WHITESPACE_REGEX = "\\s+";
 	public static final String USA_CODE = "USA";
 	public static final String EURO_CODE = "EURO";
-
+	public static final String PERCENTAGE = "%";
 }

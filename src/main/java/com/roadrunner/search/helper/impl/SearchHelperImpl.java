@@ -446,8 +446,6 @@ public class SearchHelperImpl implements SearchHelper {
 					searchQuery = URLCoderUtil.decode(searchQuery) + BloomreachConstants.URL_DELIMETER
 							+ BloomreachConstants.QPARAMS.SZ_PARAM_STR + smartZone;
 					searchQuery = URLCoderUtil.encode(searchQuery);
-				}
-				if (szb) {
 					outOfStockQuery = BloomreachConstants.URL_DELIMETER
 							.concat(BloomreachConstants.ENABLE_IN_PRODUCT_CUSTOM_SEARCH);
 				}

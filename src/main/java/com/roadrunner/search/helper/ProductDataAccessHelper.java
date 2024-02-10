@@ -38,4 +38,6 @@ public interface ProductDataAccessHelper {
 
 	BrandCategoryData getBrandCategoryData(String brandName);
 
+	String fetchEmbedId(String styleSKu);
+
 }

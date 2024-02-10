@@ -1,5 +1,7 @@
 package com.roadrunner.search.config;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -24,4 +26,5 @@ public class RRConfiguration {
 	public boolean enablePathwayRecommendation;
 	public String RRSDefaultPriceListId;
 	public String RRSSalePriceListId;
+	public List<String> nonPromotionalProducts;
 }

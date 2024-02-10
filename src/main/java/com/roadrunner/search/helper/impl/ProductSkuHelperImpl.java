@@ -246,10 +246,7 @@ public class ProductSkuHelperImpl implements ProductSkuHelper {
 	public String getSkuImage(String identifier) {
 		String imageUrlConstructed = "http://s7ondemand1.scene7.com/is/image/roadrunnersports/" + identifier
 				+ "?$productListRRS$";
-		if (!rrConfiguration.isEnableWidenImage()) {
-			return imageUrlConstructed;
-		}
-		return null;
+		return !rrConfiguration.isEnableWidenImage() ? imageUrlConstructed : null;
 	}
 
 	/**
